@@ -21,7 +21,7 @@ typedef struct {
 typedef enum { SLAVE_RX = 0, SLAVE_RX_DONE, SLAVE_TX, SLAVE_TX_DONE } i2c_slave_state_t;
 
 static rxtx_transaction_t rx_transactions = {0};
-static rxtx_transaction_t tx_transactions;
+static rxtx_transaction_t tx_transactions = {0};
 
 static volatile i2c_slave_state_t slave_state = SLAVE_RX;
 static bsp_i2c_slave_counters_t i2c_slave_counters_stats = {0};
@@ -34,9 +34,9 @@ uint8_t txBufferRead(void) {
     return tx_transactions.data[tx_transactions._BufferTail++];
 }
 
-int txBufferWrite(uint8_t* Buffer, const uint16_t length) {
+int txBufferWrite(uint8_t* buffer, const uint16_t length) {
     // if the head isn't ahead of the tail, we don't have any characters
-    memcpy(tx_transactions.data, Buffer, length);
+    memcpy(tx_transactions.data, buffer, length);
     tx_transactions._BufferHead = length;
     tx_transactions._BufferTail = 0;
     return tx_transactions._BufferHead;

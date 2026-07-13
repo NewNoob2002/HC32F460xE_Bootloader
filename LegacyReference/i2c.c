@@ -40,9 +40,9 @@ int txBufferRead(void) {
     return _txBuffer[_txBufferTail++];
 }
 
-int txBufferWrite(uint8_t* Buffer, const uint16_t length) {
+int txBufferWrite(uint8_t* buffer, const uint16_t length) {
     // if the head isn't ahead of the tail, we don't have any characters
-    memcpy(_txBuffer, Buffer, length);
+    memcpy(_txBuffer, buffer, length);
     _txBufferHead = length;
     _txBufferTail = 0;
     return _txBufferHead;
