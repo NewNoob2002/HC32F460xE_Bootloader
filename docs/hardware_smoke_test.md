@@ -1,11 +1,10 @@
 # Hardware smoke test
 
-No hardware tests were executed in this environment.
+No hardware tests have been executed yet.
 
-1. Software-reset power hold: probe PB3, reset, and Linux rail; repeat 100 times. Require no PB3 low pulse and no Linux reboot.
-2. Watchdog: blocked until polarity/pulse/device are confirmed. Then probe PA6 for idle level, active level, pulse width, 3000 ms interval, recovery feeding, and long-run reset freedom.
-3. Debug: after PSPCR `0x03`, verify PB3 GPIO control, SWD attachment, RTT output, reset reconnect, and connect-under-reset recovery.
-4. LED: blocked until polarity/topology are confirmed. Then verify all logical patterns and off-before-jump.
-5. Logging: verify compact reset/power/watchdog/LED/app/mode records and confirm disconnected-debugger boot never blocks.
-6. Application jump: verify PB3 remains asserted, PA6 remains in its documented state, PB5 is off when enabled, SysTick is disabled, and the application starts.
+1. Probe PB3, MCU reset, and the Linux power rail through at least 100 software resets. Require no power-disabling low pulse or Linux reboot.
+2. Verify PB3 GPIO operation, PA13/PA14 SWD, RTT visibility, reset reconnect, and connect-under-reset after PSPCR `0x0003`.
+3. Probe PA6: idle low, approximately 1 ms high pulses every approximately 3000 ms, no stuck-high state, and no late-poll burst. Run longer than 60 seconds and require TPL5010 RSTn inactive.
+4. Verify PB5 high turns `NET_STATE` on, low turns it off, all patterns match, and it is low before application entry.
+5. At handover verify PB3 high, PA6 low, PB5 low, then confirm the application starts and resumes DONE feeding before timeout.
 

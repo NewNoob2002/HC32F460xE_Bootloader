@@ -1,14 +1,8 @@
 # External-watchdog contract
 
-- Pin: PA6.
-- Scheduled interval: 3000 ms.
-- Device identity: UNKNOWN.
-- Idle level: UNKNOWN.
-- Active level: UNKNOWN.
-- Pulse width: UNKNOWN.
-- First-feed constraint: UNKNOWN.
+The external watchdog is a Texas Instruments TPL5010DDCT. PA6 drives its DONE input; RSTn drives MCU_RESET and WAKE is not connected to the MCU. The schematic setting is approximately 60 seconds.
 
-`LegacyReference/` contains only the pin and interval. It does not establish a TPL5010-style DONE waveform or any other polarity/pulse contract. Consequently production PA6 output configuration and feeding are gated off and initialization returns false. The generic scheduler is non-blocking, wrap-safe, deadline-based, supports force-feed, and is host-tested with injected polarity and pulse width; it must not be connected to PA6 until the missing electrical values are confirmed.
+A valid DONE event is a low-to-high transition. Boot holds PA6 low, emits a 1 ms high pulse every 3000 ms, then returns it low. The first deadline is initialization time plus 3000 ms. The 1 ms pulse exceeds the TPL5010 100 ns minimum.
 
-Later Flash erase/program loops must call `bsp_external_watchdog_force_feed()` only after the board contract is enabled. At application handover, Boot leaves PA6 unchanged and transfers ownership to the application.
+The scheduler is non-blocking and wrap-safe. Late polling emits only one pulse and advances the intended deadline into the future, avoiding catch-up bursts. Force-feed succeeds only from idle and creates a new low-to-high transition. Application preparation immediately forces PA6 low without changing it to input/analog; the application then owns DONE servicing and must feed before the remaining hardware deadline.
 

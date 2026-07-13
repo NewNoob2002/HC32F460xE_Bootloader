@@ -1,8 +1,6 @@
 # Debug-port configuration
 
-Boot writes `CM_GPIO->PSPCR = 0x03` with `WRITE_REG16`, followed by DSB/ISB, once after GPIO protection is unlocked. The DDL maps PSPCR bits as TCK=bit0, TMS=bit1, TDO=bit2, TDI=bit3, and TRST=bit4. Therefore `0x03` keeps TCK/TMS active as SWCLK/SWDIO and releases TDO/SWO, TDI, and TRST to GPIO. SWD should remain enabled by register definition, so RTT memory access should remain possible, but this has not been tested on hardware.
+`bsp_debug_port_configure_for_boot_gpio()` writes `0x0003` to `CM_GPIO->PSPCR` with `WRITE_REG16`, then executes DSB and ISB. DDL definitions map bits 0/1 to TCK/TMS, also used as PA14 SWCLK and PA13 SWDIO. Bits 2/3/4 correspond to TDO/SWO, TDI, and TRST. Therefore `0x0003` retains two-wire SWD while releasing the other JTAG/debug pins.
 
-The supplied statement that PA6 is multiplexed with JTAG conflicts with the HC32F460 pin table: PA6 has no JTAG/SWD function; PB3 is JTDO/TRACESWO. The legacy write is preserved exactly because it releases PB3 for power control while retaining the two-wire SWD pair.
-
-Hardware test warning: verify RTT and reconnect after the write before relying on logging. If normal attach fails, use connect-under-reset, halt before board initialization, restore PSPCR/debug configuration, and reflash a known-good image.
+PB3 is JTDO/TRACESWO and the safety-critical power-control GPIO. PA6 is not a conflicting debug pin. PB3 is preloaded and configured high before the PSPCR ownership configuration. SWD and RTT are expected to remain available but require physical verification. If attach fails, use connect-under-reset and reflash a known-good image.
 

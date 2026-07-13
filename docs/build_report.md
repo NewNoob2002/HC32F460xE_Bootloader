@@ -2,27 +2,33 @@
 
 Toolchain: GNU Arm Embedded GCC 14.3.1. Linker: `HC32F460xE.ld`. Application base: `0x00008000`.
 
-| Variant | Flash | Data | BSS | Stack | Total static RAM | Delta from 2132-byte baseline |
+| Variant | Flash | Data | Main BSS | Stack | Total static RAM | Change from previous stage |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Release, RTT + EasyLogger | 8072 B | 248 B | 1224 B | 2048 B | 3520 B | +5940 B |
-| Debug, RTT + EasyLogger | 8848 B | 248 B | 1224 B | 2048 B | 3520 B | +6716 B |
-| Release, logging disabled | 2952 B | 0 B | 104 B | 2048 B | 2152 B | +820 B |
+| Release, RTT + EasyLogger | 10784 B | 248 B | 1400 B | 2048 B | 3696 B | +2712 B from 8072 B |
+| Debug, RTT + EasyLogger | 12032 B | 248 B | 1400 B | 2048 B | 3696 B | n/a |
+| Release, logging disabled | 4536 B | 0 B | 104 B | 2048 B | 2152 B | +1584 B from 2952 B |
 
-The generic `size` BSS number also counts 68 bytes of non-RAM OTP allocation; the table uses main-SRAM map values. Release retains 24696 bytes within the 32 KiB Boot region. RTT/EasyLogger attribution is detailed in `logging_architecture.md`.
+Release occupies 32.91% of the 32 KiB Boot region and leaves 21984 bytes free. The generic GNU `size` BSS figure includes 68 bytes of non-RAM OTP allocation; main-BSS and total-static-RAM values above come from the linker map.
 
 Commands:
 
 ```sh
-cmake --preset Debug --fresh && cmake --build --preset Debug
-cmake --preset Release --fresh && cmake --build --preset Release
-cmake --preset ReleaseNoLog --fresh && cmake --build --preset ReleaseNoLog
-cmake --preset HostTests --fresh && cmake --build --preset HostTests
+cmake --preset gcc-release --fresh
+cmake --build --preset gcc-release
+cmake --preset Debug --fresh
+cmake --build --preset Debug
+cmake --preset ReleaseNoLog --fresh
+cmake --build --preset ReleaseNoLog
+cmake --preset HostTests --fresh
+cmake --build --preset HostTests
 ctest --preset HostTests
 ```
 
 Release SHA-256:
 
-- ELF: `022ab9e2ec274dcdf0faa9580a713b6a40f16d003d658c74cb6d12c7e3df905c`
-- HEX: `3eafb5f03a247e528594e0859edcdadc7cbc363b44514ea459c458b26fb20816`
-- BIN: `6533b9e3a36f76871356e0244265edaee24bec15e3e30c696600751c93281a0d`
-- MAP: `961dad27f5a3cb444f0880249c0123b44ea08bbbb90716e867c1ed1ec219b13b`
+- ELF: `eeecdeb015478d80019350fc961fe42e4134ae52d9e6626249a25f2496a6d68d`
+- HEX: `98c7f31bb3ef2ae3e19ac3e5af68df42eefa44c36d02e749e22cea6c419d35f9`
+- BIN: `2ecc4034824a819970e3e80e3d44f4c916b68d86eb02831a527f91921cab3a3c`
+- MAP: `6ccb52138da1f80b58a3d4b5d4d0c9cba26b28daccc1242a5b3a7b46b7e99bbc`
+
+Disassembly confirms PB3 initialization is called before the PSPCR function; PSPCR uses `strh` with `0x0003`, PA6/PB5 initialization calls `GPIO_ResetPins`, `GPIO_Init`, and latch readback, and protocol/I2C and Flash erase/program symbols are absent from the linked image.

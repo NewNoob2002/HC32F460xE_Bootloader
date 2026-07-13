@@ -1,10 +1,8 @@
 # Known limitations
 
-- The legacy watchdog and LED implementations are not present, so PA6/PB5 electrical activation is deliberately disabled.
-- External-watchdog device, idle/active levels, pulse width, and first-feed timing require schematic, source, or scope confirmation.
-- LED polarity and output topology require confirmation.
-- SWD/RTT survival after PSPCR `0x03` is supported by register definitions but not physically verified.
-- The minimal clock code observes the reset-state clock; it does not import the legacy 200 MHz PLL sequence.
-- Hardware power-hold glitch behavior is unverified despite the latch-preload sequence.
-- Protocol, I2C, Flash update, and complete OTA state logic remain disabled.
+- PB3 glitch-free behavior, PA6 waveform, PB5 polarity, SWD retention, and RTT visibility are implemented from confirmed contracts but not physically measured.
+- Debugger halts can suspend the polling scheduler long enough for the external TPL5010 to reset the MCU.
+- The application must take over DONE feeding promptly after handover.
+- Protocol/I2C processing, Flash erase/programming, OTA metadata, and the full updater remain disabled.
+- Application base remains `0x00008000`.
 

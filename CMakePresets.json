@@ -39,6 +39,11 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "BOOT_BUILD_HOST_TESTS": "ON"
             }
+        },
+        {
+            "name": "gcc-release",
+            "inherits": "Release",
+            "binaryDir": "${sourceDir}/build/gcc-release"
         }
     ],
     "buildPresets": [
@@ -57,6 +62,10 @@
         {
             "name": "HostTests",
             "configurePreset": "HostTests"
+        },
+        {
+            "name": "gcc-release",
+            "configurePreset": "gcc-release"
         }
     ],
     "testPresets": [

@@ -1,10 +1,7 @@
 #include "bsp_status_led.h"
 #include <stddef.h>
-#include "boot_config.h"
 #include "boot_timebase.h"
-
-static led_scheduler_t board_led;
-static bool board_ready;
+#include "bsp_board_config.h"
 
 static uint32_t mode_interval(boot_led_mode_t mode) {
     if (mode == BOOT_LED_MODE_UPDATE_WINDOW)
@@ -36,17 +33,41 @@ void led_scheduler_poll(led_scheduler_t* scheduler, uint32_t now_ms) {
     if ((scheduler == NULL) || (scheduler->interval_ms == 0U))
         return;
     if ((uint32_t)(now_ms - scheduler->previous_ms) >= scheduler->interval_ms) {
-        scheduler->previous_ms = now_ms;
-        scheduler->logical_on = !scheduler->logical_on;
+        uint32_t elapsed = now_ms - scheduler->previous_ms;
+        uint32_t periods = elapsed / scheduler->interval_ms;
+        scheduler->previous_ms += periods * scheduler->interval_ms;
+        if ((periods & 1U) != 0U)
+            scheduler->logical_on = !scheduler->logical_on;
         led_write(scheduler);
     }
 }
+
+#if !defined(BOOT_HOST_TEST)
+static led_scheduler_t board_led;
+static bool board_ready;
+
+static void board_gpio_write(bool level, void* context) {
+    (void)context;
+    if (level)
+        GPIO_SetPins(BOOT_STATUS_LED_PORT, BOOT_STATUS_LED_PIN);
+    else
+        GPIO_ResetPins(BOOT_STATUS_LED_PORT, BOOT_STATUS_LED_PIN);
+}
 bool bsp_status_led_init(void) {
-#if BOOT_STATUS_LED_CONTRACT_CONFIRMED
-    /* Populate only after legacy electrical polarity is supplied. */
-#endif
+    stc_gpio_init_t init;
     board_ready = false;
-    return false;
+    GPIO_ResetPins(BOOT_STATUS_LED_PORT, BOOT_STATUS_LED_PIN);
+    (void)GPIO_StructInit(&init);
+    init.u16PinState = PIN_STAT_RST;
+    init.u16PinDir = PIN_DIR_OUT;
+    init.u16PinOutputType = PIN_OUT_TYPE_CMOS;
+    if (GPIO_Init(BOOT_STATUS_LED_PORT, BOOT_STATUS_LED_PIN, &init) != LL_OK)
+        return false;
+    if (GPIO_ReadOutputPins(BOOT_STATUS_LED_PORT, BOOT_STATUS_LED_PIN) != PIN_RESET)
+        return false;
+    led_scheduler_init(&board_led, BOOT_STATUS_LED_ACTIVE_LEVEL != 0U, board_gpio_write, NULL);
+    board_ready = true;
+    return true;
 }
 void bsp_status_led_set_mode(boot_led_mode_t mode) {
     if (board_ready)
@@ -60,3 +81,7 @@ void bsp_status_led_off(void) {
     if (board_ready)
         led_scheduler_set_mode(&board_led, BOOT_LED_MODE_OFF, boot_time_ms());
 }
+bool bsp_status_led_is_ready(void) {
+    return board_ready;
+}
+#endif

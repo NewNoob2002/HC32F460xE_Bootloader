@@ -62,6 +62,10 @@ set_source_files_properties(
     Libraries/easylogger/src/elog.c Libraries/easylogger/src/elog_utils.c
     PROPERTIES COMPILE_OPTIONS "-Wno-conversion;-Wno-sign-conversion"
 )
+set_source_files_properties(
+    Drivers/hc32f4xx_ll_drivers/src/hc32_ll_pwc.c
+    PROPERTIES COMPILE_OPTIONS "-Wno-conversion"
+)
 
 target_include_directories(${BOOT_TARGET} PRIVATE
     Core/Inc App/Inc Protocol/Inc Drivers/BSP/Inc Config

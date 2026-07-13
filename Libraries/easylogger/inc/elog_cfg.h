@@ -28,39 +28,43 @@
 
 #ifndef _ELOG_CFG_H_
 #define _ELOG_CFG_H_
+
 /*---------------------------------------------------------------------------*/
 /* enable log output. */
 #define ELOG_OUTPUT_ENABLE
-/* setting static output log level. range: from ELOG_LVL_ASSERT to ELOG_LVL_VERBOSE */
-#if defined(BOOT_LOG_DEBUG_BUILD)
-#define ELOG_OUTPUT_LVL                          ELOG_LVL_DEBUG
-#else
-#define ELOG_OUTPUT_LVL                          ELOG_LVL_INFO
-#endif
+/* setting static output log level. range: from ELOG_LVL_ASSERT to
+ * ELOG_LVL_VERBOSE */
+#define ELOG_OUTPUT_LVL ELOG_LVL_INFO
+/* enable assert check */
+#define ELOG_ASSERT_ENABLE
 /* buffer size for every line's log */
-#define ELOG_LINE_BUF_SIZE                       256
+#define ELOG_LINE_BUF_SIZE          512
 /* output line number max length */
-#define ELOG_LINE_NUM_MAX_LEN                    5
+#define ELOG_LINE_NUM_MAX_LEN       20
 /* output filter's tag max length */
-#define ELOG_FILTER_TAG_MAX_LEN                  30
+#define ELOG_FILTER_TAG_MAX_LEN     16
 /* output filter's keyword max length */
-#define ELOG_FILTER_KW_MAX_LEN                   16
+#define ELOG_FILTER_KW_MAX_LEN      16
 /* output filter's tag level max num */
-#define ELOG_FILTER_TAG_LVL_MAX_NUM              5
+#define ELOG_FILTER_TAG_LVL_MAX_NUM 5
 /* output newline sign */
-#define ELOG_NEWLINE_SIGN                        "\n"
+#define ELOG_NEWLINE_SIGN           "\r\n"
 /*---------------------------------------------------------------------------*/
 /* enable log color */
+#define ELOG_COLOR_ENABLE
 /* change the some level logs to not default color if you want */
-#define ELOG_COLOR_ASSERT                        (F_MAGENTA B_NULL S_NORMAL)
-#define ELOG_COLOR_ERROR                         (F_RED B_NULL S_NORMAL)
-#define ELOG_COLOR_WARN                          (F_YELLOW B_NULL S_NORMAL)
-#define ELOG_COLOR_INFO                          (F_CYAN B_NULL S_NORMAL)
-#define ELOG_COLOR_DEBUG                         (F_GREEN B_NULL S_NORMAL)
-#define ELOG_COLOR_VERBOSE                       (F_BLUE B_NULL S_NORMAL)
+#define ELOG_COLOR_ASSERT  (F_MAGENTA B_NULL S_NORMAL)
+#define ELOG_COLOR_ERROR   (F_RED B_NULL S_NORMAL)
+#define ELOG_COLOR_WARN    (F_YELLOW B_NULL S_NORMAL)
+#define ELOG_COLOR_INFO    (F_CYAN B_NULL S_NORMAL)
+#define ELOG_COLOR_DEBUG   (F_GREEN B_NULL S_NORMAL)
+#define ELOG_COLOR_VERBOSE (F_BLUE B_NULL S_NORMAL)
 /*---------------------------------------------------------------------------*/
 /* enable log fmt */
 /* comment it if you don't want to output them at all */
+#define ELOG_FMT_USING_FUNC
+#define ELOG_FMT_USING_DIR
+#define ELOG_FMT_USING_LINE
 /*---------------------------------------------------------------------------*/
 #if defined(HC32F460)
 #else
