@@ -46,7 +46,7 @@
 #define HRC_16MHz_VALUE (16000000UL) /*!< Internal high speed RC freq. */
 #define HRC_20MHz_VALUE (20000000UL) /*!< Internal high speed RC freq. */
 /* HRC select */
-#define HRC_FREQ_MON() (*((volatile uint32_t *)(0x40010684UL)))
+#define HRC_FREQ_MON()  (*((volatile uint32_t*)(0x40010684UL)))
 
 /* Vector Table base offset field */
 #ifndef VECT_TAB_OFFSET
@@ -91,19 +91,22 @@ __NO_INIT uint32_t HRC_VALUE;
  * @param  None
  * @retval None
  */
-void SystemInit(void)
-{
-    /* FPU settings */
-#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-    SCB->CPACR |= ((3UL << 20) | (3UL << 22)); /* set CP10 and CP11 Full Access */
+void SystemInit(void) {
+#if defined(__FPU_PRESENT) && (__FPU_PRESENT == 1U)
+    SCB->CPACR |= (0xFUL << 20U);
+    __DSB();
+    __ISB();
 #endif
+
+    SCB->VTOR = VECT_TAB_OFFSET;
+    __DSB();
+    __ISB();
+
     SystemCoreClockUpdate();
+
 #if defined(ROM_EXT_QSPI)
     SystemInit_QspiMem();
-#endif /* ROM_EXT_QSPI */
-    /* Configure the Vector Table relocation */
-    SCB->VTOR = VECT_TAB_OFFSET; /* Vector Table Relocation */
-    __enable_irq();
+#endif
 }
 
 /**
@@ -111,8 +114,7 @@ void SystemInit(void)
  * @param  None
  * @retval None
  */
-void SystemCoreClockUpdate(void)
-{
+void SystemCoreClockUpdate(void) {
     uint8_t u8SysClkSrc;
     uint32_t plln;
     uint32_t pllp;
@@ -165,29 +167,28 @@ void SystemCoreClockUpdate(void)
  * @param  None
  * @retval None
  */
-__WEAKDEF void SystemInit_QspiMem(void)
-{
+__WEAKDEF void SystemInit_QspiMem(void) {
     /* QSPI configure */
     CM_GPIO->PWPR = 0xA501U;
     /* High driver */
-    CM_GPIO->PCRC7  = 0x0020U;
-    CM_GPIO->PCRC6  = 0x0020U;
-    CM_GPIO->PCRD8  = 0x0020U;
-    CM_GPIO->PCRD9  = 0x0020U;
+    CM_GPIO->PCRC7 = 0x0020U;
+    CM_GPIO->PCRC6 = 0x0020U;
+    CM_GPIO->PCRD8 = 0x0020U;
+    CM_GPIO->PCRD9 = 0x0020U;
     CM_GPIO->PCRD10 = 0x0020U;
     CM_GPIO->PCRD11 = 0x0020U;
     /* Set function */
-    CM_GPIO->PFSRC7  = 0x07U;
-    CM_GPIO->PFSRC6  = 0x07U;
-    CM_GPIO->PFSRD8  = 0x07U;
-    CM_GPIO->PFSRD9  = 0x07U;
+    CM_GPIO->PFSRC7 = 0x07U;
+    CM_GPIO->PFSRC6 = 0x07U;
+    CM_GPIO->PFSRD8 = 0x07U;
+    CM_GPIO->PFSRD9 = 0x07U;
     CM_GPIO->PFSRD10 = 0x07U;
     CM_GPIO->PFSRD11 = 0x07U;
     /* qspi configure */
     CM_PWC->FCG1 &= ~0x00000008UL;
-    CM_QSPI->CR   = 0x0002000D;
+    CM_QSPI->CR = 0x0002000D;
     CM_QSPI->CSCR = 0x00000011;
-    CM_QSPI->FCR  = 0x00008332;
+    CM_QSPI->FCR = 0x00008332;
 }
 #endif /* ROM_EXT_QSPI */
 

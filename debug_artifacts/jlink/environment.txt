@@ -1,0 +1,21 @@
+/home/gtc/Desktop/workspace/HC32_PROJ/HC32F460xE_Bootloader
+/usr/bin/JLinkExe
+/usr/bin/JLinkGDBServerCLExe
+/opt/st/stm32cubeclt_1.21.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb
+/opt/st/stm32cubeclt_1.21.0/GNU-tools-for-STM32/bin/arm-none-eabi-objdump
+/opt/st/stm32cubeclt_1.21.0/GNU-tools-for-STM32/bin/arm-none-eabi-addr2line
+SEGGER J-Link Commander V9.50 (Compiled Jun 10 2026 12:27:02)
+DLL version V9.50, compiled Jun 10 2026 12:26:20
+
+Unknown command line option -version.
+SEGGER J-Link GDB Server V9.50 Command Line Version
+
+JLinkARM.dll V9.50 (DLL compiled Jun 10 2026 12:26:20)
+
+GNU gdb (GNU Tools for STM32 14.3.rel1.20251027-0700) 15.2.90.20241229-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+unable to initialize libusb: -99
+uid=1000(gtc) gid=1000(gtc) 组=1000(gtc),65534(nogroup)

@@ -6,7 +6,6 @@ void bsp_power_hold_assert(void) {
 }
 bool bsp_power_init(void) {
     stc_gpio_init_t init;
-    GPIO_SetPins(BOOT_POWER_HOLD_PORT, BOOT_POWER_HOLD_PIN);
     (void)GPIO_StructInit(&init);
     init.u16PinState = PIN_STAT_SET;
     init.u16PinDir = PIN_DIR_OUT;

@@ -1,0 +1,6 @@
+SEGGER J-Link Commander V9.50 (Compiled Jun 10 2026 12:27:02)
+DLL version V9.50, compiled Jun 10 2026 12:26:20
+
+Connecting to J-Link ...FAILED: Cannot connect to the probe/programmer.
+Unknown command. '?' for help.
+Unknown command. '?' for help.

@@ -1,0 +1,6 @@
+connect
+halt
+regs
+mem32 0xE000ED88 1
+mem32 0xE000ED28 6
+exit

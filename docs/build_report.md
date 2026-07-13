@@ -1,5 +1,36 @@
 # Board-foundation build report
 
+## HardFault instrumentation build
+
+After adding the exception snapshot and corrected startup order:
+
+| Variant | Flash | Data | BSS reported by `size` |
+| --- | ---: | ---: | ---: |
+| Debug | 19604 B | 248 B | 5100 B |
+| Release | 16680 B | 248 B | 4332 B |
+| ReleaseNoLog | 10176 B | 0 B | 3016 B |
+
+The Debug ELF SHA-256 is
+`786ac758cead41255fa15f66af9b7d74ba56cdd60f6d54ca402c369ebd8253e3`.
+All three builds and the host tests pass.
+
+## Recovery I2C/handshake baseline
+
+| Variant | Flash | Main RAM used | Free Boot Flash |
+| --- | ---: | ---: | ---: |
+| Release | 16440 B | 4400 B | 16328 B |
+| Debug | 18208 B | 5168 B | 14560 B |
+| ReleaseNoLog | 9940 B | 2836 B | 22828 B |
+
+The transport reserves two 544-byte RX buffers and one 544-byte TX buffer. The
+streaming Parser occupies 548 bytes including state/alignment. Debug uses a
+1024-byte RTT up-buffer; Release retains 256 bytes.
+
+All variants generate ELF, HEX, BIN, and MAP files. Host CRC, Parser, codec,
+and mode tests pass. Symbol inspection confirms that I2C and Protocol modules
+are linked and no `EFM_Program`, `EFM_SectorErase`, legacy erase, or legacy
+Flash-write function is reachable.
+
 Toolchain: GNU Arm Embedded GCC 14.3.1. Linker: `HC32F460xE.ld`. Application base: `0x00008000`.
 
 | Variant | Flash | Data | Main BSS | Stack | Total static RAM | Change from previous stage |

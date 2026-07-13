@@ -1,0 +1,1559 @@
+./Tools/jlink/program_debug.jlink
+./Tools/jlink/connect_halt.jlink
+./Drivers/CMSIS/RTOS2/Source/os_tick_gtim.c:29:#include CMSIS_device_header
+./Drivers/CMSIS/RTOS2/Source/os_tick_ptim.c:26:#include CMSIS_device_header
+./Drivers/CMSIS/RTOS2/Source/os_systick.c:31:#elif !defined(CMSIS_device_header)
+./Drivers/CMSIS/RTOS2/Source/os_systick.c:32:#error "CMSIS_device_header must be defined to point to CMSIS device header"
+./Drivers/CMSIS/RTOS2/Source/os_systick.c:35:#include CMSIS_device_header
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:3: * @file  HC32F460.h
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:4: * @brief Headerfile for HC32F460 series MCU
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:25:#ifndef __HC32F460_H__
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:26:#define __HC32F460_H__
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:35:#define __MPU_PRESENT             1       /*!< HC32F460 provides MPU                                */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:36:#define __VTOR_PRESENT            1       /*!< HC32F460 supported vector table registers            */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:37:#define __NVIC_PRIO_BITS          4       /*!< HC32F460 uses 4 Bits for the Priority Levels         */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:594:    /* SWDT */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:595:    INT_SRC_SWDT_REFUDF         = 87U,      /* SWDT_REFUDF */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:815:/*                Device Specific Peripheral Registers structures             */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:2042: * @brief SWDT
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:2048:} CM_SWDT_TypeDef;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:2555:/*           Device Specific Peripheral Base Address                          */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:2607:#define CM_SWDT_BASE                         (0x40049400UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:2633:/*           Device Specific Peripheral declaration & memory map              */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:2685:#define CM_SWDT                              ((CM_SWDT_TypeDef *)CM_SWDT_BASE)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:3745:#define DBGC_MCUSTPCTL_SWDTSTP_POS                     (0U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:3746:#define DBGC_MCUSTPCTL_SWDTSTP                         (0x00000001UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5060:#define ICG_ICG0_SWDTAUTS_POS                          (0U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5061:#define ICG_ICG0_SWDTAUTS                              (0x00000001UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5062:#define ICG_ICG0_SWDTITS_POS                           (1U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5063:#define ICG_ICG0_SWDTITS                               (0x00000002UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5064:#define ICG_ICG0_SWDTPERI_POS                          (2U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5065:#define ICG_ICG0_SWDTPERI                              (0x0000000CUL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5066:#define ICG_ICG0_SWDTPERI_0                            (0x00000004UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5067:#define ICG_ICG0_SWDTPERI_1                            (0x00000008UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5068:#define ICG_ICG0_SWDTCKS_POS                           (4U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5069:#define ICG_ICG0_SWDTCKS                               (0x000000F0UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5070:#define ICG_ICG0_SWDTWDPT_POS                          (8U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5071:#define ICG_ICG0_SWDTWDPT                              (0x00000F00UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5072:#define ICG_ICG0_SWDTSLPOFF_POS                        (12U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5073:#define ICG_ICG0_SWDTSLPOFF                            (0x00001000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5147:#define INTC_NMIENR_SWDTENR_POS                        (1U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5148:#define INTC_NMIENR_SWDTENR                            (0x00000002UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5167:#define INTC_NMIFR_SWDTFR_POS                          (1U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5168:#define INTC_NMIFR_SWDTFR                              (0x00000002UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5187:#define INTC_NMICFR_SWDTCFR_POS                        (1U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5188:#define INTC_NMICFR_SWDTCFR                            (0x00000002UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5235:#define INTC_WUPEN_SWDTWUEN_POS                        (16U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5236:#define INTC_WUPEN_SWDTWUEN                            (0x00010000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5729:#define MPU_IPPR_SWDTRDP_POS                           (14U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5730:#define MPU_IPPR_SWDTRDP                               (0x00004000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5731:#define MPU_IPPR_SWDTWRP_POS                           (15U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:5732:#define MPU_IPPR_SWDTWRP                               (0x00008000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6296:#define RMU_RSTF0_SWDRF_POS                            (6U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6297:#define RMU_RSTF0_SWDRF                                (0x0040U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6902:                Bit definition for Peripheral SWDT
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6904:/*  Bit definition for SWDT_SR register  */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6905:#define SWDT_SR_CNT_POS                                (0U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6906:#define SWDT_SR_CNT                                    (0x0000FFFFUL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6907:#define SWDT_SR_UDF_POS                                (16U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6908:#define SWDT_SR_UDF                                    (0x00010000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6909:#define SWDT_SR_REF_POS                                (17U)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6910:#define SWDT_SR_REF                                    (0x00020000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6912:/*  Bit definition for SWDT_RR register  */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:6913:#define SWDT_RR_RF                                     (0x0000FFFFUL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:8752:/*             Device Specific Registers bit_band structure                   */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9023:    __IO uint32_t SWDTSTP;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9734:    __I  uint32_t SWDTAUTS;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9735:    __I  uint32_t SWDTITS;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9737:    __I  uint32_t SWDTSLPOFF;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9768:    __IO uint32_t SWDTENR;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9783:    __IO uint32_t SWDTFR;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9798:    __IO uint32_t SWDTCFR;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:9834:    __IO uint32_t SWDTWUEN;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:10101:    __IO uint32_t SWDTRDP;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:10102:    __IO uint32_t SWDTWRP;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:10189:    __IO uint32_t SWDRF;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:10511:} stc_swdt_sr_bit_t;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:11987:    stc_swdt_sr_bit_t                        SR_b;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:11988:} bCM_SWDT_TypeDef;
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:12275:/*      Device Specific Peripheral bit_band declaration & memory map          */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:12322:#define bCM_SWDT                             ((bCM_SWDT_TypeDef *)0x42928000UL)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f460.h:12351:#endif /* __HC32F460_H__ */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:3: * @file  system_hc32f460.h
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:20:#ifndef __SYSTEM_HC32F460_H__
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:21:#define __SYSTEM_HC32F460_H__
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:42: * @addtogroup HC32F460_System
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:50: * @addtogroup HC32F460_System_Global_Macros
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:55: * @addtogroup HC32F460_System_Clock_Source
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:66:#if !defined (SWDTLRC_VALUE)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:67:#define SWDTLRC_VALUE                   (10000UL)       /*!< Internal SWDT low speed RC freq. */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:94: * @addtogroup HC32F460_System_Exported_Variable
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:109: * @addtogroup HC32F460_System_Global_Functions
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/system_hc32f460.h:136:#endif /* __SYSTEM_HC32F460_H__ */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f4xx.h:33: * @brief HC32F4xx Device Include
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f4xx.h:35:#if defined(HC32F460)
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f4xx.h:36:#include "hc32f460.h"
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f4xx.h:37:#include "system_hc32f460.h"
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Include/hc32f4xx.h:39:#error "Please select first the target HC32xxxx device used in your application (in hc32xxxx.h file)"
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460xE.ddf:35:File = HC32F460.svd
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:2:<device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:3:    <name>HC32F460</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:5:    <description>HC32F460</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:5144:                            <name>SWDTSTP</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:5145:                            <description>desc SWDTSTP</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22709:                            <name>SWDTAUTS</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22710:                            <description>desc SWDTAUTS</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22716:                            <name>SWDTITS</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22717:                            <description>desc SWDTITS</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22723:                            <name>SWDTPERI</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22724:                            <description>desc SWDTPERI</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22730:                            <name>SWDTCKS</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22731:                            <description>desc SWDTCKS</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22737:                            <name>SWDTWDPT</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22738:                            <description>desc SWDTWDPT</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22744:                            <name>SWDTSLPOFF</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22745:                            <description>desc SWDTSLPOFF</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22983:                            <name>SWDTENR</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:22984:                            <description>desc SWDTENR</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:23057:                            <name>SWDTFR</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:23058:                            <description>desc SWDTFR</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:23131:                            <name>SWDTCFR</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:23132:                            <description>desc SWDTCFR</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:23717:                            <name>SWDTWUEN</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:23718:                            <description>desc SWDTWUEN</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:32764:                            <name>SWDTRDP</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:32765:                            <description>desc SWDTRDP</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:32771:                            <name>SWDTWRP</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:32772:                            <description>desc SWDTWRP</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:34800:                            <name>SWDRF</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:34801:                            <description>desc SWDRF</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:37007:            <name>SWDT</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:37008:            <description>desc SWDT</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/debugger/HC32F460.svd:51010:</device>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/startup_hc32f460.s:3:;  @file  startup_hc32f460.s
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/flashloader/FlashHC32F460.out: 匹配到二进制文件
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/IAR/flashloader/FlashHC32F460_otp.out: 匹配到二进制文件
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/ARM/sfr/HC32F460.SFR: 匹配到二进制文件
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/ARM/startup_hc32f460.s:3:;  @file  startup_hc32f460.s
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/ARM/flashloader/HC32F460_256K.FLM: 匹配到二进制文件
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/ARM/flashloader/HC32F460_RAM.FLM: 匹配到二进制文件
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/ARM/flashloader/HC32F460_512K.FLM: 匹配到二进制文件
+grep: ./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/ARM/flashloader/HC32F460_otp.FLM: 匹配到二进制文件
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S:3:;  @file  startup_hc32f460.S
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:2:<device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:3:    <name>HC32F460</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:5:    <description>HC32F460</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:5144:                            <name>SWDTSTP</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:5145:                            <description>desc SWDTSTP</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22709:                            <name>SWDTAUTS</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22710:                            <description>desc SWDTAUTS</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22716:                            <name>SWDTITS</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22717:                            <description>desc SWDTITS</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22723:                            <name>SWDTPERI</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22724:                            <description>desc SWDTPERI</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22730:                            <name>SWDTCKS</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22731:                            <description>desc SWDTCKS</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22737:                            <name>SWDTWDPT</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22738:                            <description>desc SWDTWDPT</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22744:                            <name>SWDTSLPOFF</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22745:                            <description>desc SWDTSLPOFF</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22983:                            <name>SWDTENR</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:22984:                            <description>desc SWDTENR</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:23057:                            <name>SWDTFR</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:23058:                            <description>desc SWDTFR</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:23131:                            <name>SWDTCFR</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:23132:                            <description>desc SWDTCFR</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:23717:                            <name>SWDTWUEN</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:23718:                            <description>desc SWDTWUEN</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:32764:                            <name>SWDTRDP</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:32765:                            <description>desc SWDTRDP</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:32771:                            <name>SWDTWRP</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:32772:                            <description>desc SWDTWRP</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:34800:                            <name>SWDRF</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:34801:                            <description>desc SWDRF</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:37007:            <name>SWDT</name>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:37008:            <description>desc SWDT</description>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/svd/HC32F460.svd:51010:</device>
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/linker/HC32F460xC.ld:11:/*  File        HC32F460xC.ld                                                */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/linker/HC32F460xC.ld:12:/*  Abstract    Linker script for HC32F460 Device with                       */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/linker/HC32F460xE.ld:11:/*  File        HC32F460xE.ld                                                */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/linker/HC32F460xE.ld:12:/*  Abstract    Linker script for HC32F460 Device with                       */
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c:3: * @file  system_hc32f460.c
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c:27:#include "system_hc32f460.h"
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c:35: * @addtogroup HC32F460_System
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c:43: * @defgroup HC32F460_System_Local_Macros HC32F460 System Local Macros
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c:63: * @addtogroup HC32F460_System_Global_Variable
+./Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c:84: * @addtogroup HC32F460_System_Global_Functions
+./Drivers/CMSIS/Include/core_cm3.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm3.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm3.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm3.h:138:    #warning "__CM3_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm3.h:143:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm3.h:148:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm3.h:153:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm3.h:158:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm3.h:199:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm3.h:1007:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm3.h:1008:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm3.h:1608:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm3.h:1609:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1625:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm3.h:1626:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1646:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm3.h:1647:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1663:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm3.h:1664:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1684:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm3.h:1685:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1699:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm3.h:1700:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1714:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm3.h:1715:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm3.h:1735:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm3.h:1736:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm3.h:1757:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm3.h:1758:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm3.h:1833:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm3.h:1850:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm3.h:1935:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:289:/* __ARM_FEATURE_SAT is wrong for for Armv8-M Baseline devices */
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1149:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1173:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1196:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1219:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1240:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1264:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1287:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_tiarmclang_m.h:1309:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:536:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:560:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:583:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:606:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:627:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:651:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:674:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_armclang_m.h:696:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:32:/** \brief Attribute for device memory (outer only) */
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:33:#define ARM_MPU_ATTR_DEVICE                           ( 0U )
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:47:/** \brief Device memory type non Gathering, non Re-ordering, non Early Write Acknowledgement */
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:48:#define ARM_MPU_ATTR_DEVICE_nGnRnE (0U)
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:50:/** \brief Device memory type non Gathering, non Re-ordering, Early Write Acknowledgement */
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:51:#define ARM_MPU_ATTR_DEVICE_nGnRE  (1U)
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:53:/** \brief Device memory type non Gathering, Re-ordering, Early Write Acknowledgement */
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:54:#define ARM_MPU_ATTR_DEVICE_nGRE   (2U)
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:56:/** \brief Device memory type Gathering, Re-ordering, Early Write Acknowledgement */
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:57:#define ARM_MPU_ATTR_DEVICE_GRE    (3U)
+./Drivers/CMSIS/Include/m-profile/armv8m_mpu.h:91:* \param I O == ARM_MPU_ATTR_DEVICE: Device memory attributes, else: Inner memory attributes
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:542:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:566:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:589:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:612:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:633:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:657:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:680:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_clang_m.h:702:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/armv7m_mpu.h:134:* MPU Memory Access Attribute for device memory.
+./Drivers/CMSIS/Include/m-profile/armv7m_mpu.h:140:* \param IsShareable Configures the device memory as shareable or non-shareable.
+./Drivers/CMSIS/Include/m-profile/armv7m_mpu.h:142:#define ARM_MPU_ACCESS_DEVICE(IsShareable) ((IsShareable) ? ARM_MPU_ACCESS_(0U, 1U, 0U, 1U) : ARM_MPU_ACCESS_(2U, 0U, 0U, 0U))
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:539:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:563:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:586:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:609:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:630:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:654:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:677:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/m-profile/cmsis_gcc_m.h:699:  Devices without ARMv8-M Main Extensions (i.e. Cortex-M23) lack the non-secure
+./Drivers/CMSIS/Include/core_cm0plus.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0plus.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm0plus.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm0plus.h:138:    #warning "__CM0PLUS_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0plus.h:143:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0plus.h:148:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0plus.h:153:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0plus.h:158:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0plus.h:198:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm0plus.h:753:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm0plus.h:754:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0plus.h:770:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm0plus.h:771:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0plus.h:791:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm0plus.h:792:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0plus.h:808:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm0plus.h:809:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0plus.h:829:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm0plus.h:830:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0plus.h:844:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm0plus.h:845:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0plus.h:859:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm0plus.h:860:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0plus.h:883:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm0plus.h:884:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0plus.h:959:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0plus.h:982:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0plus.h:1071:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/cmsis_armclang.h:254:/* __ARM_FEATURE_SAT is wrong for Armv8-M Baseline devices */
+./Drivers/CMSIS/Include/core_sc300.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc300.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_sc300.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_sc300.h:138:    #warning "__SC300_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc300.h:143:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc300.h:148:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc300.h:153:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc300.h:158:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc300.h:199:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_sc300.h:990:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_sc300.h:991:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_sc300.h:1591:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_sc300.h:1592:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1608:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_sc300.h:1609:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1629:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_sc300.h:1630:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1646:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_sc300.h:1647:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1667:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_sc300.h:1668:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1682:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_sc300.h:1683:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1697:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_sc300.h:1698:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc300.h:1718:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_sc300.h:1719:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc300.h:1740:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_sc300.h:1741:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc300.h:1816:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc300.h:1833:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc300.h:1918:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm1.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm1.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm1.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm1.h:138:    #warning "__CM1_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm1.h:143:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm1.h:148:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm1.h:187:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm1.h:662:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm1.h:663:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm1.h:679:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm1.h:680:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm1.h:700:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm1.h:701:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm1.h:717:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm1.h:718:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm1.h:738:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm1.h:739:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm1.h:753:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm1.h:754:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm1.h:768:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm1.h:769:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm1.h:792:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm1.h:793:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm1.h:868:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm1.h:885:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm1.h:960:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm85.h:76:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:87:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:99:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:110:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:122:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:133:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:145:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:156:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:168:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:180:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:192:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm85.h:219:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm85.h:220:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm85.h:223:    #warning "__CM85_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:228:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:234:      #warning "__FPU_DP not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:240:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:245:    #warning "__ICACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:250:    #warning "__DCACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:255:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:260:    #warning "__PMU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:266:      #warning "__PMU_NUM_EVENTCNT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:268:    #error "__PMU_NUM_EVENTCNT is out of range in device header file!" */
+./Drivers/CMSIS/Include/core_cm85.h:274:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:279:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:284:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:289:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm85.h:335:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm85.h:1172:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm85.h:1174:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_cm85.h:1292:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_cm85.h:1294:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm85.h:1695:#define ERRBNK_IEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK IEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm85.h:1696:#define ERRBNK_IEBR0_SWDEF_Msk             (0x3UL << ERRBNK_IEBR0_SWDEF_Pos)           /*!< ERRBNK IEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm85.h:1711:#define ERRBNK_IEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK IEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm85.h:1712:#define ERRBNK_IEBR1_SWDEF_Msk             (0x3UL << ERRBNK_IEBR1_SWDEF_Pos)           /*!< ERRBNK IEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm85.h:1727:#define ERRBNK_DEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK DEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm85.h:1728:#define ERRBNK_DEBR0_SWDEF_Msk             (0x3UL << ERRBNK_DEBR0_SWDEF_Pos)           /*!< ERRBNK DEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm85.h:1746:#define ERRBNK_DEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK DEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm85.h:1747:#define ERRBNK_DEBR1_SWDEF_Msk             (0x3UL << ERRBNK_DEBR1_SWDEF_Pos)           /*!< ERRBNK DEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm85.h:1765:#define ERRBNK_TEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK TEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm85.h:1766:#define ERRBNK_TEBR0_SWDEF_Msk             (0x3UL << ERRBNK_TEBR0_SWDEF_Pos)           /*!< ERRBNK TEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm85.h:1787:#define ERRBNK_TEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK TEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm85.h:1788:#define ERRBNK_TEBR1_SWDEF_Msk             (0x3UL << ERRBNK_TEBR1_SWDEF_Pos)           /*!< ERRBNK TEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm85.h:1980:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm85.h:1981:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm85.h:2174:  __IOM uint32_t DEVARCH;                           /*!< Offset: 0xFBC (R/W)  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm85.h:2176:  __IOM uint32_t DEVTYPE;                           /*!< Offset: 0xFCC (R/W)  Device Type Register */
+./Drivers/CMSIS/Include/core_cm85.h:3475:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm85.h:3477:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x01C (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_cm85.h:3505:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_cm85.h:3521:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_cm85.h:3938:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm85.h:3939:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:3955:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm85.h:3956:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:3976:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm85.h:3977:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:3993:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:3994:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4014:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm85.h:4015:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4029:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm85.h:4030:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4044:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:4045:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4066:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:4067:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4087:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:4088:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4109:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:4110:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4132:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm85.h:4133:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm85.h:4154:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm85.h:4155:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm85.h:4230:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm85.h:4247:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm85.h:4266:   * enters WARM_RST state, but another device can deny the transition preventing the
+./Drivers/CMSIS/Include/core_cm85.h:4317:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4318:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4332:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4333:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4353:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4354:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4368:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:4369:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4389:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4390:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4404:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4405:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4419:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm85.h:4420:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm85.h:4440:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4441:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm85.h:4462:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm85.h:4463:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm85.h:4549:#define ARMCM85_PMU_INT_STALL_DEV                    0xC519             /*!< Delayed exception entry due to outstanding device access */
+./Drivers/CMSIS/Include/core_cm85.h:4811:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm85.h:4839:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_starmc1.h:78:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:89:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:101:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:112:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:124:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:135:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:147:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:158:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:170:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:181:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:193:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:205:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:217:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc1.h:244:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_starmc1.h:245:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_starmc1.h:248:    #warning "__STAR_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:253:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:258:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:263:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:268:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:273:    #warning "__ICACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:278:    #warning "__DCACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:283:    #warning "__DTCM_PRESENT        not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:288:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:293:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc1.h:336:  \brief Type definitions and defines for STAR-MC1 processor based devices.
+./Drivers/CMSIS/Include/core_starmc1.h:1128:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc1.h:1272:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc1.h:1394:  __IM  uint32_t DEVARCH;        /*!< Offset: 0xFBC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_starmc1.h:1396:  __IM  uint32_t DEVTYPE;        /*!< Offset: 0xFCC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc1.h:1462:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_starmc1.h:1463:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_starmc1.h:2111:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc1.h:2112:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x010 (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_starmc1.h:2142:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_starmc1.h:2158:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_starmc1.h:2397:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_starmc1.h:2398:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2414:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_starmc1.h:2415:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2435:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_starmc1.h:2436:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2452:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2453:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2473:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_starmc1.h:2474:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2488:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_starmc1.h:2489:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2503:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2504:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2525:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2526:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2546:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2547:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2568:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2569:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2591:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_starmc1.h:2592:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc1.h:2613:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_starmc1.h:2614:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc1.h:2689:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc1.h:2706:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc1.h:2795:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2796:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2810:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2811:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2831:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2832:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2846:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2847:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2867:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2868:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2882:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2883:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2897:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc1.h:2898:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc1.h:2918:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2919:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc1.h:2940:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_starmc1.h:2941:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc1.h:3546:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_starmc1.h:3574:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/cmsis_clang.h:259:/* __ARM_FEATURE_SAT is wrong for Armv8-M Baseline devices */
+./Drivers/CMSIS/Include/core_cm35p.h:77:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:88:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:100:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:111:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:123:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:134:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:146:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:157:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:169:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:180:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:192:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:204:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:216:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm35p.h:243:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm35p.h:244:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm35p.h:247:    #warning "__CM35P_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:252:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:257:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:262:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:267:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:272:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:277:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:282:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm35p.h:325:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm35p.h:1068:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1070:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1172:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1174:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1308:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1309:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1960:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1961:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x010 (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_cm35p.h:1991:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_cm35p.h:2007:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_cm35p.h:2367:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm35p.h:2368:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2384:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm35p.h:2385:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2405:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm35p.h:2406:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2422:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2423:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2443:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm35p.h:2444:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2458:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm35p.h:2459:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2473:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2474:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2495:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2496:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2516:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2517:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2538:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2539:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2561:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm35p.h:2562:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm35p.h:2583:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm35p.h:2584:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm35p.h:2659:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm35p.h:2676:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm35p.h:2744:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2745:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2759:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2760:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2780:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2781:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2795:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2796:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2816:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2817:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2831:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2832:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2846:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm35p.h:2847:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm35p.h:2867:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2868:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm35p.h:2889:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm35p.h:2890:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm35p.h:3118:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm35p.h:3146:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_sc000.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_sc000.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_sc000.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_sc000.h:138:    #warning "__SC000_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc000.h:143:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc000.h:148:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc000.h:153:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc000.h:158:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_sc000.h:198:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_sc000.h:768:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_sc000.h:769:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc000.h:785:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_sc000.h:786:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc000.h:806:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_sc000.h:807:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc000.h:823:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_sc000.h:824:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc000.h:844:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_sc000.h:845:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc000.h:859:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_sc000.h:860:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_sc000.h:874:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_sc000.h:875:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc000.h:898:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_sc000.h:899:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc000.h:922:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc000.h:939:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_sc000.h:1023:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm23.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm23.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm23.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm23.h:138:    #warning "__CM23_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:143:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:148:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:153:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:158:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:163:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:168:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:173:    #warning "__ETM_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:178:    #warning "__MTB_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm23.h:221:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm23.h:629:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_cm23.h:701:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm23.h:702:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm23.h:1136:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm23.h:1137:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x010 (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_cm23.h:1167:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_cm23.h:1183:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_cm23.h:1476:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm23.h:1477:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1493:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm23.h:1494:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1514:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm23.h:1515:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1531:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1532:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1552:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm23.h:1553:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1567:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm23.h:1568:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1582:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1583:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1604:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1605:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1625:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1626:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1647:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1648:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1670:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm23.h:1671:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm23.h:1694:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm23.h:1695:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm23.h:1770:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm23.h:1792:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm23.h:1829:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1830:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1844:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1845:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1865:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1866:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1880:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1881:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1901:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1902:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1916:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1917:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1931:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm23.h:1932:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm23.h:1952:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1953:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm23.h:1976:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm23.h:1977:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm23.h:2191:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm23.h:2219:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/cmsis_iccarm.h:272:/* __ARM_FEATURE_SAT is wrong for Armv8-M Baseline devices */
+./Drivers/CMSIS/Include/core_starmc3.h:76:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:87:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:99:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:110:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:122:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:133:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:145:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:156:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:168:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:180:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:192:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_starmc3.h:219:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_starmc3.h:220:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_starmc3.h:223:    #warning "__STARMC3_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:228:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:234:      #warning "__FPU_DP not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:240:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:245:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:250:    #warning "__PMU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:256:      #warning "__PMU_NUM_EVENTCNT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:258:    #error "__PMU_NUM_EVENTCNT is out of range in device header file!" */
+./Drivers/CMSIS/Include/core_starmc3.h:264:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:269:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:274:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:279:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_starmc3.h:325:  \brief Type definitions and defines for STAR-MC3 processor based devices.
+./Drivers/CMSIS/Include/core_starmc3.h:1097:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1099:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1217:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1219:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1528:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1529:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1722:  __IOM uint32_t DEVARCH;                           /*!< Offset: 0xFBC (R/W)  Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc3.h:1724:  __IOM uint32_t DEVTYPE;                           /*!< Offset: 0xFCC (R/W)  Device Type Register */
+./Drivers/CMSIS/Include/core_starmc3.h:3023:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_starmc3.h:3025:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x01C (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_starmc3.h:3053:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_starmc3.h:3069:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_starmc3.h:3317:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_starmc3.h:3318:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3334:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_starmc3.h:3335:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3355:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_starmc3.h:3356:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3372:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3373:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3393:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_starmc3.h:3394:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3408:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_starmc3.h:3409:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3423:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3424:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3445:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3446:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3466:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3467:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3488:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3489:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3511:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_starmc3.h:3512:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc3.h:3533:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_starmc3.h:3534:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc3.h:3609:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc3.h:3626:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc3.h:3694:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3695:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3709:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3710:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3730:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3731:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3745:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3746:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3766:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3767:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3781:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3782:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3796:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_starmc3.h:3797:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_starmc3.h:3817:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3818:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc3.h:3839:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_starmc3.h:3840:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_starmc3.h:4142:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_starmc3.h:4170:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm7.h:77:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:89:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:101:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:113:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:125:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:137:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:149:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:161:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm7.h:188:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm7.h:189:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm7.h:192:    #warning "__CM7_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:197:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:202:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:207:    #warning "__ICACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:212:    #warning "__DCACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:217:    #warning "__DTCM_PRESENT        not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:222:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:227:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:232:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm7.h:274:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm7.h:1294:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm7.h:1295:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm7.h:2132:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm7.h:2133:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2149:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm7.h:2150:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2170:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm7.h:2171:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2187:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm7.h:2188:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2208:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm7.h:2209:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2223:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm7.h:2224:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2238:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm7.h:2239:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm7.h:2259:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm7.h:2260:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm7.h:2281:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm7.h:2282:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm7.h:2357:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm7.h:2374:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm7.h:2481:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm33.h:77:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:88:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:100:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:111:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:123:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:134:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:146:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:157:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:169:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:180:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:192:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:204:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:216:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm33.h:243:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm33.h:244:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm33.h:247:    #warning "__CM33_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:252:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:257:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:262:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:267:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:272:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:277:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:282:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm33.h:325:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm33.h:1068:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm33.h:1070:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_cm33.h:1172:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_cm33.h:1174:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm33.h:1308:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm33.h:1309:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm33.h:1960:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm33.h:1961:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x010 (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_cm33.h:1991:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_cm33.h:2007:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_cm33.h:2367:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm33.h:2368:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2384:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm33.h:2385:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2405:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm33.h:2406:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2422:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2423:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2443:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm33.h:2444:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2458:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm33.h:2459:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2473:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2474:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2495:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2496:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2516:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2517:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2538:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2539:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2561:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm33.h:2562:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm33.h:2583:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm33.h:2584:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm33.h:2659:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm33.h:2676:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm33.h:2744:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2745:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2759:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2760:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2780:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2781:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2795:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2796:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2816:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2817:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2831:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2832:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2846:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm33.h:2847:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm33.h:2867:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2868:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm33.h:2889:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm33.h:2890:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm33.h:3118:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm33.h:3146:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm4.h:77:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:89:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:101:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:113:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:125:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:137:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:149:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:161:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm4.h:188:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm4.h:189:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm4.h:192:    #warning "__CM4_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm4.h:197:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm4.h:202:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm4.h:207:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm4.h:212:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm4.h:217:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm4.h:259:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm4.h:1072:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm4.h:1073:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm4.h:1790:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm4.h:1791:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1807:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm4.h:1808:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1828:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm4.h:1829:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1845:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm4.h:1846:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1866:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm4.h:1867:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1881:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm4.h:1882:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1896:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm4.h:1897:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm4.h:1917:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm4.h:1918:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm4.h:1939:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm4.h:1940:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm4.h:2015:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm4.h:2032:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm4.h:2127:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm55.h:76:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:87:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:99:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:110:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:122:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:133:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:145:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:156:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:168:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:180:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:192:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm55.h:219:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm55.h:220:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm55.h:223:    #warning "__CM55_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:228:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:234:      #warning "__FPU_DP not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:240:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:245:    #warning "__ICACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:250:    #warning "__DCACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:255:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:260:    #warning "__PMU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:266:      #warning "__PMU_NUM_EVENTCNT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:268:    #error "__PMU_NUM_EVENTCNT is out of range in device header file!" */
+./Drivers/CMSIS/Include/core_cm55.h:274:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:279:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:284:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:289:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm55.h:335:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm55.h:1172:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm55.h:1174:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_cm55.h:1292:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_cm55.h:1294:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm55.h:1701:#define ERRBNK_IEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK IEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm55.h:1702:#define ERRBNK_IEBR0_SWDEF_Msk             (0x3UL << ERRBNK_IEBR0_SWDEF_Pos)           /*!< ERRBNK IEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm55.h:1717:#define ERRBNK_IEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK IEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm55.h:1718:#define ERRBNK_IEBR1_SWDEF_Msk             (0x3UL << ERRBNK_IEBR1_SWDEF_Pos)           /*!< ERRBNK IEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm55.h:1733:#define ERRBNK_DEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK DEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm55.h:1734:#define ERRBNK_DEBR0_SWDEF_Msk             (0x3UL << ERRBNK_DEBR0_SWDEF_Pos)           /*!< ERRBNK DEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm55.h:1752:#define ERRBNK_DEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK DEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm55.h:1753:#define ERRBNK_DEBR1_SWDEF_Msk             (0x3UL << ERRBNK_DEBR1_SWDEF_Pos)           /*!< ERRBNK DEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm55.h:1771:#define ERRBNK_TEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK TEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm55.h:1772:#define ERRBNK_TEBR0_SWDEF_Msk             (0x3UL << ERRBNK_TEBR0_SWDEF_Pos)           /*!< ERRBNK TEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm55.h:1793:#define ERRBNK_TEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK TEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm55.h:1794:#define ERRBNK_TEBR1_SWDEF_Msk             (0x3UL << ERRBNK_TEBR1_SWDEF_Pos)           /*!< ERRBNK TEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm55.h:1956:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm55.h:1957:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm55.h:2150:  __IOM uint32_t DEVARCH;                           /*!< Offset: 0xFBC (R/W)  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm55.h:2152:  __IOM uint32_t DEVTYPE;                           /*!< Offset: 0xFCC (R/W)  Device Type Register */
+./Drivers/CMSIS/Include/core_cm55.h:3451:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm55.h:3453:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x01C (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_cm55.h:3481:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_cm55.h:3497:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_cm55.h:3914:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm55.h:3915:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:3931:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm55.h:3932:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:3952:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm55.h:3953:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:3969:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:3970:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:3990:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm55.h:3991:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4005:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm55.h:4006:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4020:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:4021:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4042:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:4043:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4063:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:4064:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4085:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:4086:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4108:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm55.h:4109:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm55.h:4130:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm55.h:4131:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm55.h:4206:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm55.h:4223:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm55.h:4242:   * enters WARM_RST state, but another device can deny the transition preventing the
+./Drivers/CMSIS/Include/core_cm55.h:4293:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4294:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4308:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4309:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4329:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4330:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4344:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:4345:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4365:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4366:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4380:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4381:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4395:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm55.h:4396:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm55.h:4416:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4417:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm55.h:4438:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm55.h:4439:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm55.h:4770:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm55.h:4798:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm52.h:76:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:87:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:99:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:110:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:122:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:133:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:145:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:156:      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:168:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:180:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:192:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm52.h:219:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm52.h:220:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm52.h:223:    #warning "__CM52_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:228:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:234:      #warning "__FPU_DP not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:240:    #warning "__MPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:245:    #warning "__ICACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:250:    #warning "__DCACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:255:    #warning "__UCACHE_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:260:    #warning "__VTOR_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:265:    #warning "__PMU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:271:      #warning "__PMU_NUM_EVENTCNT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:273:    #error "__PMU_NUM_EVENTCNT is out of range in device header file!" */
+./Drivers/CMSIS/Include/core_cm52.h:279:    #warning "__SAUREGION_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:284:    #warning "__DSP_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:289:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:294:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm52.h:340:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm52.h:1224:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm52.h:1226:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Register */
+./Drivers/CMSIS/Include/core_cm52.h:1344:  __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  Device Type Architecture Register */
+./Drivers/CMSIS/Include/core_cm52.h:1346:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm52.h:1759:#define ERRBNK_IEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK IEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm52.h:1760:#define ERRBNK_IEBR0_SWDEF_Msk             (0x3UL << ERRBNK_IEBR0_SWDEF_Pos)           /*!< ERRBNK IEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm52.h:1775:#define ERRBNK_IEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK IEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm52.h:1776:#define ERRBNK_IEBR1_SWDEF_Msk             (0x3UL << ERRBNK_IEBR1_SWDEF_Pos)           /*!< ERRBNK IEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm52.h:1791:#define ERRBNK_DEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK DEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm52.h:1792:#define ERRBNK_DEBR0_SWDEF_Msk             (0x3UL << ERRBNK_DEBR0_SWDEF_Pos)           /*!< ERRBNK DEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm52.h:1810:#define ERRBNK_DEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK DEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm52.h:1811:#define ERRBNK_DEBR1_SWDEF_Msk             (0x3UL << ERRBNK_DEBR1_SWDEF_Pos)           /*!< ERRBNK DEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm52.h:1829:#define ERRBNK_TEBR0_SWDEF_Pos             30U                                         /*!< ERRBNK TEBR0: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm52.h:1830:#define ERRBNK_TEBR0_SWDEF_Msk             (0x3UL << ERRBNK_TEBR0_SWDEF_Pos)           /*!< ERRBNK TEBR0: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm52.h:1851:#define ERRBNK_TEBR1_SWDEF_Pos             30U                                         /*!< ERRBNK TEBR1: SWDEF Position */
+./Drivers/CMSIS/Include/core_cm52.h:1852:#define ERRBNK_TEBR1_SWDEF_Msk             (0x3UL << ERRBNK_TEBR1_SWDEF_Pos)           /*!< ERRBNK TEBR1: SWDEF Mask */
+./Drivers/CMSIS/Include/core_cm52.h:2006:  __IM  uint32_t DEVID;                  /*!< Offset: 0xFC8 (R/ )  Device Configuration Register */
+./Drivers/CMSIS/Include/core_cm52.h:2007:  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  Device Type Identifier Register */
+./Drivers/CMSIS/Include/core_cm52.h:2200:  __IOM uint32_t DEVARCH;                           /*!< Offset: 0xFBC (R/W)  Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm52.h:2202:  __IOM uint32_t DEVTYPE;                           /*!< Offset: 0xFCC (R/W)  Device Type Register */
+./Drivers/CMSIS/Include/core_cm52.h:3501:  __IM  uint32_t DDEVARCH;               /*!< Offset: 0x00C (R/ )  SCS Device Architecture Register */
+./Drivers/CMSIS/Include/core_cm52.h:3503:  __IM  uint32_t DDEVTYPE;               /*!< Offset: 0x01C (R/ )  SCS Device Type Register */
+./Drivers/CMSIS/Include/core_cm52.h:3531:/** \brief DIB SCS Device Architecture Register Definitions */
+./Drivers/CMSIS/Include/core_cm52.h:3547:/** \brief DIB SCS Device Type Register Definitions */
+./Drivers/CMSIS/Include/core_cm52.h:3801:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm52.h:3802:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3818:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm52.h:3819:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3839:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm52.h:3840:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3856:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:3857:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3877:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm52.h:3878:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3892:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm52.h:3893:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3907:  \details Reads the active register in the NVIC and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:3908:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3929:  \details Reads the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:3930:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3950:  \details Sets the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:3951:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3972:  \details Clears the interrupt target field in the NVIC and returns the interrupt target bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:3973:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:3995:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm52.h:3996:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm52.h:4017:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm52.h:4018:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm52.h:4093:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm52.h:4110:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm52.h:4129:   * enters WARM_RST state, but another device can deny the transition preventing the
+./Drivers/CMSIS/Include/core_cm52.h:4180:  \details Enables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4181:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4195:  \details Returns a device specific interrupt enable status from the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4196:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4216:  \details Disables a device specific interrupt in the non-secure NVIC interrupt controller when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4217:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4231:  \details Reads the NVIC pending register in the non-secure NVIC when in secure state and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:4232:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4252:  \details Sets the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4253:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4267:  \details Clears the pending bit of a device specific interrupt in the non-secure NVIC pending register when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4268:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4282:  \details Reads the active register in non-secure NVIC when in secure state and returns the active bit for the device specific interrupt.
+./Drivers/CMSIS/Include/core_cm52.h:4283:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm52.h:4303:  \details Sets the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4304:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm52.h:4325:  \details Reads the priority of a non-secure device specific interrupt or a non-secure processor exception when in secure state.
+./Drivers/CMSIS/Include/core_cm52.h:4326:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm52.h:4653:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_cm52.h:4681:           function <b>TZ_SysTick_Config_NS</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/CMSIS/Include/core_ca.h:49:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_ca.h:61:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_ca.h:73:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_ca.h:85:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_ca.h:97:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_ca.h:109:      #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_ca.h:140: /* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_ca.h:141:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_ca.h:143:    #define __CA_REV              0x0000U /*!< \brief Contains the core revision for a Cortex-A class device */
+./Drivers/CMSIS/Include/core_ca.h:144:    #warning "__CA_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_ca.h:149:    #warning "__FPU_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_ca.h:154:    #warning "__GIC_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_ca.h:159:    #warning "__TIM_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_ca.h:164:    #warning "__L2C_PRESENT not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_ca.h:2176:   DEVICE,
+./Drivers/CMSIS/Include/core_ca.h:2177:   SHARED_DEVICE,
+./Drivers/CMSIS/Include/core_ca.h:2178:   NON_SHARED_DEVICE,
+./Drivers/CMSIS/Include/core_ca.h:2341://Sect_Device_RO. Device, non-shareable, non-executable, ro, domain 0, base addr 0
+./Drivers/CMSIS/Include/core_ca.h:2342:#define section_device_ro(descriptor_l1, region) region.rg_t = SECTION; \
+./Drivers/CMSIS/Include/core_ca.h:2356://Sect_Device_RW. Sect_Device_RO, but writeable
+./Drivers/CMSIS/Include/core_ca.h:2357:#define section_device_rw(descriptor_l1, region) region.rg_t = SECTION; \
+./Drivers/CMSIS/Include/core_ca.h:2370://Page_4k_Device_RW.  Shared device, not executable, rw, domain 0
+./Drivers/CMSIS/Include/core_ca.h:2371:#define page4k_device_rw(descriptor_l1, descriptor_l2, region) region.rg_t = PAGE_4k; \
+./Drivers/CMSIS/Include/core_ca.h:2377:                                   region.mem_t = SHARED_DEVICE; \
+./Drivers/CMSIS/Include/core_ca.h:2385://Page_64k_Device_RW.  Shared device, not executable, rw, domain 0
+./Drivers/CMSIS/Include/core_ca.h:2386:#define page64k_device_rw(descriptor_l1, descriptor_l2, region)  region.rg_t = PAGE_64k; \
+./Drivers/CMSIS/Include/core_ca.h:2392:                                   region.mem_t = SHARED_DEVICE; \
+./Drivers/CMSIS/Include/core_ca.h:2653:  \param [in]               mem  Section memory type: NORMAL, DEVICE, SHARED_DEVICE, NON_SHARED_DEVICE, STRONGLY_ORDERED
+./Drivers/CMSIS/Include/core_ca.h:2667:  else if (SHARED_DEVICE == mem)
+./Drivers/CMSIS/Include/core_ca.h:2671:  else if (NON_SHARED_DEVICE == mem)
+./Drivers/CMSIS/Include/core_ca.h:2713:  \param [in]               mem  4k/64k page memory type: NORMAL, DEVICE, SHARED_DEVICE, NON_SHARED_DEVICE, STRONGLY_ORDERED
+./Drivers/CMSIS/Include/core_ca.h:2735:    else if (SHARED_DEVICE == mem)
+./Drivers/CMSIS/Include/core_ca.h:2739:    else if (NON_SHARED_DEVICE == mem)
+./Drivers/CMSIS/Include/core_cm0.h:76:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:81:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:86:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:91:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:96:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:101:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:106:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:111:    #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+./Drivers/CMSIS/Include/core_cm0.h:134:/* check device defines and use defaults */
+./Drivers/CMSIS/Include/core_cm0.h:135:#if defined __CHECK_DEVICE_DEFINES
+./Drivers/CMSIS/Include/core_cm0.h:138:    #warning "__CM0_REV not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0.h:143:    #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0.h:148:    #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+./Drivers/CMSIS/Include/core_cm0.h:187:  \brief Type definitions and defines for Cortex-M processor based devices.
+./Drivers/CMSIS/Include/core_cm0.h:635:  \details Enables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm0.h:636:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0.h:652:  \details Returns a device specific interrupt enable status from the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm0.h:653:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0.h:673:  \details Disables a device specific interrupt in the NVIC interrupt controller.
+./Drivers/CMSIS/Include/core_cm0.h:674:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0.h:690:  \details Reads the NVIC pending register and returns the pending bit for the specified device specific interrupt.
+./Drivers/CMSIS/Include/core_cm0.h:691:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0.h:711:  \details Sets the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm0.h:712:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0.h:726:  \details Clears the pending bit of a device specific interrupt in the NVIC pending register.
+./Drivers/CMSIS/Include/core_cm0.h:727:  \param [in]      IRQn  Device specific interrupt number.
+./Drivers/CMSIS/Include/core_cm0.h:741:  \details Sets the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm0.h:742:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0.h:765:  \details Reads the priority of a device specific interrupt or a processor exception.
+./Drivers/CMSIS/Include/core_cm0.h:766:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0.h:841:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0.h:858:           The interrupt number can be positive to specify a device specific interrupt,
+./Drivers/CMSIS/Include/core_cm0.h:935:           function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_pwc.c:129:     || ((x) == INT_SRC_LVD2) || ((x) == INT_SRC_SWDT_REFUDF) || ((x) == INT_SRC_PORT_EIRQ0)                           \
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_pwc.c:478:                case INT_SRC_SWDT_REFUDF:
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_pwc.c:479:                    if (0UL == bCM_INTC->WUPEN_b.SWDTWUEN) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sdioc.c:496: * @param  [out] pu16RCA                Pointer to a value of device RCA
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sdioc.c:920: * @brief  Get device insert status.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sdioc.c:1023: *           @arg SDIOC_CARD_DETECT_TEST_LVL_LOW:   Card identification test signal is low level (with device insertion)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sdioc.c:1024: *           @arg SDIOC_CARD_DETECT_TEST_LVL_HIGH:  Card identification test signal is high level (no device insertion)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sdioc.c:1655: *           @arg SDIOC_HOST_FLAG_CSS:      Device Stable flag
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sdioc.c:1656: *           @arg SDIOC_HOST_FLAG_CIN:      Device Inserted flag
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:71:static void* m_pvPrintDevice = NULL;
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:90: * @brief  Set print device.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:91: * @param  [in] pvPrintDevice           Pointer to print device
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:94:__STATIC_INLINE void LL_SetPrintDevice(void* pvPrintDevice) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:95:    m_pvPrintDevice = pvPrintDevice;
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:99: * @brief  Get print device.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:101: * @retval Pointer to print device
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:103:__STATIC_INLINE void* LL_GetPrintDevice(void) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:104:    return m_pvPrintDevice;
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:344: * @param  [in] vpDevice                Pointer to print device
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:345: * @param  [in] u32Param                Print device parameter
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:346: * @param  [in] pfnPreinit              The function pointer for initializing clock, port, print device etc.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:352:int32_t LL_PrintfInit(void* vpDevice, uint32_t u32Param, int32_t (*pfnPreinit)(void* vpDevice, uint32_t u32Param)) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:356:        i32Ret = pfnPreinit(vpDevice, u32Param); /* The callback function initialize clock, port, print device etc */
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:358:            LL_SetPrintDevice(vpDevice);
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:375: *           - LL_ERR_INVD_PARAM:       The print device is invalid.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_utility.c:382:    CM_USART_TypeDef* USARTx = (CM_USART_TypeDef*)LL_GetPrintDevice();
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:3: * @file  hc32_ll_swdt.c
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:5: *        Dog Timer(SWDT).
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:10:   2023-09-30       CDT             Optimize SWDT_ClearStatus function timeout
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:11:   2024-06-30       CDT             Modify API SWDT_ClearStatus() for couping risk
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:27:#include "hc32_ll_swdt.h"
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:36: * @defgroup LL_SWDT SWDT
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:41:#if (LL_SWDT_ENABLE == DDL_ON)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:51: * @defgroup SWDT_Local_Macros SWDT Local Macros
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:55:/* SWDT Refresh Key */
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:56:#define SWDT_REFRESH_KEY_START          (0x0123UL)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:57:#define SWDT_REFRESH_KEY_END            (0x3210UL)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:59:/* SWDT clear flag timeout(ms) */
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:60:#define SWDT_CLR_FLAG_TIMEOUT           (400UL)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:63: * @defgroup SWDT_Check_Parameters_Validity SWDT Check Parameters Validity
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:67:#define IS_SWDT_FLAG(x)                                                        \
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:69:    (((x) | SWDT_FLAG_ALL) == SWDT_FLAG_ALL))
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:95: * @defgroup SWDT_Global_Functions SWDT Global Functions
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:100: * @brief  SWDT feed dog.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:105:void SWDT_FeedDog(void)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:107:    WRITE_REG32(CM_SWDT->RR, SWDT_REFRESH_KEY_START);
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:108:    WRITE_REG32(CM_SWDT->RR, SWDT_REFRESH_KEY_END);
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:112: * @brief  Get SWDT flag status.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:113: * @param  [in] u32Flag                 SWDT flag type
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:115: *           @arg SWDT_FLAG_UDF:        Count underflow flag
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:116: *           @arg SWDT_FLAG_REFRESH:    Refresh error flag
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:117: *           @arg SWDT_FLAG_ALL:        All of the above
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:120:en_flag_status_t SWDT_GetStatus(uint32_t u32Flag)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:125:    DDL_ASSERT(IS_SWDT_FLAG(u32Flag));
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:127:    if (0UL != (READ_REG32_BIT(CM_SWDT->SR, u32Flag))) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:135: * @brief  Clear SWDT flag.
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:136: * @param  [in] u32Flag                 SWDT flag type
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:138: *           @arg SWDT_FLAG_UDF:        Count underflow flag
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:139: *           @arg SWDT_FLAG_REFRESH:    Refresh error flag
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:140: *           @arg SWDT_FLAG_ALL:        All of the above
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:145:int32_t SWDT_ClearStatus(uint32_t u32Flag)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:151:    DDL_ASSERT(IS_SWDT_FLAG(u32Flag));
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:154:    u32Count = SWDT_CLR_FLAG_TIMEOUT * (HCLK_VALUE / 25000UL);
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:155:    while (0UL != READ_REG32_BIT(CM_SWDT->SR, u32Flag)) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:156:        MODIFY_REG32(CM_SWDT->SR, SWDT_FLAG_ALL, ~u32Flag);
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_swdt.c:171:#endif /* LL_SWDT_ENABLE */
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_gpio.c:349: *   @arg  ENABLE: set to debug port (SWD/JTAG)
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:3: * @file  hc32f460_ll_interrupts_share.c
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:30:#include "hc32f460_ll_interrupts_share.h"
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:39: * @defgroup LL_HC32F460_SHARE_INTERRUPTS SHARE_INTERRUPTS
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:453:    /* SWDT */
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:454:    if ((0UL != (CM_SWDT->SR & (BIT_MASK_16 | BIT_MASK_17))) && (0UL != (VSSEL130 & BIT_MASK_23))) {
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:455:        SWDT_IrqHandler();
+./Drivers/hc32f4xx_ll_drivers/src/hc32f460_ll_interrupts_share.c:1743:__WEAKDEF void SWDT_IrqHandler(void)
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_mpu.c:875: *           @arg MPU_IP_SWDT:          SWDT module
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_mpu.c:911: *           @arg MPU_IP_SWDT:          SWDT module
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_fcm.c:76:     || ((x) == FCM_TARGET_CLK_LRC) || ((x) == FCM_TARGET_CLK_SWDTLRC) || ((x) == FCM_TARGET_CLK_PCLK1)                \
+./Drivers/hc32f4xx_ll_drivers/src/hc32_ll_fcm.c:81:     || ((x) == FCM_REF_CLK_HRC) || ((x) == FCM_REF_CLK_LRC) || ((x) == FCM_REF_CLK_SWDTLRC)                           \
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:3: * @file  hc32_ll_swdt.h
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:4: * @brief This file contains all the functions prototypes of the SWDT driver
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:21:#ifndef __HC32_LL_SWDT_H__
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:22:#define __HC32_LL_SWDT_H__
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:44: * @addtogroup LL_SWDT
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:48:#if (LL_SWDT_ENABLE == DDL_ON)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:58: * @defgroup SWDT_Global_Macros SWDT Global Macros
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:63: * @defgroup SWDT_Flag SWDT Flag
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:66:#define SWDT_FLAG_UDF                           (SWDT_SR_UDF)   /*!< Count underflow flag */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:67:#define SWDT_FLAG_REFRESH                       (SWDT_SR_REF)   /*!< Refresh error flag   */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:68:#define SWDT_FLAG_ALL                           (SWDT_SR_UDF | SWDT_SR_REF)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:85: * @addtogroup SWDT_Global_Functions
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:90: * @brief  Get SWDT count value.
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:94:__STATIC_INLINE uint16_t SWDT_GetCountValue(void)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:96:    return (uint16_t)(READ_REG32(CM_SWDT->SR) & SWDT_SR_CNT);
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:100:void SWDT_FeedDog(void);
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:101:uint16_t SWDT_GetCountValue(void);
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:104:en_flag_status_t SWDT_GetStatus(uint32_t u32Flag);
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:105:int32_t SWDT_ClearStatus(uint32_t u32Flag);
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:111:#endif /* LL_SWDT_ENABLE */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_swdt.h:125:#endif /* __HC32_LL_SWDT_H__ */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_mpu.h:291:#define MPU_IP_SWDT                             (MPU_IPPR_SWDTRDP)      /*!< SWDT module                             */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_mpu.h:300:                                                 MPU_IP_EFM | MPU_IP_WDT  | MPU_IP_SWDT  | MPU_IP_BKSRAM | \
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_interrupts.h:129:#define NMI_SRC_SWDT                    (INTC_NMIFR_SWDTFR)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_interrupts.h:137:#define NMI_SRC_ALL                     (NMI_SRC_PIN        | NMI_SRC_SWDT  | NMI_SRC_LVD1      |   \
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_interrupts.h:385:#define INTC_STOP_WKUP_SWDT             INTC_WUPEN_SWDTWUEN
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_interrupts.h:394:#define INTC_WUPEN_ALL                  (INTC_WUPEN_EIRQWUEN    | INTC_WUPEN_SWDTWUEN           |           \
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_sdioc.h:181:#define SDIOC_CARD_DETECT_TEST_LVL_LOW          (0x00U)                 /*!< Card identification test signal is low level (with device insertion) */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_sdioc.h:182:#define SDIOC_CARD_DETECT_TEST_LVL_HIGH         (SDIOC_HOSTCON_CDTL)    /*!< Card identification test signal is high level (no device insertion)  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_sdioc.h:350:#define SDIOC_HOST_FLAG_CSS                     (SDIOC_PSTAT_CSS)     /*!< Device Stable Status             */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_sdioc.h:351:#define SDIOC_HOST_FLAG_CIN                     (SDIOC_PSTAT_CIN)     /*!< Device Inserted status           */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:4: * @brief This file contains HC32 Series Device Driver Library file call
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:80:/* Defined use Device Driver Library */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:83: * @brief Comment the line below if you will not use the Device Driver Library.
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:108:/* Use Device Driver Library */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:199:#include "hc32f460_ll_interrupts_share.h"
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:242:#if (LL_SWDT_ENABLE == DDL_ON)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:243:#include "hc32_ll_swdt.h"
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll.h:244:#endif /* LL_SWDT_ENABLE */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32f460_ll_interrupts_share.h:3: * @file  hc32f460_ll_interrupts_share.h
+./Drivers/hc32f4xx_ll_drivers/inc/hc32f460_ll_interrupts_share.h:22:#ifndef __HC32F460_LL_INTERRUPTS_SHARE_H__
+./Drivers/hc32f4xx_ll_drivers/inc/hc32f460_ll_interrupts_share.h:23:#define __HC32F460_LL_INTERRUPTS_SHARE_H__
+./Drivers/hc32f4xx_ll_drivers/inc/hc32f460_ll_interrupts_share.h:45: * @addtogroup LL_HC32F460_SHARE_INTERRUPTS
+./Drivers/hc32f4xx_ll_drivers/inc/hc32f460_ll_interrupts_share.h:145:void SWDT_IrqHandler(void);
+./Drivers/hc32f4xx_ll_drivers/inc/hc32f460_ll_interrupts_share.h:347:#endif /* __HC32F460_LL_INTERRUPTS_SHARE_H__ */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_utility.h:81:int32_t LL_PrintfInit(void* vpDevice, uint32_t u32Param, int32_t (*pfnPreinit)(void* vpDevice, uint32_t u32Param));
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_utility.h:104:#define DDL_PrintfInit(vpDevice, u32Param, pfnPreinit)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_rmu.h:69:#define RMU_FLAG_SWDT                   (RMU_RSTF0_SWDRF)       /*!< Special watchdog timer reset */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_rmu.h:79:                                        RMU_FLAG_PVD2 | RMU_FLAG_WDT | RMU_FLAG_SWDT | RMU_FLAG_PWR_DOWN | \
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_i2c.h:191:#define I2C_FLAG_SMBUS_DEFAULT_MATCH  (I2C_SR_SMBDEFAULTF) /*!< SMBUS device default address detected */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_i2c.h:223:#define I2C_FLAG_CLR_SMBUS_DEFAULT_MATCH    (I2C_CLR_SMBDEFAULTFCLR) /*!< SMBUS device default address detected */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_fcm.h:94:#define FCM_TARGET_CLK_SWDTLRC      (0x04UL << FCM_MCCR_MCKS_POS)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_fcm.h:158:#define FCM_REF_CLK_SWDTLRC         (0x14UL << FCM_RCCR_RCKS_POS)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_gpio.h:210:#define GPIO_PIN_SWDIO              (0x02U)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_gpio.h:212:#define GPIO_PIN_DEBUG_SWD          (0x07U)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_dbgc.h:65:#define DBGC_PERIPH_SWDT                    (DBGC_MCUSTPCTL_SWDTSTP)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:10:   2023-12-15       CDT             Modify macro define: ICG_SWDT_LPM_CNT_CONTINUE -> ICG_SWDT_LPM_CNT_CONT
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:64: * @defgroup ICG_SWDT_Reset_State ICG SWDT Reset State
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:67:#define ICG_SWDT_RST_START                      (0UL)                   /*!< SWDT auto start after reset */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:68:#define ICG_SWDT_RST_STOP                       (ICG_ICG0_SWDTAUTS)     /*!< SWDT stop after reset       */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:74: * @defgroup ICG_SWDT_Exception_Type ICG SWDT Exception Type
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:77:#define ICG_SWDT_EXP_TYPE_INT                   (0UL)               /*!< SWDT trigger interrupt */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:78:#define ICG_SWDT_EXP_TYPE_RST                   (ICG_ICG0_SWDTITS)  /*!< SWDT trigger reset     */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:84: * @defgroup ICG_SWDT_Count_Period ICG SWDT Count Period
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:87:#define ICG_SWDT_CNT_PERIOD256                  (0UL)                   /*!< 256 clock cycle   */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:88:#define ICG_SWDT_CNT_PERIOD4096                 (ICG_ICG0_SWDTPERI_0)   /*!< 4096 clock cycle  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:89:#define ICG_SWDT_CNT_PERIOD16384                (ICG_ICG0_SWDTPERI_1)   /*!< 16384 clock cycle */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:90:#define ICG_SWDT_CNT_PERIOD65536                (ICG_ICG0_SWDTPERI)     /*!< 65536 clock cycle */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:96: * @defgroup ICG_SWDT_Clock_Division ICG SWDT Clock Division
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:99:#define ICG_SWDT_CLK_DIV1                       (0UL)                               /*!< CLK      */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:100:#define ICG_SWDT_CLK_DIV16                      (0x04UL << ICG_ICG0_SWDTCKS_POS)    /*!< CLK/16   */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:101:#define ICG_SWDT_CLK_DIV32                      (0x05UL << ICG_ICG0_SWDTCKS_POS)    /*!< CLK/32   */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:102:#define ICG_SWDT_CLK_DIV64                      (0x06UL << ICG_ICG0_SWDTCKS_POS)    /*!< CLK/64   */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:103:#define ICG_SWDT_CLK_DIV128                     (0x07UL << ICG_ICG0_SWDTCKS_POS)    /*!< CLK/128  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:104:#define ICG_SWDT_CLK_DIV256                     (0x08UL << ICG_ICG0_SWDTCKS_POS)    /*!< CLK/256  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:105:#define ICG_SWDT_CLK_DIV2048                    (0x0BUL << ICG_ICG0_SWDTCKS_POS)    /*!< CLK/2048 */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:111: * @defgroup ICG_SWDT_Refresh_Range ICG SWDT Refresh Range
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:114:#define ICG_SWDT_RANGE_0TO25PCT                 (0x01UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~25%             */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:115:#define ICG_SWDT_RANGE_25TO50PCT                (0x02UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 25%~50%            */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:116:#define ICG_SWDT_RANGE_0TO50PCT                 (0x03UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~50%             */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:117:#define ICG_SWDT_RANGE_50TO75PCT                (0x04UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 50%~75%            */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:118:#define ICG_SWDT_RANGE_0TO25PCT_50TO75PCT       (0x05UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~25% & 50%~75%   */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:119:#define ICG_SWDT_RANGE_25TO75PCT                (0x06UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 25%~75%            */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:120:#define ICG_SWDT_RANGE_0TO75PCT                 (0x07UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~75%             */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:121:#define ICG_SWDT_RANGE_75TO100PCT               (0x08UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 75%~100%           */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:122:#define ICG_SWDT_RANGE_0TO25PCT_75TO100PCT      (0x09UL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~25% & 75%~100%  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:123:#define ICG_SWDT_RANGE_25TO50PCT_75TO100PCT     (0x0AUL << ICG_ICG0_SWDTWDPT_POS)   /*!< 25%~50% & 75%~100% */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:124:#define ICG_SWDT_RANGE_0TO50PCT_75TO100PCT      (0x0BUL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~50% & 75%~100%  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:125:#define ICG_SWDT_RANGE_50TO100PCT               (0x0CUL << ICG_ICG0_SWDTWDPT_POS)   /*!< 50%~100%           */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:126:#define ICG_SWDT_RANGE_0TO25PCT_50TO100PCT      (0x0DUL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~25% & 50%~100%  */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:127:#define ICG_SWDT_RANGE_25TO100PCT               (0x0EUL << ICG_ICG0_SWDTWDPT_POS)   /*!< 25%~100%           */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:128:#define ICG_SWDT_RANGE_0TO100PCT                (0x0FUL << ICG_ICG0_SWDTWDPT_POS)   /*!< 0%~100%            */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:134: * @defgroup ICG_SWDT_LPM_Count ICG SWDT Low Power Mode Count
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:135: * @brief    Counting control of SWDT in sleep/stop mode
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:138:#define ICG_SWDT_LPM_CNT_CONT                   (0UL)                   /*!< Continue counting in sleep/stop mode */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:139:#define ICG_SWDT_LPM_CNT_STOP                   (ICG_ICG0_SWDTSLPOFF)   /*!< Stop counting in sleep/stop mode     */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:335: * @defgroup ICG_SWDT_Preload_Configuration ICG SWDT Preload Configuration
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:338:/* SWDT register bits config */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:339:#define ICG_RB_SWDT_AUTS                        (ICG_SWDT_RST_STOP)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:340:#define ICG_RB_SWDT_ITS                         (ICG_SWDT_EXP_TYPE_RST)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:341:#define ICG_RB_SWDT_PERI                        (ICG_SWDT_CNT_PERIOD65536)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:342:#define ICG_RB_SWDT_CKS                         (ICG_SWDT_CLK_DIV2048)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:343:#define ICG_RB_SWDT_WDPT                        (ICG_SWDT_RANGE_0TO100PCT)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:344:#define ICG_RB_SWDT_SLTPOFF                     (ICG_SWDT_LPM_CNT_STOP)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:346:/* SWDT register value */
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:347:#define ICG_REG_SWDT_CONFIG                     (ICG_RB_SWDT_AUTS | ICG_RB_SWDT_ITS  | ICG_RB_SWDT_PERI | \
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:348:                                                 ICG_RB_SWDT_CKS  | ICG_RB_SWDT_WDPT | ICG_RB_SWDT_SLTPOFF)
+./Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_icg.h:428:#define ICG_REG_CFG0_CONST                      (ICG_REG_WDT_CONFIG | ICG_REG_SWDT_CONFIG | 0xE000E000UL)
+./App/Src/app_jump.c:5:#include "hc32f460.h"
+./Tools/jlink/program_debug.jlink:4:loadfile build/Debug/hc32f460_boot.elf
+./Tools/jlink/program_debug.jlink:5:verifybin build/Debug/hc32f460_boot.bin 0x00000000
+./Core/Src/hc32f460_it.c:1:#include "hc32f460_it.h"
+./Core/Src/hc32f460_it.c:2:#include "hc32f460.h"
+./Core/Src/boot_state.c:12:    context->reset_info.watchdog_reset = (raw & (RMU_FLAG_WDT | RMU_FLAG_SWDT)) != 0U;
+./Core/Src/boot_timebase.c:2:#include "hc32f460.h"
+./Core/Src/boot_timebase.c:3:#include "system_hc32f460.h"
+./Core/Inc/hc32f460_it.h:1:#ifndef HC32F460_IT_H
+./Core/Inc/hc32f460_it.h:2:#define HC32F460_IT_H
+./cmake/ProjectOptions.cmake:13:    HC32F460
+./Config/hc32f4xx_conf.h:4: * @brief This file contains HC32 Series Device Driver Library usage management.
+./Config/hc32f4xx_conf.h:41: * @brief This is the list of modules to be used in the Device Driver Library.
+./Config/hc32f4xx_conf.h:45: * @note LL_UTILITY_ENABLE must be turned on(DDL_ON) if using Device Driver
+./Config/hc32f4xx_conf.h:84:#define LL_SWDT_ENABLE             (DDL_OFF)
+./Config/hc32f4xx_conf.h:97:#define BSP_EV_HC32F460_LQFP100_V2 (4U)
+./Config/hc32f4xx_conf.h:106:#define BSP_EV_HC32F4XX            (BSP_EV_HC32F460_LQFP100_V2)
+./Platform/svd/HC32F460.svd:2:<device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
+./Platform/svd/HC32F460.svd:3:    <name>HC32F460</name>
+./Platform/svd/HC32F460.svd:5:    <description>HC32F460</description>
+./Platform/svd/HC32F460.svd:5144:                            <name>SWDTSTP</name>
+./Platform/svd/HC32F460.svd:5145:                            <description>desc SWDTSTP</description>
+./Platform/svd/HC32F460.svd:22709:                            <name>SWDTAUTS</name>
+./Platform/svd/HC32F460.svd:22710:                            <description>desc SWDTAUTS</description>
+./Platform/svd/HC32F460.svd:22716:                            <name>SWDTITS</name>
+./Platform/svd/HC32F460.svd:22717:                            <description>desc SWDTITS</description>
+./Platform/svd/HC32F460.svd:22723:                            <name>SWDTPERI</name>
+./Platform/svd/HC32F460.svd:22724:                            <description>desc SWDTPERI</description>
+./Platform/svd/HC32F460.svd:22730:                            <name>SWDTCKS</name>
+./Platform/svd/HC32F460.svd:22731:                            <description>desc SWDTCKS</description>
+./Platform/svd/HC32F460.svd:22737:                            <name>SWDTWDPT</name>
+./Platform/svd/HC32F460.svd:22738:                            <description>desc SWDTWDPT</description>
+./Platform/svd/HC32F460.svd:22744:                            <name>SWDTSLPOFF</name>
+./Platform/svd/HC32F460.svd:22745:                            <description>desc SWDTSLPOFF</description>
+./Platform/svd/HC32F460.svd:22983:                            <name>SWDTENR</name>
+./Platform/svd/HC32F460.svd:22984:                            <description>desc SWDTENR</description>
+./Platform/svd/HC32F460.svd:23057:                            <name>SWDTFR</name>
+./Platform/svd/HC32F460.svd:23058:                            <description>desc SWDTFR</description>
+./Platform/svd/HC32F460.svd:23131:                            <name>SWDTCFR</name>
+./Platform/svd/HC32F460.svd:23132:                            <description>desc SWDTCFR</description>
+./Platform/svd/HC32F460.svd:23717:                            <name>SWDTWUEN</name>
+./Platform/svd/HC32F460.svd:23718:                            <description>desc SWDTWUEN</description>
+./Platform/svd/HC32F460.svd:32764:                            <name>SWDTRDP</name>
+./Platform/svd/HC32F460.svd:32765:                            <description>desc SWDTRDP</description>
+./Platform/svd/HC32F460.svd:32771:                            <name>SWDTWRP</name>
+./Platform/svd/HC32F460.svd:32772:                            <description>desc SWDTWRP</description>
+./Platform/svd/HC32F460.svd:34800:                            <name>SWDRF</name>
+./Platform/svd/HC32F460.svd:34801:                            <description>desc SWDRF</description>
+./Platform/svd/HC32F460.svd:37007:            <name>SWDT</name>
+./Platform/svd/HC32F460.svd:37008:            <description>desc SWDT</description>
+./Platform/svd/HC32F460.svd:51010:</device>
+grep: ./debug_artifacts/jlink/probe_detection.txt: 输入文件同时也是输出文件
+./debug_artifacts/jlink/environment.txt:1:/home/gtc/Desktop/workspace/HC32_PROJ/HC32F460xE_Bootloader
+./debug_artifacts/jlink/environment.txt:2:/usr/bin/JLinkExe
+./debug_artifacts/jlink/environment.txt:3:/usr/bin/JLinkGDBServerCLExe
+./debug_artifacts/jlink/environment.txt:13:JLinkARM.dll V9.50 (DLL compiled Jun 10 2026 12:26:20)
+./HC32F460xE.ld:11:/*  File        HC32F460xE.ld                                                */
+./HC32F460xE.ld:12:/*  Abstract    Linker script for HC32F460 Device with                       */
+./LegacyReference/i2c.h:7:/* Define slave device address for example */
+./LegacyReference/i2c.h:8:#define DEVICE_ADDR                     (0x11U)
+./LegacyReference/i2c.c:203:        I2C_SlaveAddrConfig(I2C_UNIT, I2C_ADDR0, I2C_ADDR_7BIT, DEVICE_ADDR);
+./Libraries/SEGGER/SEGGER_RTT_Conf.h:132:*       such as on Cortex-A devices with MMU.
+./Libraries/easylogger/src/elog_buf.c:81: * flush all buffered logs to output device
+./Libraries/easylogger/inc/elog_cfg.h:69:#if defined(HC32F460)
+./Libraries/Mp2762a/mp2762a.h:8://device address
+./Libraries/Mp2762a/mp2762a.h:9:#define MP2762A_DEVICE_ADDRESS             0x5C
+./Libraries/Mp2762a/mp2762a.cpp:18:    if (mp2762aI2c->beginTransmission(MP2762A_DEVICE_ADDRESS)) {
+./Libraries/Mp2762a/mp2762a.cpp:19:        mp2762aI2c->requestFrom(MP2762A_DEVICE_ADDRESS, reg, &byte, 1);
+./Libraries/Mp2762a/mp2762a.cpp:28:    if (mp2762aI2c->beginTransmission(MP2762A_DEVICE_ADDRESS)) {
+./Libraries/Mp2762a/mp2762a.cpp:29:        mp2762aI2c->requestFrom(MP2762A_DEVICE_ADDRESS, reg, buf, 2);
+./Libraries/Mp2762a/mp2762a.cpp:37:    if (mp2762aI2c->beginTransmission(MP2762A_DEVICE_ADDRESS)) {
+./Libraries/CMakeLists.txt:7:    Adafruit_BusIO/Adafruit_SPIDevice.cpp
+./Libraries/Bq40z50/bq40z50.cpp:18:    if (bq40z50I2c->beginTransmission(BQ40Z50_DEVICE_ADDRESS)) {
+./Libraries/Bq40z50/bq40z50.cpp:19:        bq40z50I2c->requestFrom(BQ40Z50_DEVICE_ADDRESS, reg, &data, 1);
+./Libraries/Bq40z50/bq40z50.cpp:28:    if (bq40z50I2c->beginTransmission(BQ40Z50_DEVICE_ADDRESS)) {
+./Libraries/Bq40z50/bq40z50.cpp:29:        bq40z50I2c->requestFrom(BQ40Z50_DEVICE_ADDRESS, reg, buf, 2);
+./Libraries/Bq40z50/bq40z50.h:6://device address
+./Libraries/Bq40z50/bq40z50.h:7:#define BQ40Z50_DEVICE_ADDRESS           0x0B
+./CMakeLists.txt:2:project(HC32F460_Bootloader LANGUAGES C ASM)
+./CMakeLists.txt:18:set(BOOT_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/HC32F460xE.ld)
+./CMakeLists.txt:19:set(BOOT_TARGET hc32f460_boot)
+./CMakeLists.txt:26:    Core/Src/hc32f460_it.c
+./CMakeLists.txt:45:    Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c
+./CMakeLists.txt:46:    Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S
+./CMakeLists.txt:82:    Drivers/CMSIS/Device/HDSC/hc32f4xx/Include
+./CMakeLists.txt:86:    HC32F460 USE_DDL_DRIVER VECT_TAB_OFFSET=0U
+./docs/build_report.md:34:Toolchain: GNU Arm Embedded GCC 14.3.1. Linker: `HC32F460xE.ld`. Application base: `0x00008000`.
+./docs/hardfault_root_cause.md:34:The deterministic Debug artifact is `build/Debug/hc32f460_boot.elf`, SHA-256
+./docs/hardfault_root_cause.md:50:Use `docs/jlink_hardfault_debug.md` and the supplied scripts to program the exact
+./docs/jlink_hardfault_debug.md:3:Use only `build/Debug/hc32f460_boot.elf` for symbols and programming. Configure
+./docs/jlink_hardfault_debug.md:4:Ozone for `HC32F460xE`, SWD, 4 MHz, load the ELF, and enable Download File on
+./docs/jlink_hardfault_debug.md:23:sha256sum build/Debug/hc32f460_boot.elf build/Debug/hc32f460_boot.bin
+./docs/jlink_hardfault_debug.md:24:JLinkExe -device HC32F460xE -if SWD -speed 4000 -CommandFile Tools/jlink/program_debug.jlink
+./docs/jlink_hardfault_debug.md:27:For GDB, start `JLinkGDBServerCLExe -device HC32F460xE -if SWD -speed 4000
+./docs/jlink_hardfault_debug.md:28:-port 2331`, then run `arm-none-eabi-gdb -x Tools/jlink/hardfault.gdb
+./docs/jlink_hardfault_debug.md:29:build/Debug/hc32f460_boot.elf`.
+./docs/hardware_smoke_test.md:24:2. Verify PB3 GPIO operation, PA13/PA14 SWD, RTT visibility, reset reconnect, and connect-under-reset after PSPCR `0x0003`.
+./docs/debug_port_configuration.md:3:`bsp_debug_port_configure_for_boot_gpio()` writes `0x0003` to `CM_GPIO->PSPCR` with `WRITE_REG16`, then executes DSB and ISB. DDL definitions map bits 0/1 to TCK/TMS, also used as PA14 SWCLK and PA13 SWDIO. Bits 2/3/4 correspond to TDO/SWO, TDI, and TRST. Therefore `0x0003` retains two-wire SWD while releasing the other JTAG/debug pins.
+./docs/debug_port_configuration.md:5:PB3 is JTDO/TRACESWO and the safety-critical power-control GPIO. PA6 is not a conflicting debug pin. PB3 is preloaded and configured high before the PSPCR ownership configuration. SWD and RTT are expected to remain available but require physical verification. If attach fails, use connect-under-reset and reflash a known-good image.
+./docs/known_limitations.md:3:- PB3 glitch-free behavior, PA6 waveform, PB5 polarity, SWD retention, and RTT visibility are implemented from confirmed contracts but not physically measured.
+./docs/legacy_ota_audit.md:9:| MCU | HC32F460xE | linker/device headers | confirmed | |
+./docs/legacy_ota_audit.md:10:| Flash | 512 KiB | `HC32F460xE.ld` | confirmed | `0x00000000..0x0007FFFF` |
+./docs/board_configuration.md:10:PB3 is also JTDO/TRACESWO. Boot preloads/configures PB3 high before writing PSPCR `0x0003`, which retains PA13/PA14 SWDIO/SWCLK and releases the other JTAG/debug pins. PA6 has no relevant debug-pin conflict.
+./.gitignore:18:Platform/project/JLinkLog.txt
+./.gitignore:19:Platform/project/JLinkSettings.ini
+/opt/SEGGER/JLink_V950/Doc/ReleaseNotes/ReleaseNotes.html:9534:          <li>HDSC HC32F460: Utilization of WDT or SWDT could cause failing of programming. Fixed.</li>
+/opt/SEGGER/JLink_V950/Doc/ReleaseNotes/ReleaseNotes.html:12363:          <li>HDSC HC32F460: Added debug &amp; flash programming support for Huada Semiconductor HC32F460 series.</li>
+/opt/SEGGER/JLink_V950/Doc/ReleaseNotes/ReleaseNotes.html:12364:          <li>HDSC HC32F460: Improved flash programming and erase speed.</li>
+/opt/SEGGER/JLink_V950/Doc/ReleaseNotes/ReleaseNotes.html:12386:          <li>XHSC HC32F460xC: Added debug &amp; flash programming support for XHSC HC32F460xC devices.</li>

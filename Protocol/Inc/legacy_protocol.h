@@ -1,5 +1,6 @@
 #ifndef LEGACY_PROTOCOL_H
 #define LEGACY_PROTOCOL_H
-void legacy_protocol_init(void);
-void legacy_protocol_poll(void);
+#include <stdint.h>
+void legacy_protocol_service_init(uint32_t now_ms);
+void legacy_protocol_service_poll(uint32_t now_ms);
 #endif

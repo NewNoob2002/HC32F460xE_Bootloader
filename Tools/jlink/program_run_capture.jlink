@@ -1,0 +1,18 @@
+connect
+halt
+mem32 0x40010400 10
+erase 0x00000000 0x00005FFF
+loadfile /home/gtc/Desktop/workspace/HC32_PROJ/HC32F460xE_Bootloader/build/Debug/hc32f460_boot.elf
+mem32 0x00000000 8
+mem32 0x40010400 10
+reset
+go
+sleep 1000
+halt
+regs
+mem32 0x00000000 8
+mem32 0xE000ED04 16
+mem32 0xE000ED88 1
+mem32 0x1FFF9428 28
+mem32 0x40010400 10
+exit

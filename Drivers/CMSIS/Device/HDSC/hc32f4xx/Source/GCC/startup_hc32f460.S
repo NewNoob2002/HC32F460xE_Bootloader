@@ -354,10 +354,10 @@ SetSRAM3Wait:
                 mov         r1, #0x76
                 str         r1, [r0]
 
-                /* Call static constructors */
-                bl          __libc_init_array
                 /* Call the clock system initialization function. */
                 bl          SystemInit
+                /* Call static constructors after CPU/system initialization. */
+                bl          __libc_init_array
                 /* Call the application's entry point. */
                 bl          main
                 bx          lr

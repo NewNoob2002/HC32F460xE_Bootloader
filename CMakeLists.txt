@@ -37,6 +37,11 @@ add_executable(${BOOT_TARGET}
     Drivers/BSP/Src/bsp_debug_port.c
     Drivers/BSP/Src/bsp_external_watchdog.c
     Drivers/BSP/Src/bsp_status_led.c
+    Drivers/BSP/Src/bsp_i2c_slave.c
+    Protocol/Src/legacy_crc16.c
+    Protocol/Src/legacy_parser.c
+    Protocol/Src/legacy_codec.c
+    Protocol/Src/legacy_protocol.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_rmu.c
@@ -47,6 +52,9 @@ add_executable(${BOOT_TARGET}
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_efm.c
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_pwc.c
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_sram.c
+    Drivers/hc32f4xx_ll_drivers/src/hc32_ll_i2c.c
+    Drivers/hc32f4xx_ll_drivers/src/hc32_ll_interrupts.c
+    Drivers/hc32f4xx_ll_drivers/src/hc32_ll_fcg.c
 )
 
 if(BOOT_ENABLE_LOGGING)
@@ -79,11 +87,12 @@ target_compile_definitions(${BOOT_TARGET} PRIVATE
     BOOT_CFG_LOGGING=$<BOOL:${BOOT_ENABLE_LOGGING}>
     BOOT_BUILD_ID="814873c-board"
     $<$<CONFIG:Debug>:BOOT_LOG_DEBUG_BUILD=1>
+    $<$<CONFIG:Debug>:BUFFER_SIZE_UP=1024>
 )
 target_compile_options(${BOOT_TARGET} PRIVATE
     ${CPU_FLAGS} -ffunction-sections -fdata-sections
     -Wall -Wextra -Wshadow -Wconversion -Wundef
-    $<$<CONFIG:Debug>:-Og;-g3>
+    $<$<CONFIG:Debug>:-Og;-g3;-fno-omit-frame-pointer>
     $<$<CONFIG:Release>:-Os;-g0>
 )
 target_link_options(${BOOT_TARGET} PRIVATE

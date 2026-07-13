@@ -1,0 +1,7 @@
+connect
+halt
+mem32 0x00000400 16
+mem32 0x0317FFE0 8
+mem32 0x40010400 10
+mem32 0x400104E0 3
+exit
