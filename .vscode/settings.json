@@ -1,0 +1,9 @@
+{
+    "git.ignoreLimitWarning": true,
+    "clangd.arguments": [
+        "--enable-config",
+        "--clang-tidy",
+        "--background-index",
+        "--query-driver=**/arm-none-eabi-gcc*,**/arm-none-eabi-g++*"
+    ]
+}

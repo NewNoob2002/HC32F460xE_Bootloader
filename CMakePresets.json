@@ -2,21 +2,23 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "gcc-debug",
-            "displayName": "GCC Debug",
+            "name": "default",
+            "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/gcc-debug",
-            "toolchainFile": "${sourceDir}/cmake/arm-none-eabi-gcc.cmake",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
+            "cacheVariables": {}
+        },
+        {
+            "name": "Debug",
+            "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "gcc-release",
-            "displayName": "GCC Release",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/gcc-release",
-            "toolchainFile": "${sourceDir}/cmake/arm-none-eabi-gcc.cmake",
+            "name": "Release",
+            "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -24,13 +26,12 @@
     ],
     "buildPresets": [
         {
-            "name": "gcc-debug",
-            "configurePreset": "gcc-debug"
+            "name": "Debug",
+            "configurePreset": "Debug"
         },
         {
-            "name": "gcc-release",
-            "configurePreset": "gcc-release"
+            "name": "Release",
+            "configurePreset": "Release"
         }
     ]
 }
-

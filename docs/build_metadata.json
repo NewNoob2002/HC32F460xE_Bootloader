@@ -1,0 +1,19 @@
+{
+  "source_revision": "814873c",
+  "configuration": "gcc-release",
+  "compiler": "arm-none-eabi-gcc 14.3.1",
+  "linker_script": "HC32F460xE.ld",
+  "flash_region": "0x00000000+0x00008000",
+  "application_base": "0x00008000",
+  "flash_load_bytes": 2132,
+  "bss_bytes": 1104,
+  "reserved_stack_bytes": 2048,
+  "total_static_ram_reservation_bytes": 3152,
+  "artifacts": {
+    "hc32f460_boot.elf": "12868a180f8fab7636a6bcfcccec3915de1947028a7d149f345318b4291b51f9",
+    "hc32f460_boot.hex": "01949456fd8b1a6837509b8ac5ea516d70dcffc3cd7df0bca155f09d3e7636d0",
+    "hc32f460_boot.bin": "4d75775d2105b42ea37c469574a3caca47d88971f56614daf95f48025d1964aa",
+    "hc32f460_boot.map": "9f8919c772546cfb80086d78dfd46d45de64c33b36fcb98e501fb8d4e246852a"
+  },
+  "note": "SHA-256 values are for the verified 2026-07-13 release build."
+}

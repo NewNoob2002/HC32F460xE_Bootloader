@@ -46,6 +46,8 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+    ASSERT(FLASH_ORIGIN == 0x00000000, "boot image must start at Flash base")
+    ASSERT(FLASH_LENGTH <= 0x00008000, "boot image region exceeds 32 KiB")
     .vectors :
     {
         . = ALIGN(4);
