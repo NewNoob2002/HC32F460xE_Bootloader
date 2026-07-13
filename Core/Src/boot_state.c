@@ -1,23 +1,30 @@
 #include "boot_state.h"
-#include "app_validator.h"
 #include "boot_app.h"
 #include "boot_config.h"
-#include "bsp_clock.h"
-#include "bsp_gpio.h"
 #include "bsp_reset.h"
-#include "bsp_watchdog.h"
-void boot_early_init(boot_context_t* context) {
-    context->reset_flags = bsp_reset_capture_and_clear();
-    bsp_gpio_safe_init();
-    bsp_clock_init();
-    bsp_watchdog_init();
-    context->timeout_polls = 0U;
+#include "hc32_ll_rmu.h"
+void boot_capture_reset_info(boot_context_t* context) {
+    uint32_t raw = bsp_reset_capture_and_clear();
+    context->reset_info.raw_flags = raw;
+    context->reset_info.power_on_reset = (raw & RMU_FLAG_PWR_ON) != 0U;
+    context->reset_info.pin_reset = (raw & RMU_FLAG_PIN) != 0U;
+    context->reset_info.software_reset = (raw & RMU_FLAG_SW) != 0U;
+    context->reset_info.watchdog_reset = (raw & (RMU_FLAG_WDT | RMU_FLAG_SWDT)) != 0U;
+    context->reset_info.low_voltage_reset = (raw & (RMU_FLAG_BROWN_OUT | RMU_FLAG_PVD1 | RMU_FLAG_PVD2)) != 0U;
+    context->reset_info.clock_failure_reset = (raw & (RMU_FLAG_CLK_ERR | RMU_FLAG_XTAL_ERR)) != 0U;
+    context->reset_info.multiple_reset_sources = (raw & RMU_FLAG_MX) != 0U;
+    context->update_started_ms = 0U;
+    context->app_valid = false;
+    context->watchdog_ready = false;
+    context->led_ready = false;
+    context->log_ready = false;
     context->jump_requested = false;
 }
 void boot_select_mode(boot_context_t* context) {
-    boot_app_select_mode(context, boot_application_vector_is_valid(), bsp_reset_was_software(context->reset_flags));
+    boot_app_select_mode(context, context->app_valid, context->reset_info.software_reset);
 }
-void boot_timeout_poll(boot_context_t* context) {
-    if ((context->mode == BOOT_MODE_UPDATE_WINDOW) && (++context->timeout_polls >= BOOT_UPDATE_WINDOW_POLLS))
+void boot_timeout_poll(boot_context_t* context, uint32_t now_ms) {
+    if ((context->mode == BOOT_MODE_UPDATE_WINDOW)
+        && ((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS))
         context->jump_requested = true;
 }

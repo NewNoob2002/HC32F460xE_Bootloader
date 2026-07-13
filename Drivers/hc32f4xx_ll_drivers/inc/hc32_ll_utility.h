@@ -22,8 +22,7 @@
 
 /* C binding of definitions if building with C++ compiler */
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /*******************************************************************************
@@ -66,33 +65,46 @@ extern "C"
  * @{
  */
 
+/* Imprecise delay */
+void DDL_DelayMS(uint32_t u32Count);
+void DDL_DelayUS(uint32_t u32Count);
+
+/* SysTick functions */
+int32_t SysTick_Init(uint32_t u32Freq);
+void SysTick_Delay(uint32_t u32Delay);
+void SysTick_IncTick(void);
+uint32_t SysTick_GetTick(void);
+void SysTick_Suspend(void);
+void SysTick_Resume(void);
+
 #if (LL_PRINT_ENABLE == DDL_ON)
-int32_t LL_PrintfInit(void *vpDevice, uint32_t u32Param, int32_t (*pfnPreinit)(void *vpDevice, uint32_t u32Param));
+int32_t LL_PrintfInit(void* vpDevice, uint32_t u32Param, int32_t (*pfnPreinit)(void* vpDevice, uint32_t u32Param));
 #endif
 
 /* You can add your own assert functions by implement the function DDL_AssertHandler
    definition follow the function DDL_AssertHandler declaration */
 #ifdef __DEBUG
-#define DDL_ASSERT(x)                                                          \
-do {                                                                           \
-    ((x) ? (void)0 : DDL_AssertHandler(__FILE__, __LINE__));                   \
-} while (0)
+#define DDL_ASSERT(x)                                                                                                  \
+    do {                                                                                                               \
+        ((x) ? (void)0 : DDL_AssertHandler(__FILE__, __LINE__));                                                       \
+    } while (0)
 /* Exported function */
-void DDL_AssertHandler(const char *file, int line);
+void DDL_AssertHandler(const char* file, int line);
 #else
-#define DDL_ASSERT(x)                   ((void)0U)
+#define DDL_ASSERT(x) ((void)0U)
 #endif /* __DEBUG */
 
 #if (LL_PRINT_ENABLE == DDL_ON)
 #include <stdio.h>
 __WEAKDEF int32_t DDL_ConsoleOutputChar(char cData);
 
-#define DDL_PrintfInit                  (void)LL_PrintfInit
-#define DDL_Printf                      (void)printf
+#define DDL_PrintfInit (void)LL_PrintfInit
+#define DDL_Printf     (void)printf
 #else
 #define DDL_PrintfInit(vpDevice, u32Param, pfnPreinit)
 #define DDL_Printf(...)
 #endif
+
 /**
  * @}
  */

@@ -32,11 +32,13 @@
 /* enable log output. */
 #define ELOG_OUTPUT_ENABLE
 /* setting static output log level. range: from ELOG_LVL_ASSERT to ELOG_LVL_VERBOSE */
-#define ELOG_OUTPUT_LVL                          ELOG_LVL_VERBOSE
-/* enable assert check */
-#define ELOG_ASSERT_ENABLE
+#if defined(BOOT_LOG_DEBUG_BUILD)
+#define ELOG_OUTPUT_LVL                          ELOG_LVL_DEBUG
+#else
+#define ELOG_OUTPUT_LVL                          ELOG_LVL_INFO
+#endif
 /* buffer size for every line's log */
-#define ELOG_LINE_BUF_SIZE                       1024
+#define ELOG_LINE_BUF_SIZE                       256
 /* output line number max length */
 #define ELOG_LINE_NUM_MAX_LEN                    5
 /* output filter's tag max length */
@@ -49,9 +51,6 @@
 #define ELOG_NEWLINE_SIGN                        "\n"
 /*---------------------------------------------------------------------------*/
 /* enable log color */
-#if defined(HC32F460)
-#define ELOG_COLOR_ENABLE
-#endif
 /* change the some level logs to not default color if you want */
 #define ELOG_COLOR_ASSERT                        (F_MAGENTA B_NULL S_NORMAL)
 #define ELOG_COLOR_ERROR                         (F_RED B_NULL S_NORMAL)
@@ -62,9 +61,6 @@
 /*---------------------------------------------------------------------------*/
 /* enable log fmt */
 /* comment it if you don't want to output them at all */
-#define ELOG_FMT_USING_FUNC
-#define ELOG_FMT_USING_DIR
-#define ELOG_FMT_USING_LINE
 /*---------------------------------------------------------------------------*/
 #if defined(HC32F460)
 #else

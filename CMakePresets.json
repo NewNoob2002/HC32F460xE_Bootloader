@@ -22,6 +22,23 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "ReleaseNoLog",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "BOOT_ENABLE_LOGGING": "OFF"
+            }
+        },
+        {
+            "name": "HostTests",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/HostTests",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "BOOT_BUILD_HOST_TESTS": "ON"
+            }
         }
     ],
     "buildPresets": [
@@ -32,6 +49,17 @@
         {
             "name": "Release",
             "configurePreset": "Release"
+        },
+        {
+            "name": "ReleaseNoLog",
+            "configurePreset": "ReleaseNoLog"
+        },
+        {
+            "name": "HostTests",
+            "configurePreset": "HostTests"
         }
+    ],
+    "testPresets": [
+        { "name": "HostTests", "configurePreset": "HostTests", "output": { "outputOnFailure": true } }
     ]
 }
