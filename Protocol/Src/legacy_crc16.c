@@ -1,6 +1,5 @@
 #include "legacy_crc16.h"
-uint16_t legacy_crc16_xmodem(const uint8_t *data, size_t length)
-{
+uint16_t legacy_crc16_xmodem(const uint8_t* data, size_t length) {
     uint16_t crc = 0U;
     for (size_t index = 0U; index < length; ++index) {
         crc ^= (uint16_t)((uint16_t)data[index] << 8U);
