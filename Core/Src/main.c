@@ -12,7 +12,9 @@
 #include "bsp_power.h"
 #include "bsp_status_led.h"
 #include "bsp_write_protection.h"
-#include "legacy_protocol.h"
+
+static size_t output_length = 0U;
+uint8_t output_buffer[BSP_I2C_TX_CAPACITY];
 
 #if BOOT_ENABLE_EASYLOGGER
 static const char* mode_name(boot_mode_t mode) {
@@ -106,7 +108,6 @@ int main(void) {
         BOOT_LOG_ERROR("I2C1 slave initialization failed %d", i2c_ready);
         fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
     }
-    legacy_protocol_service_init(boot_time_ms());
     BOOT_LOG_INFO("ready addr=0x11 baud=400000 mode=%s", mode_name(context.mode));
     bsp_status_led_set_mode(context.mode == BOOT_MODE_UPDATE_WINDOW ? BOOT_LED_MODE_UPDATE_WINDOW
                                                                     : BOOT_LED_MODE_RECOVERY);
@@ -114,8 +115,10 @@ int main(void) {
         now_ms = boot_time_ms();
         bsp_external_watchdog_poll(now_ms);
         bsp_status_led_poll(now_ms);
-        bsp_i2c_slave_poll();
-        legacy_protocol_service_poll(now_ms);
+        bsp_i2c_slave_poll(output_buffer, sizeof(output_buffer), &output_length);
+        if (output_length > 0) {
+            BOOT_LOG_DEBUG("poll output_length=%u", (unsigned)output_length);
+        }
         if ((context.mode == BOOT_MODE_UPDATE_WINDOW) && context.app_valid)
             boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)

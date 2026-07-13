@@ -9,6 +9,7 @@
 #define BOOT_ENABLE_LEGACY_JUMP          0
 #define BOOT_ENABLE_LEGACY_UPLOAD        0
 #define BOOT_ENABLE_FLASH_UPDATE         0
+#define BOOT_ENABLE_LEGACY_UPDATE_SIMULATION 1
 #define BOOT_ENABLE_APPLICATION_JUMP     1
 #define BOOT_ENABLE_SOFTWARE_RESET_ENTRY 1
 #ifndef BOOT_CFG_LOGGING
@@ -41,6 +42,12 @@
 #if (BOOT_ENABLE_LEGACY_ERASE || BOOT_ENABLE_LEGACY_DOWNLOAD || BOOT_ENABLE_LEGACY_JUMP) && \
     !BOOT_ENABLE_FLASH_UPDATE
 #error "Destructive legacy commands require Flash update"
+#endif
+#if BOOT_ENABLE_LEGACY_UPDATE_SIMULATION && BOOT_ENABLE_FLASH_UPDATE
+#error "Legacy simulation and real Flash update cannot be enabled together"
+#endif
+#if BOOT_ENABLE_LEGACY_UPDATE_SIMULATION && !BOOT_ENABLE_LEGACY_PROTOCOL
+#error "Legacy simulation requires legacy protocol"
 #endif
 
 #endif

@@ -5,10 +5,12 @@
 #include "elog.h"
 #define BOOT_LOG_INFO(tag, ...)  log_i((tag), __VA_ARGS__)
 #define BOOT_LOG_DEBUG(tag, ...) log_d((tag), __VA_ARGS__)
+#define BOOT_LOG_WARN(tag, ...)  log_w((tag), __VA_ARGS__)
 #define BOOT_LOG_ERROR(tag, ...) log_e((tag), __VA_ARGS__)
 #else
 #define BOOT_LOG_INFO(tag, ...)  ((void)0)
 #define BOOT_LOG_DEBUG(tag, ...) ((void)0)
+#define BOOT_LOG_WARN(tag, ...)  ((void)0)
 #define BOOT_LOG_ERROR(tag, ...) ((void)0)
 #endif
 #endif

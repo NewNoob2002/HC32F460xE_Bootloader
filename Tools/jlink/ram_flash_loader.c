@@ -18,7 +18,7 @@
 #define EFM_CLEAR_FLAGS     0x0000003FUL
 
 #define IMAGE_SOURCE        ((const volatile uint32_t *)0x20000000UL)
-#define IMAGE_LENGTH        0x00004D90UL
+#define IMAGE_LENGTH        0x000058A8UL
 #define STATUS_ADDRESS      0x20017000UL
 #define LOADER_MAGIC        0x45464D32UL
 #define LOADER_SUCCESS      0x600D600DUL
