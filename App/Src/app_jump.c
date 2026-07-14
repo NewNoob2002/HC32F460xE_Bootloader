@@ -13,19 +13,14 @@ bool boot_jump_to_application(uint32_t app_base) {
     if ((app_base != APP_FLASH_BASE) || !boot_application_vector_is_valid()) {
         return false;
     }
-    msp = *(const volatile uint32_t*)(uintptr_t)app_base;
-    reset = *(const volatile uint32_t*)(uintptr_t)(app_base + 4U);
     __disable_irq();
-    boot_timebase_deinit();
-    for (uint32_t index = 0U; index < 8U; ++index) {
-        NVIC->ICER[index] = UINT32_MAX;
-        NVIC->ICPR[index] = UINT32_MAX;
-    }
-    SCB->VTOR = app_base;
+    SysTick_Suspend();
+    msp = *(__IO uint32_t*)app_base;
+    reset = *(__IO uint32_t*)(app_base + 4U);
     __DSB();
     __ISB();
     __set_MSP(msp);
-    entry = (app_entry_t)(uintptr_t)reset;
+    entry = (app_entry_t)reset;
     entry();
     return false;
 }

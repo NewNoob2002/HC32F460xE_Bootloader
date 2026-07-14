@@ -4,6 +4,7 @@
 #include "bsp_reset.h"
 #include "elog.h"
 #include "hc32_ll_rmu.h"
+
 void boot_capture_reset_info(boot_context_t* context) {
     uint32_t raw = bsp_reset_capture_and_clear();
     context->reset_info.raw_flags = raw;

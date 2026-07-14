@@ -1,7 +1,7 @@
 #include "bsp_status_led.h"
-#include <stddef.h>
 #include "boot_timebase.h"
 #include "bsp_board_config.h"
+#include "hc32_ll.h"
 
 static uint32_t mode_interval(boot_led_mode_t mode) {
     if (mode == BOOT_LED_MODE_UPDATE_WINDOW)

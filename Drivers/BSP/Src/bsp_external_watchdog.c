@@ -1,6 +1,6 @@
 #include "bsp_external_watchdog.h"
-#include <stddef.h>
 #include "bsp_board_config.h"
+#include "hc32_ll.h"
 
 void watchdog_scheduler_init(watchdog_scheduler_t* scheduler, uint32_t now_ms, uint32_t interval_ms, uint32_t pulse_ms,
                              bool active_level, watchdog_gpio_write_t write, void* context) {

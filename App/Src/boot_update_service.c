@@ -24,6 +24,7 @@ static bool erase_completed;
 static bool jump_requested;
 static bool arm_jump_after_publish;
 static uint32_t session_programmed_bytes;
+static uint32_t programmed_high_water;
 
 static int32_t erase_application(void) {
     const uint32_t first_sector = APP_FLASH_BASE / BSP_FLASH_SECTOR_SIZE;
@@ -91,6 +92,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                 } else {
                     erase_completed = true;
                     session_programmed_bytes = 0U;
+                    programmed_high_water = APP_FLASH_BASE;
                     ++service_stats.erase_commands;
                     log_i("ERASE_FLASH complete start=0x%08lX sectors=%u", (unsigned long)APP_FLASH_BASE,
                           (unsigned int)bsp_flash_sector_count(APP_FLASH_MAX_SIZE));
@@ -117,6 +119,8 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
             } else {
                 service_stats.programmed_bytes += data_length;
                 session_programmed_bytes += data_length;
+                if ((flash_address + data_length) > programmed_high_water)
+                    programmed_high_water = flash_address + data_length;
                 log_i("APP_DOWNLOAD complete address=0x%08lX length=%u", (unsigned long)flash_address,
                       (unsigned int)data_length);
             }
@@ -127,7 +131,8 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
             response_payload_length = payload_length;
             if (!erase_completed || !boot_application_vector_is_valid()) {
                 result = PACKET_ACK_ERROR;
-                log_w("JUMP_TO_APP rejected: application vector invalid");
+                log_w("JUMP_TO_APP rejected erased=%u bytes=%lu high=0x%08lX", erase_completed ? 1U : 0U,
+                      (unsigned long)session_programmed_bytes, (unsigned long)programmed_high_water);
             } else {
                 bsp_status_led_set_mode(BOOT_LED_MODE_OFF);
                 arm_jump_after_publish = true;
@@ -165,6 +170,7 @@ void BootUpdateServiceInit(void) {
     jump_requested = false;
     arm_jump_after_publish = false;
     session_programmed_bytes = 0U;
+    programmed_high_water = APP_FLASH_BASE;
 }
 
 void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
@@ -180,8 +186,10 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
         return;
     if (txBufferWrite(response_buffer, response_length) == (int)response_length) {
         ++service_stats.responses_published;
-        if (arm_jump_after_publish)
+        if (arm_jump_after_publish) {
             jump_requested = true;
+            log_i("JUMP ACK queued length=%u", (unsigned int)response_length);
+        }
     } else {
         ++service_stats.response_busy_drop;
     }

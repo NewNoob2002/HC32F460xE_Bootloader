@@ -101,9 +101,11 @@ static void i2c_eei_callback(void) {
         /* Clear STOPF flag */
         I2C_ClearStatus(I2C_UNIT, I2C_CLR_STOPFCLR);
         if (slave_state == SLAVE_RX) {
+            ++i2c_slave_counters_stats.rx_transactions;
             slave_state = SLAVE_RX_DONE;
         } else if (slave_state == SLAVE_TX) {
             i2c_slave_counters_stats.err_count = 0;
+            ++i2c_slave_counters_stats.tx_complete_reads;
             tx_transactions._BufferHead = 0;
             slave_state = SLAVE_TX_DONE;
         }

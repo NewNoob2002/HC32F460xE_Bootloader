@@ -17,7 +17,7 @@
 
 static boot_protocol_parser_t protocol_parser;
 static uint32_t protocol_last_byte_ms;
-
+static boot_context_t context = {0};
 #if BOOT_ENABLE_EASYLOGGER
 static const char* mode_name(boot_mode_t mode) {
     if (mode == BOOT_MODE_START_APPLICATION)
@@ -43,9 +43,6 @@ static bool logging_init(void) {
 
 static void prepare_for_application(void) {
     bsp_i2c_slave_deinit();
-    bsp_status_led_off();
-    bsp_external_watchdog_prepare_handover();
-    bsp_power_hold_assert();
 }
 
 static void fatal_safe_loop(bool timebase_ready, bool watchdog_ready, bool led_ready) {
@@ -64,20 +61,14 @@ static void fatal_safe_loop(bool timebase_ready, bool watchdog_ready, bool led_r
 }
 
 int main(void) {
-    boot_context_t context = {0};
     uint32_t now_ms;
-    bool power_gpio_ready;
 
     bsp_write_protection_unlock();
     bsp_debug_port_configure_for_boot_gpio();
-    boot_capture_reset_info(&context);
-    power_gpio_ready = bsp_power_init();
     bsp_clock_init();
-    if (!boot_timebase_init())
-        fatal_safe_loop(false, false, false);
-
-    if (!power_gpio_ready || !bsp_power_hold_is_asserted())
-        fatal_safe_loop(false, false, false);
+    boot_timebase_init();
+    bsp_power_init();
+    boot_capture_reset_info(&context);
 
     now_ms = boot_time_ms();
     context.watchdog_ready = bsp_external_watchdog_init(now_ms);
@@ -98,15 +89,14 @@ int main(void) {
     BOOT_LOG_INFO("id=%s reset=%08lx app=%u mode=%s", BOOT_BUILD_ID, (unsigned long)context.reset_info.raw_flags,
                   context.app_valid ? 1U : 0U, mode_name(context.mode));
 
+    BOOT_LOG_INFO("init begin %ums", (unsigned)(boot_time_ms() - now_ms));
+    bool i2c_ready = bsp_i2c_slave_init();
+    bsp_write_protection_restore();
     if (context.mode == BOOT_MODE_START_APPLICATION) {
-        bsp_write_protection_restore();
         prepare_for_application();
         (void)boot_jump_to_application(APP_FLASH_BASE);
         fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
     }
-    BOOT_LOG_INFO("init begin %ums", (unsigned)(boot_time_ms() - now_ms));
-    bool i2c_ready = bsp_i2c_slave_init();
-    bsp_write_protection_restore();
     if (!i2c_ready) {
         BOOT_LOG_ERROR("I2C1 slave initialization failed %d", i2c_ready);
         fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
@@ -127,8 +117,14 @@ int main(void) {
             boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)
             context.jump_requested = false;
-        if ((context.jump_requested && context.app_valid) || BootUpdateServiceTakeJumpRequest()) {
-            log_i("JUMP_TO_APP requested; preparing for application");
+        const bool update_jump_requested =
+            (bsp_i2c_slave_get_state() == SLAVE_TX_DONE) && BootUpdateServiceTakeJumpRequest();
+        if ((context.jump_requested && context.app_valid) || update_jump_requested) {
+            bsp_i2c_slave_counters_t i2c_counters;
+            bsp_i2c_slave_get_counters(&i2c_counters);
+            log_i("JUMP ACK transmitted tx_reads=%lu rx=%lu PB3=%s", (unsigned long)i2c_counters.tx_complete_reads,
+                  (unsigned long)i2c_counters.rx_transactions, bsp_power_hold_is_asserted() ? "high" : "fault");
+            log_i("JUMP to application requested by %s", update_jump_requested ? "update service" : "user");
             prepare_for_application();
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
