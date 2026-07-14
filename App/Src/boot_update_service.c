@@ -6,6 +6,7 @@
 #include "boot_memory_map.h"
 #include "boot_protocol_crc.h"
 #include "bsp_i2c_slave.h"
+#include "bsp_status_led.h"
 #if BOOT_CFG_LOGGING
 #include "elog.h"
 #else
@@ -54,6 +55,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
             break;
 
         case PACKET_CMD_APP_DOWNLOAD: {
+            bsp_status_led_set_mode(BOOT_LED_MODE_UPDATE_WINDOW);
             const uint16_t data_length = (uint16_t)(payload_length - PACKET_INSTRUCT_SEGMENT_SIZE);
             response_payload_length = PACKET_INSTRUCT_SEGMENT_SIZE;
             if ((frame->payload[1U] != PACKET_CMD_TYPE_DATA) || (flash_address < APP_FLASH_BASE)
@@ -68,6 +70,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
         }
 
         case PACKET_CMD_JUMP_TO_APP:
+            bsp_status_led_set_mode(BOOT_LED_MODE_OFF);
             response_payload_length = payload_length;
             log_i("JUMP_TO_APP EFM marker/jump pending");
             break;

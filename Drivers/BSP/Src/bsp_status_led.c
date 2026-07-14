@@ -56,7 +56,6 @@ static void board_gpio_write(bool level, void* context) {
 bool bsp_status_led_init(void) {
     stc_gpio_init_t init;
     board_ready = false;
-    GPIO_ResetPins(BOOT_STATUS_LED_PORT, BOOT_STATUS_LED_PIN);
     (void)GPIO_StructInit(&init);
     init.u16PinState = PIN_STAT_RST;
     init.u16PinDir = PIN_DIR_OUT;
