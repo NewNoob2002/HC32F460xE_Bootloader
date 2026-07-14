@@ -5,8 +5,10 @@
 #include "boot_config.h"
 #include "boot_memory_map.h"
 #include "boot_protocol_crc.h"
+#include "bsp_flash.h"
 #include "bsp_i2c_slave.h"
 #include "bsp_status_led.h"
+
 #if BOOT_CFG_LOGGING
 #include "elog.h"
 #else

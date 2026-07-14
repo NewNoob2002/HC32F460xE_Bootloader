@@ -65,6 +65,7 @@ add_executable(${BOOT_TARGET}
     Drivers/BSP/Src/bsp_external_watchdog.c
     Drivers/BSP/Src/bsp_status_led.c
     Drivers/BSP/Src/bsp_i2c_slave.c
+    Drivers/BSP/Src/bsp_flash.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_rmu.c
