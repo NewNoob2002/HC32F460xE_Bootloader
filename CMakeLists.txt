@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-project(HC32F460_Bootloader LANGUAGES C ASM)
+if(BOOT_BUILD_HOST_TESTS)
+    project(HC32F460_Bootloader LANGUAGES C)
+else()
+    project(HC32F460_Bootloader LANGUAGES C ASM)
+endif()
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -8,13 +12,35 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(BOOT_BUILD_HOST_TESTS "Build hardware-independent host tests" OFF)
 option(BOOT_ENABLE_LOGGING "Enable SEGGER RTT and EasyLogger" ON)
 
+set(CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
+
+add_library(boot_project_options INTERFACE)
+add_library(project::options ALIAS boot_project_options)
+target_compile_options(boot_project_options INTERFACE -Wall -Wextra -Wshadow -Wconversion -Wundef)
+if(NOT BOOT_BUILD_HOST_TESTS)
+    target_compile_options(boot_project_options INTERFACE ${CPU_FLAGS})
+endif()
+
+add_library(boot_config_target INTERFACE)
+add_library(boot::config ALIAS boot_config_target)
+target_include_directories(boot_config_target INTERFACE Config Core/Inc)
+
+add_library(boot_protocol STATIC
+    Protocol/Src/boot_protocol_parser.c
+    Protocol/Src/boot_protocol_crc.c
+)
+add_library(boot::protocol ALIAS boot_protocol)
+target_include_directories(boot_protocol PUBLIC Protocol/Inc PRIVATE
+    Drivers/BSP/Inc
+    Drivers/CMSIS/Include)
+target_link_libraries(boot_protocol PUBLIC project::options boot::config)
+
 if(BOOT_BUILD_HOST_TESTS)
     enable_testing()
     add_subdirectory(Tests)
     return()
 endif()
 
-set(CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
 set(BOOT_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/HC32F460xE.ld)
 set(BOOT_TARGET hc32f460_boot)
 
@@ -26,6 +52,7 @@ add_executable(${BOOT_TARGET}
     Core/Src/hc32f460_it.c
     Core/Src/syscalls.c
     App/Src/boot_app.c
+    App/Src/boot_update_service.c
     App/Src/app_validator.c
     App/Src/app_jump.c
     Drivers/BSP/Src/bsp_clock.c
@@ -38,7 +65,6 @@ add_executable(${BOOT_TARGET}
     Drivers/BSP/Src/bsp_external_watchdog.c
     Drivers/BSP/Src/bsp_status_led.c
     Drivers/BSP/Src/bsp_i2c_slave.c
-    Protocol/Src/legacy_crc16.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_rmu.c
@@ -92,6 +118,7 @@ target_compile_options(${BOOT_TARGET} PRIVATE
     $<$<CONFIG:Debug>:-Og;-g3;-fno-omit-frame-pointer>
     $<$<CONFIG:Release>:-Os;-g0>
 )
+target_link_libraries(${BOOT_TARGET} PRIVATE boot::protocol)
 target_link_options(${BOOT_TARGET} PRIVATE
     ${CPU_FLAGS} -T${BOOT_LINKER_SCRIPT}
     -Wl,--defsym=FLASH_ORIGIN=0x00000000

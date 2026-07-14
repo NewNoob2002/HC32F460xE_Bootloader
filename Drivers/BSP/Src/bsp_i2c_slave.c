@@ -12,19 +12,11 @@
 #define I2C_RXI_IRQn INT006_IRQn
 #define I2C_TEI_IRQn INT004_IRQn
 
-typedef struct {
-    uint8_t data[BSP_I2C_RX_CAPACITY];
-    volatile uint16_t _BufferHead;
-    volatile uint16_t _BufferTail;
-} rxtx_transaction_t;
-
-typedef enum { SLAVE_RX = 0, SLAVE_RX_DONE, SLAVE_TX, SLAVE_TX_DONE } i2c_slave_state_t;
-
 static rxtx_transaction_t rx_transactions = {0};
 static rxtx_transaction_t tx_transactions = {0};
 
 static volatile i2c_slave_state_t slave_state = SLAVE_RX;
-static bsp_i2c_slave_counters_t i2c_slave_counters_stats = {0};
+bsp_i2c_slave_counters_t i2c_slave_counters_stats = {0};
 
 int txBufferAvailable() {
     return tx_transactions._BufferHead - tx_transactions._BufferTail;
@@ -43,8 +35,7 @@ int txBufferWrite(uint8_t* buffer, const uint16_t length) {
 }
 
 int rxBufferAvailable(void) {
-    return ((unsigned int)(BSP_I2C_RX_CAPACITY + rx_transactions._BufferHead - rx_transactions._BufferTail))
-           % BSP_I2C_RX_CAPACITY;
+    return ((BSP_I2C_RX_CAPACITY + rx_transactions._BufferHead - rx_transactions._BufferTail)) % BSP_I2C_RX_CAPACITY;
 }
 
 uint8_t rxBufferRead(void) {
@@ -169,6 +160,10 @@ bool bsp_i2c_slave_init(void) {
     }
     I2C_Cmd(I2C_UNIT, ENABLE);
     I2C_IntCmd(I2C_UNIT, I2C_INT_MATCH_ADDR0 | I2C_INT_RX_FULL, ENABLE);
+    slave_state = SLAVE_RX;
+    memset(&rx_transactions, 0, sizeof(rx_transactions));
+    memset(&tx_transactions, 0, sizeof(tx_transactions));
+    basp_i2c_slave_err_reset();
     return true;
 }
 
@@ -185,20 +180,24 @@ void bsp_i2c_slave_deinit(void) {
     (void)I2C_DeInit(I2C_UNIT);
 }
 
-void bsp_i2c_slave_poll(uint8_t* output_buffer, size_t output_buffer_size, size_t* output_length) {
-    if (rxBufferAvailable() > 0 && slave_state == SLAVE_RX_DONE) {
-        __disable_irq();
-        size_t read_bytes = rxBufferReadBytes(output_buffer, output_buffer_size);
-        *output_length = read_bytes;
-        __enable_irq();
-    }
-    if (i2c_slave_counters_stats.err_count >= 1000) {
-        i2c_slave_counters_stats.err_count = 0;
-        bsp_i2c_slave_init();
-    }
-}
-
 void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters) {
     if (counters != NULL)
         *counters = i2c_slave_counters_stats;
+}
+
+i2c_slave_state_t bsp_i2c_slave_get_state(void) {
+    return slave_state;
+}
+
+void basp_i2c_slave_err_reset(void) {
+    i2c_slave_counters_stats.err_count = 0;
+}
+
+void bsp_i2c_slave_update() {
+    if (i2c_slave_counters_stats.err_count >= 2000) {
+        bsp_i2c_slave_deinit();
+        bsp_i2c_slave_init();
+        i2c_slave_counters_stats.err_count = 0;
+        i2c_slave_counters_stats.err_deinit_count++;
+    }
 }

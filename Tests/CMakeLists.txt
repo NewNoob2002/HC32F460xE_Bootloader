@@ -1,15 +1,12 @@
-add_executable(boot_host_tests
-    test_main.c
-    ../Protocol/Src/legacy_crc16.c
-    ../Protocol/Src/legacy_parser.c
-    ../Protocol/Src/legacy_codec.c
-    ../Protocol/Src/legacy_simulation.c
-    ../Protocol/Src/legacy_protocol.c
-    ../App/Src/boot_app.c
+add_executable(boot_protocol_tests
+    boot_protocol_parser_tests.c
+    boot_protocol_crc_tests.c
+    ../App/Src/boot_update_service.c
 )
-target_include_directories(boot_host_tests PRIVATE
+target_include_directories(boot_protocol_tests PRIVATE
     ../Protocol/Inc ../Core/Inc ../App/Inc ../Drivers/BSP/Inc
 )
-target_compile_definitions(boot_host_tests PRIVATE BOOT_CFG_LOGGING=0)
-target_compile_options(boot_host_tests PRIVATE -Wall -Wextra -Wshadow -Wconversion -Wundef)
-add_test(NAME boot_host_tests COMMAND boot_host_tests)
+target_compile_definitions(boot_protocol_tests PRIVATE BOOT_CFG_LOGGING=0)
+target_compile_options(boot_protocol_tests PRIVATE -Wall -Wextra -Wshadow -Wconversion -Wundef)
+target_link_libraries(boot_protocol_tests PRIVATE boot::protocol)
+add_test(NAME boot_protocol_tests COMMAND boot_protocol_tests)

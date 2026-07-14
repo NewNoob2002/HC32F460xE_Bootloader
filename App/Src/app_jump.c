@@ -2,7 +2,7 @@
 #include "app_validator.h"
 #include "boot_memory_map.h"
 #include "boot_timebase.h"
-#include "hc32f460.h"
+#include "hc32_ll.h"
 
 typedef void (*app_entry_t)(void);
 

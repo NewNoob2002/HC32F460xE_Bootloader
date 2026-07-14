@@ -2,8 +2,10 @@
 #include "app_jump.h"
 #include "app_validator.h"
 #include "boot_log.h"
+#include "boot_protocol_parser.h"
 #include "boot_state.h"
 #include "boot_timebase.h"
+#include "boot_update_service.h"
 #include "bsp_board_config.h"
 #include "bsp_clock.h"
 #include "bsp_debug_port.h"
@@ -13,8 +15,8 @@
 #include "bsp_status_led.h"
 #include "bsp_write_protection.h"
 
-static size_t output_length = 0U;
-uint8_t output_buffer[BSP_I2C_TX_CAPACITY];
+static boot_protocol_parser_t protocol_parser;
+static uint32_t protocol_last_byte_ms;
 
 #if BOOT_ENABLE_EASYLOGGER
 static const char* mode_name(boot_mode_t mode) {
@@ -67,15 +69,15 @@ int main(void) {
     bool power_gpio_ready;
 
     bsp_write_protection_unlock();
+    bsp_clock_init();
+    if (!boot_timebase_init())
+        fatal_safe_loop(false, false, false);
     boot_capture_reset_info(&context);
     power_gpio_ready = bsp_power_init();
     bsp_debug_port_configure_for_boot_gpio();
     if (!power_gpio_ready || !bsp_power_hold_is_asserted())
         fatal_safe_loop(false, false, false);
 
-    bsp_clock_init();
-    if (!boot_timebase_init())
-        fatal_safe_loop(false, false, false);
     now_ms = boot_time_ms();
     context.watchdog_ready = bsp_external_watchdog_init(now_ms);
     context.led_ready = bsp_status_led_init();
@@ -109,16 +111,17 @@ int main(void) {
         fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
     }
     BOOT_LOG_INFO("ready addr=0x11 baud=400000 mode=%s", mode_name(context.mode));
+    BootUpdateServiceInit();
+    BootProtocolParserInit(&protocol_parser);
+    BootProtocolParserRegisterCallback(&protocol_parser, BootUpdateServiceFrameCallback, NULL);
+    protocol_last_byte_ms = boot_time_ms();
     bsp_status_led_set_mode(context.mode == BOOT_MODE_UPDATE_WINDOW ? BOOT_LED_MODE_UPDATE_WINDOW
                                                                     : BOOT_LED_MODE_RECOVERY);
     while (1) {
         now_ms = boot_time_ms();
+        BootProtocolParserProcess(&protocol_parser);
         bsp_external_watchdog_poll(now_ms);
         bsp_status_led_poll(now_ms);
-        bsp_i2c_slave_poll(output_buffer, sizeof(output_buffer), &output_length);
-        if (output_length > 0) {
-            BOOT_LOG_DEBUG("poll output_length=%u", (unsigned)output_length);
-        }
         if ((context.mode == BOOT_MODE_UPDATE_WINDOW) && context.app_valid)
             boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)

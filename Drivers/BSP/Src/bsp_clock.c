@@ -30,7 +30,8 @@ void bsp_clock_init(void) {
     stcMpllInit.PLLCFGR_f.PLLSRC = CLK_PLL_SRC_XTAL;
     (void)CLK_PLLInit(&stcMpllInit);
     /* Wait MPLL ready. */
-    while (SET != CLK_GetStableStatus(CLK_STB_FLAG_PLL)) {
+    uint32_t timeout = 0x100000;
+    while ((CLK_GetStableStatus(CLK_STB_FLAG_PLL) != SET) && (timeout-- > 0UL)) {
         ;
     }
 
