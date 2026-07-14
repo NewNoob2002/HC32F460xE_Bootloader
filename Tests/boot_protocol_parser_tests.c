@@ -70,6 +70,24 @@ static uint32_t feed_bytes(boot_protocol_parser_t* parser, const uint8_t* bytes,
     return completed;
 }
 
+/** @brief Checks the common response header, result byte, and payload CRC. */
+static void assert_response(uint8_t frame_number, uint8_t command, uint8_t result, uint16_t payload_length) {
+    const uint16_t crc = BootProtocolCrcCalculate(&mock_tx[BOOT_PROTOCOL_HEADER_SIZE], payload_length);
+
+    assert(mock_tx_length == BOOT_PROTOCOL_HEADER_SIZE + payload_length + BOOT_PROTOCOL_CRC_SIZE);
+    assert(mock_tx[0] == BOOT_PROTOCOL_SYNC_1);
+    assert(mock_tx[1] == BOOT_PROTOCOL_SYNC_2);
+    assert(mock_tx[2] == BOOT_PROTOCOL_SYNC_3);
+    assert(mock_tx[3] == frame_number);
+    assert(mock_tx[4] == (uint8_t)(frame_number ^ 0xFFU));
+    assert(mock_tx[5] == (uint8_t)payload_length);
+    assert(mock_tx[6] == (uint8_t)(payload_length >> 8U));
+    assert(mock_tx[7] == command);
+    assert(mock_tx[8] == result);
+    assert(mock_tx[BOOT_PROTOCOL_HEADER_SIZE + payload_length] == (uint8_t)crc);
+    assert(mock_tx[BOOT_PROTOCOL_HEADER_SIZE + payload_length + 1U] == (uint8_t)(crc >> 8U));
+}
+
 /** @brief Verifies synchronization recovery, callback content, and minimum payload framing. */
 static void test_sync_and_callback(void) {
     boot_protocol_parser_t parser;
@@ -177,12 +195,60 @@ static void test_process_and_legacy_callback(void) {
     assert(stats.responses_published == 1U);
 }
 
+/** @brief Verifies simulated update commands still publish legacy-compatible acknowledgements. */
+static void test_update_command_responses(void) {
+    boot_protocol_frame_t frame = {0};
+    boot_update_service_stats_t stats;
+
+    frame.frame_number = 0x35U;
+    frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE;
+    frame.payload[1] = PACKET_CMD_TYPE_DATA;
+    frame.payload[2] = 0x00U;
+    frame.payload[3] = 0x80U;
+
+    BootUpdateServiceInit();
+    frame.payload[0] = PACKET_CMD_ERASE_FLASH;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+
+    frame.payload[0] = PACKET_CMD_APP_DOWNLOAD;
+    frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 4U;
+    frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE] = 0x11U;
+    frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 1U] = 0x22U;
+    frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 2U] = 0x33U;
+    frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 3U] = 0x44U;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(frame.frame_number, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+
+    frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
+    frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(frame.frame_number, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+
+    frame.payload[0] = PACKET_CMD_ERASE_FLASH;
+    frame.payload[2] = 0U;
+    frame.payload[3] = 0U;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_ADDR_ERROR,
+                    BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+
+    mock_tx_length = 0U;
+    frame.payload[0] = PACKET_CMD_APP_UPLOAD;
+    BootUpdateServiceHandleFrame(&frame);
+    assert(mock_tx_length == 0U);
+    BootUpdateServiceGetStats(&stats);
+    assert(stats.validated_frames == 5U);
+    assert(stats.responses_published == 4U);
+    assert(stats.unsupported_commands == 1U);
+}
+
 int main(void) {
     boot_protocol_crc_tests_run();
     test_sync_and_callback();
     test_rejection_and_recovery();
     test_maximum_and_timeout();
     test_process_and_legacy_callback();
+    test_update_command_responses();
     puts("boot_protocol_tests: PASS");
     return 0;
 }
