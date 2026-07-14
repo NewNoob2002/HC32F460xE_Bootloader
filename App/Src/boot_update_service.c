@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "app_validator.h"
 #include "boot_config.h"
 #include "boot_memory_map.h"
 #include "boot_protocol_crc.h"
@@ -18,6 +19,34 @@
 
 static boot_update_service_stats_t service_stats;
 static uint8_t response_buffer[BOOT_PROTOCOL_MAX_FRAME_SIZE];
+static uint8_t verify_buffer[PACKET_DATA_SEGMENT_SIZE];
+static bool erase_completed;
+static bool jump_requested;
+static bool arm_jump_after_publish;
+static uint32_t session_programmed_bytes;
+
+static int32_t erase_application(void) {
+    const uint32_t first_sector = APP_FLASH_BASE / BSP_FLASH_SECTOR_SIZE;
+    const uint16_t sector_count = bsp_flash_sector_count(APP_FLASH_MAX_SIZE);
+
+    for (uint16_t index = 0U; index < sector_count; ++index) {
+        const int32_t result = bsp_flash_erase_sector(first_sector + index);
+        if (result != BSP_FLASH_OK)
+            return result;
+    }
+    return BSP_FLASH_OK;
+}
+
+static int32_t program_and_verify(uint32_t address, const uint8_t* data, uint16_t length) {
+    int32_t result = bsp_flash_write(address, data, length);
+
+    if (result != BSP_FLASH_OK)
+        return result;
+    result = bsp_flash_read(address, verify_buffer, length);
+    if (result != BSP_FLASH_OK)
+        return result;
+    return (memcmp(verify_buffer, data, length) == 0) ? BSP_FLASH_OK : -1;
+}
 
 /**
  * @brief Encodes a legacy response frame using the request sequence number and payload.
@@ -48,11 +77,24 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
 
         case PACKET_CMD_ERASE_FLASH:
             response_payload_length = PACKET_INSTRUCT_SEGMENT_SIZE;
-            if ((frame->payload[1U] != PACKET_CMD_TYPE_DATA) || (flash_address < APP_FLASH_BASE)
-                || (flash_address >= APP_FLASH_END)) {
+            if ((frame->payload[1U] != PACKET_CMD_TYPE_DATA) || (flash_address != APP_FLASH_BASE)) {
                 result = PACKET_ACK_ADDR_ERROR;
+            } else if (erase_completed && (session_programmed_bytes == 0U)) {
+                log_i("ERASE_FLASH duplicate acknowledged");
             } else {
-                log_i("ERASE_FLASH EFM pending address=0x%08lX", (unsigned long)flash_address);
+                erase_completed = false;
+                jump_requested = false;
+                if (erase_application() != BSP_FLASH_OK) {
+                    ++service_stats.flash_errors;
+                    result = PACKET_ACK_ERROR;
+                    log_w("ERASE_FLASH failed");
+                } else {
+                    erase_completed = true;
+                    session_programmed_bytes = 0U;
+                    ++service_stats.erase_commands;
+                    log_i("ERASE_FLASH complete start=0x%08lX sectors=%u", (unsigned long)APP_FLASH_BASE,
+                          (unsigned int)bsp_flash_sector_count(APP_FLASH_MAX_SIZE));
+                }
             }
             break;
 
@@ -64,17 +106,33 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                 || (flash_address >= APP_FLASH_END) || (data_length == 0U)
                 || ((uint32_t)data_length > (APP_FLASH_END - flash_address))) {
                 result = PACKET_ACK_ADDR_ERROR;
+            } else if (!erase_completed) {
+                result = PACKET_ACK_ERROR;
+            } else if (program_and_verify(flash_address, &frame->payload[PACKET_INSTRUCT_SEGMENT_SIZE], data_length)
+                       != BSP_FLASH_OK) {
+                ++service_stats.flash_errors;
+                result = PACKET_ACK_ERROR;
+                log_w("APP_DOWNLOAD failed address=0x%08lX length=%u", (unsigned long)flash_address,
+                      (unsigned int)data_length);
             } else {
-                log_i("APP_DOWNLOAD EFM pending address=0x%08lX length=%u", (unsigned long)flash_address,
+                service_stats.programmed_bytes += data_length;
+                session_programmed_bytes += data_length;
+                log_i("APP_DOWNLOAD complete address=0x%08lX length=%u", (unsigned long)flash_address,
                       (unsigned int)data_length);
             }
             break;
         }
 
         case PACKET_CMD_JUMP_TO_APP:
-            bsp_status_led_set_mode(BOOT_LED_MODE_OFF);
             response_payload_length = payload_length;
-            log_i("JUMP_TO_APP EFM marker/jump pending");
+            if (!erase_completed || !boot_application_vector_is_valid()) {
+                result = PACKET_ACK_ERROR;
+                log_w("JUMP_TO_APP rejected: application vector invalid");
+            } else {
+                bsp_status_led_set_mode(BOOT_LED_MODE_OFF);
+                arm_jump_after_publish = true;
+                log_i("JUMP_TO_APP accepted; waiting for ACK transmission");
+            }
             break;
 
         default:
@@ -102,6 +160,11 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
 void BootUpdateServiceInit(void) {
     memset(&service_stats, 0, sizeof(service_stats));
     memset(response_buffer, 0, sizeof(response_buffer));
+    memset(verify_buffer, 0, sizeof(verify_buffer));
+    erase_completed = false;
+    jump_requested = false;
+    arm_jump_after_publish = false;
+    session_programmed_bytes = 0U;
 }
 
 void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
@@ -111,13 +174,18 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
         return;
     ++service_stats.validated_frames;
 
+    arm_jump_after_publish = false;
     response_length = encode_response(frame, frame->payload_length);
     if (response_length == 0U)
         return;
-    if (txBufferWrite(response_buffer, response_length) == (int)response_length)
+    if (txBufferWrite(response_buffer, response_length) == (int)response_length) {
         ++service_stats.responses_published;
-    else
+        if (arm_jump_after_publish)
+            jump_requested = true;
+    } else {
         ++service_stats.response_busy_drop;
+    }
+    arm_jump_after_publish = false;
 }
 
 void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* context) {
@@ -129,4 +197,10 @@ void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* co
 void BootUpdateServiceGetStats(boot_update_service_stats_t* stats) {
     if (stats != NULL)
         *stats = service_stats;
+}
+
+bool BootUpdateServiceTakeJumpRequest(void) {
+    const bool requested = jump_requested;
+    jump_requested = false;
+    return requested;
 }

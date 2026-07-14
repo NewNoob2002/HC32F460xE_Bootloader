@@ -69,12 +69,13 @@ int main(void) {
     bool power_gpio_ready;
 
     bsp_write_protection_unlock();
+    bsp_debug_port_configure_for_boot_gpio();
+    boot_capture_reset_info(&context);
+    power_gpio_ready = bsp_power_init();
     bsp_clock_init();
     if (!boot_timebase_init())
         fatal_safe_loop(false, false, false);
-    boot_capture_reset_info(&context);
-    power_gpio_ready = bsp_power_init();
-    bsp_debug_port_configure_for_boot_gpio();
+
     if (!power_gpio_ready || !bsp_power_hold_is_asserted())
         fatal_safe_loop(false, false, false);
 
@@ -126,7 +127,8 @@ int main(void) {
             boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)
             context.jump_requested = false;
-        if (context.jump_requested && context.app_valid) {
+        if ((context.jump_requested && context.app_valid) || BootUpdateServiceTakeJumpRequest()) {
+            log_i("JUMP_TO_APP requested; preparing for application");
             prepare_for_application();
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);

@@ -6,7 +6,7 @@ add_executable(boot_protocol_tests
 target_include_directories(boot_protocol_tests PRIVATE
     ../Protocol/Inc ../Core/Inc ../App/Inc ../Drivers/BSP/Inc
 )
-target_compile_definitions(boot_protocol_tests PRIVATE BOOT_CFG_LOGGING=0)
+target_compile_definitions(boot_protocol_tests PRIVATE BOOT_CFG_LOGGING=0 BOOT_HOST_TEST=1)
 target_compile_options(boot_protocol_tests PRIVATE -Wall -Wextra -Wshadow -Wconversion -Wundef)
 target_link_libraries(boot_protocol_tests PRIVATE boot::protocol)
 add_test(NAME boot_protocol_tests COMMAND boot_protocol_tests)

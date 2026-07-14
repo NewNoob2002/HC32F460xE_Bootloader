@@ -36,6 +36,7 @@ target_include_directories(boot_protocol PUBLIC Protocol/Inc PRIVATE
 target_link_libraries(boot_protocol PUBLIC project::options boot::config)
 
 if(BOOT_BUILD_HOST_TESTS)
+    target_compile_definitions(boot_protocol PRIVATE BOOT_HOST_TEST=1)
     enable_testing()
     add_subdirectory(Tests)
     return()

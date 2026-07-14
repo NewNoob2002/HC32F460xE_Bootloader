@@ -2,6 +2,7 @@
 #include "boot_app.h"
 #include "boot_config.h"
 #include "bsp_reset.h"
+#include "elog.h"
 #include "hc32_ll_rmu.h"
 void boot_capture_reset_info(boot_context_t* context) {
     uint32_t raw = bsp_reset_capture_and_clear();
@@ -25,6 +26,8 @@ void boot_select_mode(boot_context_t* context) {
 }
 void boot_timeout_poll(boot_context_t* context, uint32_t now_ms) {
     if ((context->mode == BOOT_MODE_UPDATE_WINDOW)
-        && ((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS))
-        context->jump_requested = true;
+        && ((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS)) {
+        log_e("BOOT update window expired; resetting");
+        NVIC_SystemReset();
+    }
 }

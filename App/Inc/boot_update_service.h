@@ -3,6 +3,7 @@
 
 #include "boot_protocol_types.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef struct {
@@ -10,6 +11,9 @@ typedef struct {
     uint32_t responses_published;
     uint32_t response_busy_drop;
     uint32_t unsupported_commands;
+    uint32_t erase_commands;
+    uint32_t programmed_bytes;
+    uint32_t flash_errors;
 } boot_update_service_stats_t;
 
 typedef enum {
@@ -93,5 +97,8 @@ void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* co
 
 /** @brief Copies service statistics into caller-owned storage. */
 void BootUpdateServiceGetStats(boot_update_service_stats_t* stats);
+
+/** @brief Consumes a validated jump request after its response has been transmitted. */
+bool BootUpdateServiceTakeJumpRequest(void);
 
 #endif
