@@ -12,6 +12,7 @@
 #include "bsp_external_watchdog.h"
 #include "bsp_i2c_slave.h"
 #include "bsp_power.h"
+#include "bsp_reset.h"
 #include "bsp_status_led.h"
 #include "bsp_write_protection.h"
 
@@ -113,17 +114,18 @@ int main(void) {
         BootProtocolParserProcess(&protocol_parser);
         bsp_external_watchdog_poll(now_ms);
         bsp_status_led_poll(now_ms);
-        if ((context.mode == BOOT_MODE_UPDATE_WINDOW) && context.app_valid)
-            boot_timeout_poll(&context, now_ms);
+        boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)
             context.jump_requested = false;
         const bool update_jump_requested =
             (bsp_i2c_slave_get_state() == SLAVE_TX_DONE) && BootUpdateServiceTakeJumpRequest();
         if ((context.jump_requested && context.app_valid) || update_jump_requested) {
             bsp_i2c_slave_counters_t i2c_counters;
+            const uint32_t reset_flags = bsp_reset_capture();
             bsp_i2c_slave_get_counters(&i2c_counters);
-            log_i("JUMP ACK transmitted tx_reads=%lu rx=%lu PB3=%s", (unsigned long)i2c_counters.tx_complete_reads,
-                  (unsigned long)i2c_counters.rx_transactions, bsp_power_hold_is_asserted() ? "high" : "fault");
+            log_i("JUMP ACK transmitted tx_reads=%lu rx=%lu PB3=%s RMU=0x%04lx",
+                  (unsigned long)i2c_counters.tx_complete_reads, (unsigned long)i2c_counters.rx_transactions,
+                  bsp_power_hold_is_asserted() ? "high" : "fault", (unsigned long)reset_flags);
             log_i("JUMP to application requested by %s", update_jump_requested ? "update service" : "user");
             prepare_for_application();
             (void)boot_jump_to_application(APP_FLASH_BASE);

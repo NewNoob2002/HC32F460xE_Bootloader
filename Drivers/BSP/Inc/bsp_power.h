@@ -3,5 +3,6 @@
 #include <stdbool.h>
 bool bsp_power_init(void);
 void bsp_power_hold_assert(void);
+void bsp_power_hold_deassert(void);
 bool bsp_power_hold_is_asserted(void);
 #endif

@@ -1,12 +1,14 @@
 #include "boot_state.h"
 #include "boot_app.h"
 #include "boot_config.h"
+#include "boot_timebase.h"
+#include "bsp_power.h"
 #include "bsp_reset.h"
 #include "elog.h"
 #include "hc32_ll_rmu.h"
 
 void boot_capture_reset_info(boot_context_t* context) {
-    uint32_t raw = bsp_reset_capture_and_clear();
+    uint32_t raw = bsp_reset_capture();
     context->reset_info.raw_flags = raw;
     context->reset_info.power_on_reset = (raw & RMU_FLAG_PWR_ON) != 0U;
     context->reset_info.pin_reset = (raw & RMU_FLAG_PIN) != 0U;
@@ -26,9 +28,12 @@ void boot_select_mode(boot_context_t* context) {
     boot_app_select_mode(context, context->app_valid, context->reset_info.software_reset);
 }
 void boot_timeout_poll(boot_context_t* context, uint32_t now_ms) {
-    if ((context->mode == BOOT_MODE_UPDATE_WINDOW)
-        && ((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS)) {
-        log_e("BOOT update window expired; resetting");
-        NVIC_SystemReset();
+    if (((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS)) {
+        log_e("BOOT update window expired; power hold deasserted");
+        // Wait for 1 second
+        while (boot_time_ms() - now_ms < 1000) {
+            ;
+        }
+        bsp_power_hold_deassert();
     }
 }

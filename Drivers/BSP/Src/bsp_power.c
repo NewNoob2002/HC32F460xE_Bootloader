@@ -5,6 +5,10 @@
 void bsp_power_hold_assert(void) {
     GPIO_SetPins(BOOT_POWER_HOLD_PORT, BOOT_POWER_HOLD_PIN);
 }
+
+void bsp_power_hold_deassert(void) {
+    GPIO_ResetPins(BOOT_POWER_HOLD_PORT, BOOT_POWER_HOLD_PIN);
+}
 bool bsp_power_init(void) {
     stc_gpio_init_t init;
     (void)GPIO_StructInit(&init);

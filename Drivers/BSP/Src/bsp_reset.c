@@ -1,6 +1,7 @@
 #include "bsp_reset.h"
 #include "hc32_ll_rmu.h"
-uint32_t bsp_reset_capture_and_clear(void) {
+uint32_t bsp_reset_capture(void) {
+    /* Preserve the latched reset cause for the application after direct handover. */
     uint32_t flags = READ_REG32_BIT(CM_RMU->RSTF0, RMU_FLAG_ALL);
     return flags;
 }
