@@ -1,5 +1,7 @@
 # Reproducible J-Link HardFault workflow
 
+The versions, hashes and probe observations below reproduce a historical session. Rebuild and verify the current ELF before reuse; see [current_status.md](current_status.md).
+
 ## Known-good setup
 
 - J-Link Commander/DLL: V9.50
@@ -65,4 +67,3 @@ against the exact compared ELF.
 The current corrected build did not fault, so
 `debug_artifacts/jlink/fault_snapshot.txt` explicitly records the absence of a
 new exception frame rather than inventing stacked values.
-

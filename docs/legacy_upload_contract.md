@@ -3,6 +3,8 @@
 This document separates byte-for-byte evidence from unknown behavior. It is not
 a proposal for a new OTA architecture.
 
+This remains a historical wire-contract recovery. The current implementation delta is summarized in [current_status.md](current_status.md): ERASE/DOWNLOAD/JUMP are now reachable with bounded Application addresses and per-chunk readback, but legacy marker semantics, complete-image integrity and host retry behavior remain unresolved.
+
 ## Proven frame contract
 
 ```text
@@ -163,4 +165,3 @@ prevents Boot/reserved-region corruption once those semantics are proven.
 - power-loss-safe two-copy state
 - new protocol commands or ACK values
 - new Linux uploader behavior
-

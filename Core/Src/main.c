@@ -120,13 +120,17 @@ int main(void) {
         const bool update_jump_requested =
             (bsp_i2c_slave_get_state() == SLAVE_TX_DONE) && BootUpdateServiceTakeJumpRequest();
         if ((context.jump_requested && context.app_valid) || update_jump_requested) {
+#if BOOT_ENABLE_EASYLOGGER
             bsp_i2c_slave_counters_t i2c_counters;
             const uint32_t reset_flags = bsp_reset_capture();
             bsp_i2c_slave_get_counters(&i2c_counters);
-            log_i("JUMP ACK transmitted tx_reads=%lu rx=%lu PB3=%s RMU=0x%04lx",
-                  (unsigned long)i2c_counters.tx_complete_reads, (unsigned long)i2c_counters.rx_transactions,
-                  bsp_power_hold_is_asserted() ? "high" : "fault", (unsigned long)reset_flags);
-            log_i("JUMP to application requested by %s", update_jump_requested ? "update service" : "user");
+            BOOT_LOG_INFO("JUMP ACK transmitted tx_reads=%lu rx=%lu PB3=%s RMU=0x%04lx",
+                          (unsigned long)i2c_counters.tx_complete_reads,
+                          (unsigned long)i2c_counters.rx_transactions,
+                          bsp_power_hold_is_asserted() ? "high" : "fault", (unsigned long)reset_flags);
+            BOOT_LOG_INFO("JUMP to application requested by %s",
+                          update_jump_requested ? "update service" : "user");
+#endif
             prepare_for_application();
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);

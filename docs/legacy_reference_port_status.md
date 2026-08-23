@@ -1,5 +1,7 @@
 # LegacyReference port status
 
+Historical audit snapshot from 2026-07-13. Several “current” filenames and gate conclusions below describe that revision, not the present tree. See [current_status.md](current_status.md) for the current implementation and [portability_plan.md](portability_plan.md) for planned restructuring.
+
 Audit date: 2026-07-13. No production behavior was changed during this audit.
 
 ## Evidence inspected
@@ -87,7 +89,4 @@ The explicit stop conditions apply:
 - Linux finalization and the 50-unit delay are ambiguous;
 - the legacy protocol requires an undocumented persistent flag.
 
-Enabling ERASE, DOWNLOAD, or JUMP would therefore require inventing behavior or
-could erase/program an unproven range. These gates remain disabled. No Metadata
-or replacement persistence design was introduced.
-
+At that audit revision, enabling ERASE, DOWNLOAD, or JUMP would have required inventing behavior or risking an unproven range, so the gates remained disabled. Later commits introduced a new full-Application erase/download implementation without recovering the legacy marker design; see [current_status.md](current_status.md).

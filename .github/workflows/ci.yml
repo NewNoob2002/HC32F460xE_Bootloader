@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - name: Configure
+        run: cmake --preset HostTests --fresh
+      - name: Build
+        run: cmake --build --preset HostTests
+      - name: Test
+        run: ctest --preset HostTests
+
+  firmware-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Arm GNU Toolchain
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+      - name: Build Release
+        run: cmake --preset Release --fresh && cmake --build --preset Release
+      - name: Build Release without logging
+        run: cmake --preset ReleaseNoLog --fresh && cmake --build --preset ReleaseNoLog
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hc32f460-boot-firmware
+          path: |
+            build/Release/hc32f460_boot.elf
+            build/Release/hc32f460_boot.hex
+            build/Release/hc32f460_boot.bin
+            build/Release/hc32f460_boot.map
+            build/ReleaseNoLog/hc32f460_boot.elf
+            build/ReleaseNoLog/hc32f460_boot.hex
+            build/ReleaseNoLog/hc32f460_boot.bin
+            build/ReleaseNoLog/hc32f460_boot.map

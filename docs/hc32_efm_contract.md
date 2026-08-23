@@ -1,5 +1,7 @@
 # HC32 EFM contract
 
+Current implementation status: [current_status.md](current_status.md).
+
 The contract is recovered from the checked-in HC32 DDL:
 `Drivers/hc32f4xx_ll_drivers/inc/hc32_ll_efm.h` and
 `Drivers/hc32f4xx_ll_drivers/src/hc32_ll_efm.c`.
@@ -20,7 +22,6 @@ The contract is recovered from the checked-in HC32 DDL:
 - `EFM_ClearStatus(EFM_FLAG_ALL)` and `EFM_WaitEnd()` provide status/error and
   timeout handling inside the DDL.
 
-No repository application linker script or production application map is
-present, so the highest used application address cannot yet be verified against
-`0x0007A000`. Destructive OTA remains gated off until that evidence is added.
+No repository application linker script or production application map is present, so the highest used application address cannot yet be verified against `0x0007A000`.
 
+`bsp_flash.c` now exposes real sector erase, program and read operations. `boot_update_service.c` uses them for ERASE_FLASH and APP_DOWNLOAD and performs a per-chunk readback comparison. These operations are reachable even though the feature macros claim Flash update is disabled.

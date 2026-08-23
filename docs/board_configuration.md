@@ -1,5 +1,7 @@
 # Board configuration
 
+Current implementation status: [current_status.md](current_status.md).
+
 | Function | Pin | GPIO mode | Electrical contract |
 | --- | --- | --- | --- |
 | `MCU_ON_OFF_BAT_POWER` | PB3 | CMOS push-pull output | Active high; held high throughout Boot |
@@ -10,4 +12,3 @@
 PB3 is also JTDO/TRACESWO. Boot preloads/configures PB3 high before writing PSPCR `0x0003`, which retains PA13/PA14 SWDIO/SWCLK and releases the other JTAG/debug pins. PA6 has no relevant debug-pin conflict.
 
 Protection uses `LL_PERIPH_WE(CONFIG_PERIPH_WE)` and restores the supplied `CONFIG_PERIPH_WP` mask after board initialization. Compile-time assertions enforce watchdog and LED level/timing consistency.
-

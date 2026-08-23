@@ -1,5 +1,7 @@
 # Debug build and hardware regression report
 
+Historical evidence for the artifact hashes and physical session recorded here. It is not the current build report; see [build_report.md](build_report.md) and [current_status.md](current_status.md).
+
 ## Artifact
 
 - Preset: `Debug`
@@ -55,4 +57,3 @@ before the next session.
 RTT control-block memory was present at `0x1FFF8050`, but JLinkRTTLogger did not
 attach to it in this session. Runtime electrical PB3/PA6/PB5 waveforms and the
 Linux I2C handshake were not measured here.
-

@@ -29,6 +29,8 @@ bool app_validator_check(uint32_t app_base, app_vector_read_t read_word, void* c
 }
 
 bool boot_application_vector_is_valid(void) {
+    const bool valid = app_validator_check(APP_FLASH_BASE, read_target_word, NULL);
+#if BOOT_ENABLE_EASYLOGGER
     const uint32_t msp = read_target_word(APP_FLASH_BASE, NULL);
     const uint32_t reset = read_target_word(APP_FLASH_BASE + 4U, NULL);
     const uint32_t reset_address = reset & UINT32_C(0xFFFFFFFE);
@@ -38,8 +40,6 @@ bool boot_application_vector_is_valid(void) {
     const bool reset_not_erased = reset != UINT32_MAX;
     const bool reset_is_thumb = (reset & 1U) != 0U;
     const bool reset_in_app = boot_memory_is_app_address(reset_address);
-    const bool valid = app_validator_check(APP_FLASH_BASE, read_target_word, NULL);
-
     BOOT_LOG_INFO("APP_VECTOR base=0x%08lX msp=0x%08lX reset=0x%08lX target=0x%08lX",
                   (unsigned long)APP_FLASH_BASE, (unsigned long)msp, (unsigned long)reset,
                   (unsigned long)reset_address);
@@ -48,5 +48,6 @@ bool boot_application_vector_is_valid(void) {
                       msp_not_erased ? 0U : 1U, msp_aligned ? 1U : 0U, msp_in_sram ? 1U : 0U,
                       reset_not_erased ? 0U : 1U, reset_is_thumb ? 1U : 0U, reset_in_app ? 1U : 0U);
     }
+#endif
     return valid;
 }

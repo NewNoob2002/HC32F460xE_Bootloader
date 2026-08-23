@@ -1,6 +1,7 @@
 Platform/project/Objects/
 Platform/project/*.bin
 build/
+.codegraph/
 
 # Build outputs and generated reports
 *.axf

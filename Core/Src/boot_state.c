@@ -1,10 +1,10 @@
 #include "boot_state.h"
 #include "boot_app.h"
 #include "boot_config.h"
+#include "boot_log.h"
 #include "boot_timebase.h"
 #include "bsp_power.h"
 #include "bsp_reset.h"
-#include "elog.h"
 #include "hc32_ll_rmu.h"
 
 void boot_capture_reset_info(boot_context_t* context) {
@@ -29,7 +29,7 @@ void boot_select_mode(boot_context_t* context) {
 }
 void boot_timeout_poll(boot_context_t* context, uint32_t now_ms) {
     if (((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS)) {
-        log_e("BOOT update window expired; power hold deasserted");
+        BOOT_LOG_ERROR("BOOT update window expired; power hold deasserted");
         // Wait for 1 second
         while (boot_time_ms() - now_ms < 1000) {
             ;

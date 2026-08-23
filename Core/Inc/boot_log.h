@@ -3,14 +3,14 @@
 #include "boot_config.h"
 #if BOOT_ENABLE_EASYLOGGER
 #include "elog.h"
-#define BOOT_LOG_INFO(tag, ...)  log_i((tag), __VA_ARGS__)
-#define BOOT_LOG_DEBUG(tag, ...) log_d((tag), __VA_ARGS__)
-#define BOOT_LOG_WARN(tag, ...)  log_w((tag), __VA_ARGS__)
-#define BOOT_LOG_ERROR(tag, ...) log_e((tag), __VA_ARGS__)
+#define BOOT_LOG_INFO(...)  log_i(__VA_ARGS__)
+#define BOOT_LOG_DEBUG(...) log_d(__VA_ARGS__)
+#define BOOT_LOG_WARN(...)  log_w(__VA_ARGS__)
+#define BOOT_LOG_ERROR(...) log_e(__VA_ARGS__)
 #else
-#define BOOT_LOG_INFO(tag, ...)  ((void)0)
-#define BOOT_LOG_DEBUG(tag, ...) ((void)0)
-#define BOOT_LOG_WARN(tag, ...)  ((void)0)
-#define BOOT_LOG_ERROR(tag, ...) ((void)0)
+#define BOOT_LOG_INFO(...)  ((void)0)
+#define BOOT_LOG_DEBUG(...) ((void)0)
+#define BOOT_LOG_WARN(...)  ((void)0)
+#define BOOT_LOG_ERROR(...) ((void)0)
 #endif
 #endif

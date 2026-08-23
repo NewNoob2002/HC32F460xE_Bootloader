@@ -1,5 +1,7 @@
 # HardFault root-cause report
 
+Historical investigation evidence. Current capability and verification status are maintained in [current_status.md](current_status.md).
+
 ## Outcome
 
 The corrected Debug image does not reproduce the Boot HardFault. It reaches
@@ -85,4 +87,3 @@ Raw evidence is in `debug_artifacts/jlink/`, especially
 `gdb_startup_runtime.log`, `gdb_live_attach2.log`,
 `ram_flash_program_retry.log`, `verify_after_ram_loader.log`, and
 `regression.log`.
-

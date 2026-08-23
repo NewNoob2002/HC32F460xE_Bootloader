@@ -1,5 +1,7 @@
 # Logging architecture
 
+Current implementation status: [current_status.md](current_status.md). The size deltas below are measurements from an earlier build stage and must not be used as current artifact sizes; current build sizes are in [build_report.md](build_report.md).
+
 EasyLogger 2.2.99 from `Libraries/easylogger` writes through the Boot-specific `elog_port.c` into the single bundled SEGGER RTT implementation in `Libraries/SEGGER`. The RTT header identifies revision 25842 and the C source revision 29668; no separate semantic version is provided.
 
 RTT uses channel 0, a 256-byte up buffer, a 16-byte down buffer, and `SEGGER_RTT_MODE_NO_BLOCK_SKIP`. Logging is never called from an ISR and failure does not block Boot. EasyLogger is bare-metal with lock callbacks disabled, no process/thread fields, no color, and a 256-byte line buffer. Format is `time level tag message`; release compiles through INFO and debug through DEBUG. File, function, line, process, thread, and floating-point formatting are disabled by policy.

@@ -3,8 +3,8 @@
 #include <stddef.h>
 #include <string.h>
 #include "boot_config.h"
+#include "boot_log.h"
 #include "boot_timebase.h"
-#include "elog.h"
 #include "hc32_ll.h"
 
 #define I2C_UNIT     CM_I2C1
@@ -142,14 +142,14 @@ bool bsp_i2c_slave_init(void) {
     GPIO_SetFunc(GPIO_PORT_A, GPIO_PIN_03, GPIO_FUNC_49);
     GPIO_SetFunc(GPIO_PORT_A, GPIO_PIN_02, GPIO_FUNC_48);
     if (LL_OK != I2C_DeInit(I2C_UNIT) || LL_OK != I2C_StructInit(&config)) {
-        log_e("I2c init failed in %s:%d", __FILE__, __LINE__);
+        BOOT_LOG_ERROR("I2c init failed in %s:%d", __FILE__, __LINE__);
         return false;
     }
     config.u32ClockDiv = I2C_CLK_DIV2;
     config.u32Baudrate = 400000U;
     config.u32SclTime = 5UL;
     if (LL_OK != I2C_Init(I2C_UNIT, &config, &baud_error)) {
-        log_e("I2c init failed in %s:%d", __FILE__, __LINE__);
+        BOOT_LOG_ERROR("I2c init failed in %s:%d", __FILE__, __LINE__);
         return false;
     }
     I2C_SlaveAddrConfig(I2C_UNIT, I2C_ADDR0, I2C_ADDR_7BIT, BOOT_I2C_SLAVE_ADDRESS);
@@ -157,7 +157,7 @@ bool bsp_i2c_slave_init(void) {
         || !register_irq(I2C_RXI_IRQn, INT_SRC_I2C1_RXI, DDL_IRQ_PRIO_10, i2c_rxi_callback)
         || !register_irq(I2C_TEI_IRQn, INT_SRC_I2C1_TEI, DDL_IRQ_PRIO_10, i2c_tei_callback)) {
         bsp_i2c_slave_deinit();
-        log_e("I2c init failed in %s:%d", __FILE__, __LINE__);
+        BOOT_LOG_ERROR("I2c init failed in %s:%d", __FILE__, __LINE__);
         return false;
     }
     I2C_Cmd(I2C_UNIT, ENABLE);

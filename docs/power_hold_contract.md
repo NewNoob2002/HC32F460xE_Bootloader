@@ -1,8 +1,9 @@
 # Power-hold contract
 
+Current implementation status: [current_status.md](current_status.md).
+
 PB3 drives `MCU_ON_OFF_BAT_POWER` active high as a CMOS push-pull output. A schematic pull-up assists during reset, but firmware does not rely on it.
 
-The sequence is protected-register unlock, raw RMU capture, PB3 output-latch preload high, PB3 high/output/CMOS configuration, 16-bit PSPCR `0x0003` write, DSB/ISB, then PB3 latch verification. A failed GPIO initialization or latch readback enters the safe fatal loop; Boot never intentionally writes PB3 low or requests a reset. `bsp_power_hold_assert()` is idempotent.
+The startup sequence unlocks protected registers, configures the debug-port ownership, initializes PB3 high/output and later restores write protection. The fatal loop reasserts PB3 and services watchdog/LED polling. `bsp_power_hold_assert()` is idempotent.
 
-Normal, software-reset update, recovery, invalid-application, and fatal modes retain PB3 high. Application preparation reasserts it and does not deinitialize or float the pin. Hardware glitch performance remains pending oscilloscope validation over at least 100 software resets.
-
+Normal startup and fatal mode retain PB3 high. `boot_timeout_poll()` intentionally deasserts PB3 after ten minutes in both update-window and Recovery modes. Application preparation currently does not explicitly reassert or deinitialize PB3. Hardware glitch performance remains pending oscilloscope validation over at least 100 resets.
