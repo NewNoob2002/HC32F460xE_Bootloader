@@ -70,6 +70,7 @@ add_executable(${BOOT_TARGET}
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/system_hc32f460.c
     Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_rmu.c
+    Drivers/hc32f4xx_ll_drivers/src/hc32_ll_icg.c
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll.c
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_gpio.c
     Drivers/hc32f4xx_ll_drivers/src/hc32_ll_clk.c

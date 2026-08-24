@@ -1,10 +1,10 @@
 device HC32F460xE
 si SWD
-speed 4000
+speed 100
 connect
 halt
-loadbin /home/gtc/Desktop/workspace/HC32_PROJ/HC32F460xE_Bootloader/build/Debug/hc32f460_boot.bin 0x20000000
-loadbin /home/gtc/Desktop/workspace/HC32_PROJ/HC32F460xE_Bootloader/debug_artifacts/jlink/ram_flash_loader.bin 0x20018000
+loadbin build/Debug/hc32f460_boot.bin 0x20000000
+loadbin build/Debug/ram_flash_loader.bin 0x20018000
 w4 0x20017000 0x00000000
 w4 0xE000E010 0x00000000
 w4 0xE000E180 0xFFFFFFFF
@@ -21,7 +21,7 @@ wreg FAULTMASK, 0x00000001
 wreg XPSR, 0x01000000
 wreg MSP, 0x20027000
 wreg R13, 0x20027000
-setpc 0x20018069
+setpc 0x20018001
 go
 waithalt 15000
 regs

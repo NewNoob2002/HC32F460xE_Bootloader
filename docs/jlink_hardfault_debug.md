@@ -26,12 +26,14 @@ before interpreting any source location.
 
 On the tested V9.50 installation/probe, the built-in HC32 Flash loader reported
 successful programming but a fresh connection still saw the prior firmware.
-The failed and successful evidence is preserved in `debug_artifacts/jlink/`.
-Do not trust an immediate-session verify alone on this setup.
+The session showed that an immediate-session verify alone was insufficient on
+this setup; always verify again from a fresh connection.
 
 `Tools/jlink/run_ram_flash_loader.jlink` and
 `Tools/jlink/ram_flash_loader.c` are the narrow recovery path used in this
-session. They program Boot sectors only. Review the ELF SHA and loader address
+session. Run the command file from the repository root after building
+`build/Debug/ram_flash_loader.bin` with `IMAGE_LENGTH` set to the exact firmware
+BIN size. They program Boot sectors only. Review the ELF SHA and loader address
 limits before reusing them; never broaden them to application or metadata
 regions as part of HardFault diagnosis.
 
@@ -64,6 +66,5 @@ current handler PC. Decode all CFSR fields. Only use MMFAR or BFAR when their
 validity bits are set. Symbolize the stacked PC, PC-2, PC-4, and stacked LR
 against the exact compared ELF.
 
-The current corrected build did not fault, so
-`debug_artifacts/jlink/fault_snapshot.txt` explicitly records the absence of a
-new exception frame rather than inventing stacked values.
+The current corrected build did not fault. Treat a missing new snapshot as
+"no fault observed" rather than inventing stacked values.

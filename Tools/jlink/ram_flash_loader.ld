@@ -9,6 +9,7 @@ SECTIONS
 {
     .text :
     {
+        KEEP(*(.text.loader_main))
         *(.text*)
         *(.rodata*)
     } > RAM
@@ -24,3 +25,5 @@ SECTIONS
         *(COMMON)
     } > RAM
 }
+
+ASSERT(loader_main == ORIGIN(RAM), "loader_main must be the first SRAM instruction")

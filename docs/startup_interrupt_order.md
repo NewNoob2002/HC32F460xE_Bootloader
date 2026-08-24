@@ -26,5 +26,5 @@ Flash, select Boot mode, or jump to the application.
 
 The parser briefly masks interrupts while copying RX bytes through `bsp_enter_critical()` and restores the captured PRIMASK through `bsp_exit_critical()`. Application handover later disables global interrupts and does not re-enable them before branching.
 
-Live evidence is in
-[`gdb_startup_runtime.log`](../debug_artifacts/jlink/gdb_startup_runtime.log).
+Reproduce the matching evidence with the maintained J-Link workflow and the
+current ELF symbols.

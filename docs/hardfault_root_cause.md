@@ -83,7 +83,6 @@ as active causes. A precise historical root cause cannot be promoted beyond the
 CPACR synchronization hypothesis without the old failing image and its original
 stacked exception frame.
 
-Raw evidence is in `debug_artifacts/jlink/`, especially
-`gdb_startup_runtime.log`, `gdb_live_attach2.log`,
-`ram_flash_program_retry.log`, `verify_after_ram_loader.log`, and
-`regression.log`.
+The raw logs and target dumps were one-session diagnostic artifacts and are not
+versioned. Reproduce the checks with the maintained J-Link workflow before
+using addresses from a new build.

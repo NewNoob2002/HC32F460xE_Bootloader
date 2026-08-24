@@ -5,6 +5,7 @@
 #define EFM_FWMC  (*(volatile uint32_t *)0x4001040CUL)
 #define EFM_FSR   (*(volatile uint32_t *)0x40010410UL)
 #define EFM_FSCLR (*(volatile uint32_t *)0x40010414UL)
+#define WDT_RR    (*(volatile uint32_t *)0x40049008UL)
 
 #define EFM_CACHE_ALL       0x01010000UL
 #define EFM_FWMC_PEMODE     0x00000001UL
@@ -18,11 +19,17 @@
 #define EFM_CLEAR_FLAGS     0x0000003FUL
 
 #define IMAGE_SOURCE        ((const volatile uint32_t *)0x20000000UL)
-#define IMAGE_LENGTH        0x000058A8UL
+#ifndef IMAGE_LENGTH
+#error "IMAGE_LENGTH must match the firmware binary"
+#endif
+#define IMAGE_ERASE_LENGTH  ((IMAGE_LENGTH + 0x1FFFUL) & ~0x1FFFUL)
 #define STATUS_ADDRESS      0x20017000UL
 #define LOADER_MAGIC        0x45464D32UL
 #define LOADER_SUCCESS      0x600D600DUL
 #define LOOP_TIMEOUT        10000000UL
+
+_Static_assert((IMAGE_LENGTH > 0U) && (IMAGE_LENGTH <= 0x8000U) && ((IMAGE_LENGTH & 3U) == 0U),
+               "firmware must be word-aligned and fit in Boot Flash");
 
 typedef struct {
     uint32_t magic;
@@ -37,11 +44,18 @@ typedef struct {
 static volatile loader_status_t *const status =
     (volatile loader_status_t *)STATUS_ADDRESS;
 
+static void watchdog_feed(void)
+{
+    WDT_RR = 0x0123UL;
+    WDT_RR = 0x3210UL;
+}
+
 static int wait_complete(uint32_t address)
 {
     uint32_t timeout = LOOP_TIMEOUT;
 
     while ((EFM_FSR & EFM_FLAG_READY) == 0U) {
+        watchdog_feed();
         if (--timeout == 0U) {
             status->address = address;
             status->fsr = EFM_FSR;
@@ -65,7 +79,7 @@ static int wait_complete(uint32_t address)
     return 1;
 }
 
-__attribute__((noreturn, used)) void loader_main(void)
+__attribute__((noreturn, used, section(".text.loader_main"))) void loader_main(void)
 {
     uint32_t cache_state;
     uint32_t address;
@@ -96,7 +110,7 @@ __attribute__((noreturn, used)) void loader_main(void)
     EFM_FRMC &= ~EFM_CACHE_ALL;
 
     status->stage = 2U;
-    for (address = 0U; address < 0x6000U; address += 0x2000U) {
+    for (address = 0U; address < IMAGE_ERASE_LENGTH; address += 0x2000U) {
         EFM_FSCLR = EFM_CLEAR_FLAGS;
         EFM_FWMC = (EFM_FWMC & ~EFM_FWMC_PEMOD) | EFM_MODE_ERASE;
         *(volatile uint32_t *)address = 0U;
