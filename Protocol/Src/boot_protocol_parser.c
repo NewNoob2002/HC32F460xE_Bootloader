@@ -3,10 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "boot_protocol_crc.h"
-#include "bsp_critical.h"
-#include "bsp_i2c_slave.h"
 
-uint8_t local_buffer[1024];
 /** @brief Clears frame collection state without changing callback or statistics. */
 static void parser_reset_frame(boot_protocol_parser_t* parser) {
     parser->state = BOOT_PARSER_SYNC_1;
@@ -154,26 +151,6 @@ size_t BootProtocolParserPushBytes(boot_protocol_parser_t* parser, const uint8_t
     for (size_t index = 0U; index < length; ++index)
         completed += BootProtocolParserPushByte(parser, bytes[index]) ? 1U : 0U;
     return completed;
-}
-
-size_t BootProtocolParserProcess(boot_protocol_parser_t* parser) {
-    if (parser == NULL)
-        return 0U;
-
-    size_t copied_length = 0U;
-    if (bsp_i2c_slave_get_state() == SLAVE_RX_DONE) {
-        bsp_irq_state_t irq_state = bsp_enter_critical();
-        while ((rxBufferAvailable() > 0) && (copied_length < sizeof(local_buffer))) {
-            local_buffer[copied_length] = rxBufferRead();
-            ++copied_length;
-        }
-        bsp_exit_critical(irq_state);
-    }
-
-    for (size_t i = 0U; i < copied_length; ++i) {
-        BootProtocolParserPushByte(parser, local_buffer[i]);
-    }
-    return copied_length;
 }
 
 void BootProtocolParserTimeout(boot_protocol_parser_t* parser) {

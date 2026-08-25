@@ -46,6 +46,7 @@ typedef struct {
 bool bsp_i2c_slave_init(void);
 void bsp_i2c_slave_deinit(void);
 bool bsp_i2c_slave_poll(uint32_t now_ms);
+size_t bsp_i2c_slave_read(uint8_t* buffer, size_t capacity);
 void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters);
 i2c_slave_state_t bsp_i2c_slave_get_state(void);
 
@@ -54,9 +55,5 @@ void txBufferCancelWrite(void);
 int txBufferAvailable(void);
 uint8_t txBufferRead(void);
 int txBufferWrite(const uint8_t* buffer, uint16_t length);
-int rxBufferAvailable(void);
-uint8_t rxBufferRead(void);
-size_t rxBufferReadBytes(uint8_t* buffer, size_t length);
-void rxBufferWrite(uint8_t ch);
 
 #endif

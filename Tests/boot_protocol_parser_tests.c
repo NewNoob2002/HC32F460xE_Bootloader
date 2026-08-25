@@ -14,9 +14,6 @@
 #define BOOT_TEST_UPDATE_MODE 1
 #endif
 
-static uint8_t mock_rx[BOOT_PROTOCOL_MAX_FRAME_SIZE * 2U];
-static size_t mock_rx_length;
-static size_t mock_rx_index;
 static uint8_t mock_tx[BSP_I2C_TX_CAPACITY];
 static uint16_t mock_tx_length;
 static bool mock_tx_pending;
@@ -67,14 +64,6 @@ void bsp_status_led_set_mode(boot_led_mode_t mode) {
 
 i2c_slave_state_t bsp_i2c_slave_get_state(void) {
     return mock_i2c_state;
-}
-
-int rxBufferAvailable(void) {
-    return (int)(mock_rx_length - mock_rx_index);
-}
-
-uint8_t rxBufferRead(void) {
-    return (mock_rx_index < mock_rx_length) ? mock_rx[mock_rx_index++] : 0U;
 }
 
 int txBufferAvailable(void) {
@@ -272,8 +261,8 @@ static void test_maximum_and_timeout(void) {
     assert(feed_bytes(&parser, frame, length) == 1U);
 }
 
-/** @brief Verifies the parser callback produces the legacy handshake response through txBufferWrite. */
-static void test_process_and_legacy_callback(void) {
+/** @brief Verifies chunk input produces the legacy handshake response through txBufferWrite. */
+static void test_chunk_and_legacy_callback(void) {
     static const uint8_t request[] = {0xAAU, 0x44U, 0x18U, 0x01U, 0xFEU, 0x0CU, 0x00U, 0x20U, 0x11U, 0U,   0U,
                                       0U,    0U,    0U,    0U,    0U,    0U,    0U,    0U,    0xD4U, 0xE3U};
     static const uint8_t response[] = {0xAAU, 0x44U, 0x18U, 0x01U, 0xFEU, 0x0CU, 0x00U, 0x20U, 0x00U, 0U,   0U,
@@ -281,9 +270,6 @@ static void test_process_and_legacy_callback(void) {
     boot_protocol_parser_t parser;
     boot_update_service_stats_t stats;
 
-    memcpy(mock_rx, request, sizeof(request));
-    mock_rx_length = sizeof(request);
-    mock_rx_index = 0U;
     mock_tx_length = 0U;
     mock_tx_pending = false;
     mock_tx_reserved = false;
@@ -291,8 +277,7 @@ static void test_process_and_legacy_callback(void) {
     BootUpdateServiceInit();
     BootProtocolParserInit(&parser);
     BootProtocolParserRegisterCallback(&parser, BootUpdateServiceFrameCallback, NULL);
-    BootProtocolParserProcess(&parser);
-    assert(mock_rx_index == sizeof(request));
+    assert(BootProtocolParserPushBytes(&parser, request, sizeof(request)) == 1U);
     assert(mock_tx_length == sizeof(response));
     assert(memcmp(mock_tx, response, sizeof(response)) == 0);
     assert_response(1U, PACKET_CMD_HANDSHAKE, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
@@ -492,7 +477,7 @@ int main(void) {
     test_rejection_and_recovery();
     test_maximum_and_timeout();
     test_push_bytes();
-    test_process_and_legacy_callback();
+    test_chunk_and_legacy_callback();
     test_update_command_responses();
     test_update_flash_failures();
     puts("boot_protocol_tests: PASS");

@@ -79,31 +79,27 @@ int txBufferWrite(const uint8_t* buffer, uint16_t length) {
     return (int)length;
 }
 
-int rxBufferAvailable(void) {
-    return (int)((BSP_I2C_RX_CAPACITY + rx_transactions._BufferHead - rx_transactions._BufferTail)
-                 % BSP_I2C_RX_CAPACITY);
-}
-
-uint8_t rxBufferRead(void) {
-    if (rx_transactions._BufferHead == rx_transactions._BufferTail)
-        return 0U;
-    const uint8_t byte = rx_transactions.data[rx_transactions._BufferTail];
-    rx_transactions._BufferTail = (uint16_t)(rx_transactions._BufferTail + 1U) % BSP_I2C_RX_CAPACITY;
-    return byte;
-}
-
-size_t rxBufferReadBytes(uint8_t* buffer, size_t length) {
+static size_t rx_buffer_read(uint8_t* buffer, size_t capacity) {
     size_t bytes_read = 0U;
-    if (buffer == NULL)
-        return 0U;
-    while ((bytes_read < length) && (rx_transactions._BufferHead != rx_transactions._BufferTail)) {
+    while ((bytes_read < capacity) && (rx_transactions._BufferHead != rx_transactions._BufferTail)) {
         buffer[bytes_read++] = rx_transactions.data[rx_transactions._BufferTail];
         rx_transactions._BufferTail = (uint16_t)(rx_transactions._BufferTail + 1U) % BSP_I2C_RX_CAPACITY;
     }
     return bytes_read;
 }
 
-void rxBufferWrite(uint8_t ch) {
+size_t bsp_i2c_slave_read(uint8_t* buffer, size_t capacity) {
+    size_t bytes_read = 0U;
+    if ((buffer == NULL) || (capacity == 0U))
+        return 0U;
+    const bsp_irq_state_t irq_state = bsp_enter_critical();
+    if (slave_state == SLAVE_RX_DONE)
+        bytes_read = rx_buffer_read(buffer, capacity);
+    bsp_exit_critical(irq_state);
+    return bytes_read;
+}
+
+static void rx_buffer_write(uint8_t ch) {
     const uint16_t next = (uint16_t)(rx_transactions._BufferHead + 1U) % BSP_I2C_RX_CAPACITY;
     ++i2c_slave_counters_stats.rx_bytes;
     if (next == rx_transactions._BufferTail) {
@@ -204,7 +200,7 @@ static void i2c_eei_callback(void) {
 
 static void i2c_rxi_callback(void) {
     i2c_slave_counters_stats.last_sr = BOOT_I2C_UNIT->SR;
-    rxBufferWrite(I2C_ReadData(BOOT_I2C_UNIT));
+    rx_buffer_write(I2C_ReadData(BOOT_I2C_UNIT));
     note_progress();
 }
 

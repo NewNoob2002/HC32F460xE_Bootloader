@@ -17,6 +17,7 @@
 #include "bsp_write_protection.h"
 
 static boot_protocol_parser_t protocol_parser;
+static uint8_t transport_rx_buffer[BOOT_I2C_BUFFER_CAPACITY];
 static uint32_t protocol_last_byte_ms;
 static boot_context_t context = {0};
 #if BOOT_ENABLE_EASYLOGGER
@@ -137,8 +138,11 @@ int main(void) {
                                                                     : BOOT_LED_MODE_RECOVERY);
     while (1) {
         now_ms = boot_time_ms();
-        if (BootProtocolParserProcess(&protocol_parser) > 0U)
+        const size_t received = bsp_i2c_slave_read(transport_rx_buffer, sizeof(transport_rx_buffer));
+        if (received > 0U) {
+            (void)BootProtocolParserPushBytes(&protocol_parser, transport_rx_buffer, received);
             protocol_last_byte_ms = now_ms;
+        }
         if (BootProtocolParserHasPartialFrame(&protocol_parser)
             && boot_time_elapsed(now_ms, protocol_last_byte_ms, BOOT_PROTOCOL_PARTIAL_TIMEOUT_MS)) {
             BootProtocolParserTimeout(&protocol_parser);
