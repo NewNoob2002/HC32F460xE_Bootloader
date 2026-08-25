@@ -131,10 +131,40 @@ static size_t make_frame(uint8_t* output, uint8_t frame_number, const uint8_t* p
 
 /** @brief Feeds bytes individually and returns the valid-frame completion count. */
 static uint32_t feed_bytes(boot_protocol_parser_t* parser, const uint8_t* bytes, size_t length) {
-    uint32_t completed = 0U;
-    for (size_t index = 0U; index < length; ++index)
-        completed += BootProtocolParserPushByte(parser, bytes[index]) ? 1U : 0U;
-    return completed;
+    return (uint32_t)BootProtocolParserPushBytes(parser, bytes, length);
+}
+
+/** @brief Verifies chunk input preserves state and counts every completed frame. */
+static void test_push_bytes(void) {
+    boot_protocol_parser_t parser;
+    uint8_t payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE] = {PACKET_CMD_HANDSHAKE, PACKET_CMD_TYPE_DATA};
+    uint8_t first[BOOT_PROTOCOL_MAX_FRAME_SIZE];
+    uint8_t second[BOOT_PROTOCOL_MAX_FRAME_SIZE];
+    uint8_t stream[BOOT_PROTOCOL_MAX_FRAME_SIZE * 2U + 3U];
+    const size_t first_length = make_frame(first, 0x21U, payload, sizeof(payload));
+    const size_t second_length = make_frame(second, 0x22U, payload, sizeof(payload));
+
+    BootProtocolParserInit(&parser);
+    BootProtocolParserRegisterCallback(&parser, capture_frame, NULL);
+    callback_count = 0U;
+    assert(BootProtocolParserPushBytes(NULL, first, first_length) == 0U);
+    assert(BootProtocolParserPushBytes(&parser, NULL, first_length) == 0U);
+    assert(BootProtocolParserPushBytes(&parser, first, 0U) == 0U);
+
+    assert(BootProtocolParserPushBytes(&parser, first, 3U) == 0U);
+    assert(BootProtocolParserHasPartialFrame(&parser));
+    assert(BootProtocolParserPushBytes(&parser, &first[3U], first_length - 3U) == 1U);
+    assert(callback_count == 1U);
+    assert(callback_frame.frame_number == 0x21U);
+
+    stream[0] = 0x55U;
+    stream[1] = 0xAAU;
+    stream[2] = 0x00U;
+    memcpy(&stream[3U], first, first_length);
+    memcpy(&stream[3U + first_length], second, second_length);
+    assert(BootProtocolParserPushBytes(&parser, stream, 3U + first_length + second_length) == 2U);
+    assert(callback_count == 3U);
+    assert(callback_frame.frame_number == 0x22U);
 }
 
 /** @brief Checks the common response header, result byte, and payload CRC. */
@@ -461,6 +491,7 @@ int main(void) {
     test_sync_and_callback();
     test_rejection_and_recovery();
     test_maximum_and_timeout();
+    test_push_bytes();
     test_process_and_legacy_callback();
     test_update_command_responses();
     test_update_flash_failures();

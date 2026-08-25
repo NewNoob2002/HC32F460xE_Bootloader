@@ -147,6 +147,15 @@ bool BootProtocolParserPushByte(boot_protocol_parser_t* parser, uint8_t byte) {
     return false;
 }
 
+size_t BootProtocolParserPushBytes(boot_protocol_parser_t* parser, const uint8_t* bytes, size_t length) {
+    size_t completed = 0U;
+    if ((parser == NULL) || (bytes == NULL))
+        return 0U;
+    for (size_t index = 0U; index < length; ++index)
+        completed += BootProtocolParserPushByte(parser, bytes[index]) ? 1U : 0U;
+    return completed;
+}
+
 size_t BootProtocolParserProcess(boot_protocol_parser_t* parser) {
     if (parser == NULL)
         return 0U;

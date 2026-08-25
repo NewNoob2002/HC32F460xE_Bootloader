@@ -62,6 +62,9 @@ void BootProtocolParserRegisterCallback(boot_protocol_parser_t* parser, boot_pro
  */
 bool BootProtocolParserPushByte(boot_protocol_parser_t* parser, uint8_t byte);
 
+/** @brief Feeds an ordered byte chunk and returns the number of valid frames completed. */
+size_t BootProtocolParserPushBytes(boot_protocol_parser_t* parser, const uint8_t* bytes, size_t length);
+
 /** @brief Consumes available I2C bytes and returns the number consumed. */
 size_t BootProtocolParserProcess(boot_protocol_parser_t* parser);
 
