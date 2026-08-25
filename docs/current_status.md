@@ -1,6 +1,6 @@
 # Current implementation status
 
-Baseline: node 1 safety baseline closed on 2026-08-25. Phase 2 inbound transport-boundary software is implemented; target HIL is pending. This document describes reachable code, not only the feature macros in `Core/Inc/boot_config.h`.
+Baseline: node 1 safety baseline and Phase 2 inbound transport boundary closed with target evidence on 2026-08-25. This document describes reachable code, not only the feature macros in `Core/Inc/boot_config.h`.
 
 ## Implemented and reachable
 
@@ -39,19 +39,22 @@ The update timeout is currently polled in both update-window and Recovery modes.
 - Stalled-I2C recovery and application handover ordering still require target/HIL evidence. The normal final-byte NACK+STOP read-completion path is verified.
 - Metadata A/B sectors are reserved in the map but unused.
 - No current hardware/HIL run proves Flash update, power-loss behavior, I2C retry behavior, GPIO waveforms or application handover.
-- Phase 2 has not yet repeated the exact target HANDSHAKE; outbound response reservation/publication remains I2C-specific Phase 3 scope.
+- Outbound response reservation/publication remains I2C-specific Phase 3 scope.
 
 ## Automated verification
 
 Host CTest covers CRC, parser rejection/recovery/timeout, maximum frames, null and zero-length chunk input, frames split across chunks, multiple frames per chunk, Legacy golden bytes, enabled/disabled/simulation gates, TX busy ownership, ACK-before-jump, mocked Flash failures, memory ranges, vector validation and boot-mode selection. GitHub Actions builds host tests plus Release and ReleaseNoLog firmware. Host mocks do not prove target Flash, interrupts, timing or electrical behavior.
 
-## Phase 2 software evidence
+## Phase 2 evidence
 
 - `Protocol/` accepts ordered byte chunks and has no BSP/I2C, raw RX-buffer or slave-state dependency.
 - `main.c` owns BSP read -> parser chunk feed -> partial-frame timeout -> I2C recovery ordering.
 - Debug, Release and ReleaseNoLog clean builds pass; Debug BSS is 12,984 bytes after replacing the parser-owned 1024-byte buffer with the 544-byte main-loop transport buffer.
 - Debug BIN SHA-256: `819262842eb0a550be33687cddd2822e41c5fe950846a3067861b811b3c16ec4`; Debug ELF SHA-256: `d5d6af9bd11eb5c13682546bf6e8a057c9d4809d2f8203794b51a177fc0a93fc`.
-- Debug, Release and ReleaseNoLog retain `.icg_sec` at `0x00000400`, size `0x20`, with the validated eight words. Host CTest passes 4/4; target HIL remains pending.
+- Debug, Release and ReleaseNoLog retain `.icg_sec` at `0x00000400`, size `0x20`, with the validated eight words. Host CTest passes 4/4.
+- After a fresh reset, the exact I2C1 address `0x11`, 400 kHz HANDSHAKE returned `AA 44 18 01 FE 0C 00 20 00 00 00 00 00 00 00 00 00 00 00 A0 6E`.
+- Post-read capture recorded RX/TX address matches `1/1`, RX/TX bytes `21/21`, one completed response read, released TX ownership, `PRIMASK=0`, no exception and no overflow, empty-read, busy, arbitration or recovery event.
+- A preserved first attempt ran about 35 minutes 56 seconds after reset, beyond the ten-minute window, and returned 21 controlled `0xFF` bytes while the complete request remained queued. The passing retry was performed after reset within the documented window; the failure was not converted into a pass.
 
 ## Node 1 target evidence
 
