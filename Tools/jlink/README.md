@@ -14,7 +14,7 @@ The scripts never unlock protection, recover the device or mass erase.
 | `test_board_verify_debug.jlink` | Fresh-session BIN verification | unchanged |
 | `test_board_reset_run.jlink` | Reset and run a verified image | running |
 | `connect_halt.jlink` | Capture core/fault registers | halted |
-| `test_board_capture_i2c1_postread.jlink` | Capture node 1 I2C1 counters | running |
+| `test_board_capture_i2c1_postread.jlink` | Capture I2C1 post-read counters/state | running |
 | `read_flash_security.jlink` | Read ICG/security/EFM state | running |
 | `hardfault.gdb`, `live_attach.gdb` | Symbol-aware GDB diagnosis | script-specific |
 
@@ -25,7 +25,7 @@ JLinkExe -NoGui 1 -ExitOnError 1 \
   -CommandFile Tools/jlink/test_board_verify_debug.jlink
 ```
 
-`test_board_capture_i2c1_postread.jlink` contains RAM addresses from the node 1
+`test_board_capture_i2c1_postread.jlink` contains RAM addresses from the current
 Debug ELF. Before reuse after a rebuild, confirm them with:
 
 ```sh
