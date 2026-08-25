@@ -1,6 +1,6 @@
 # Cross-platform bootloader plan
 
-Status: approved design plan; implementation has not started. The current HC32 behavior remains the baseline while boundaries are extracted incrementally.
+Status: phase 1 safety baseline closed with target evidence on 2026-08-25; phases 2-8 have not started. The current HC32 behavior remains the baseline while boundaries are extracted incrementally.
 
 ## Objective
 
@@ -42,7 +42,7 @@ Provide only operations the manager actually needs: Flash erase/write/read, time
 
 ## Migration phases
 
-1. **Safety baseline:** make destructive feature gates control reachable dispatch; fix or explicitly document response ownership, parser timeout and handover behavior.
+1. **Safety baseline (closed):** destructive feature gates control reachable dispatch; response ownership, parser timeout, stalled-I2C recovery, handover cleanup and HC32 ICG placement are enforced. Host regression and the logging-enabled 400 kHz I2C HANDSHAKE/NACK+STOP path have target evidence.
 2. **Transport boundary:** move I2C polling out of `boot_protocol_parser.c`; feed byte chunks through the existing parser API.
 3. **Manager boundary:** separate legacy frame decode/encode from Flash/session execution; return a response instead of writing the I2C buffer directly.
 4. **Logical addressing:** change manager operations from absolute Flash addresses to image offsets and inject Flash operations/configuration.
@@ -56,6 +56,8 @@ Provide only operations the manager actually needs: Flash erase/write/read, time
 - Host: parser/codec vectors, manager state transitions, range/overflow/alignment, retries, abort, version policy and power-loss state-machine simulation.
 - Target: Flash erase/program/readback, linker/map bounds, VTOR/MSP handover and reset causes.
 - HIL: each transport, interrupted update, watchdog timing, power loss during erase/write/metadata commit, ACK-before-jump and rollback.
+
+Phase 1 has passed its host build/test gate, HC32 linker/ICG gate and one exact I2C1 400 kHz HANDSHAKE HIL transaction. Repeated I2C soak, real Flash update, power-loss and application-handover HIL remain future gates rather than blockers for starting phase 2.
 
 ## Completion criteria
 

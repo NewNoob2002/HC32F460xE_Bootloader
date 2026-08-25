@@ -1,0 +1,11 @@
+selectemubysn 20781318
+r1
+device HC32F460PETB-LQFP100
+si SWD
+speed 100
+connect
+r0
+halt
+loadfile build/Debug/hc32f460_boot.bin 0x00000000
+verifybin build/Debug/hc32f460_boot.bin 0x00000000
+exit

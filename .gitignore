@@ -2,6 +2,7 @@ Platform/project/Objects/
 Platform/project/*.bin
 build/
 .codegraph/
+/debug_artifacts/
 
 # Build outputs and generated reports
 *.axf

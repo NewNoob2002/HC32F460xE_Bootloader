@@ -11,15 +11,15 @@ PRIMASK `0` at both `SystemInit` and `main`; this does not mean the removed
 early `__enable_irq()` still exists. No peripheral IRQ is enabled until its
 software state and callback have been installed.
 
-For I2C1, current initialization follows this order:
+For the board-configured I2C slave, current initialization follows this order:
 
-1. Enable the I2C1 clock and configure PA3/PA2.
-2. Deinitialize and initialize `CM_I2C1`.
+1. Enable the configured I2C clock and configure the configured SCL/SDA pins (currently Boot I2C1 PA3/PA2).
+2. Deinitialize and initialize the configured I2C instance (currently `CM_I2C1`).
 3. Configure slave address `0x11`.
 4. For INT005/INT006/INT004, call `INTC_IrqSignIn`, clear NVIC pending state,
    set priority, then enable that NVIC channel.
-5. Enable I2C1 and its address-match/RX-full events.
-6. Reset the RX/TX buffers and error counter.
+5. Enable the configured I2C instance and its address-match/RX-full events.
+6. Reset the RX/TX buffers and runtime recovery state.
 
 The callbacks do transport work only. They do not log, parse, erase/program
 Flash, select Boot mode, or jump to the application.

@@ -1,4 +1,10 @@
+selectemubysn 20781318
+r1
+device HC32F460PETB-LQFP100
+si SWD
+speed 100
 connect
+r0
 halt
 regs
 mem32 0xE000ED88 1

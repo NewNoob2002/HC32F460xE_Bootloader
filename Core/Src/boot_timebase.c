@@ -1,10 +1,7 @@
 #include "boot_timebase.h"
-#include "bsp_i2c_slave.h"
 #include "hc32f460.h"
 #include "system_hc32f460.h"
 static volatile uint32_t time_ms;
-
-extern bsp_i2c_slave_counters_t i2c_slave_counters_stats;
 
 bool boot_timebase_init(void) {
     time_ms = 0U;
@@ -21,5 +18,4 @@ void boot_timebase_deinit(void) {
 }
 void SysTick_Handler(void) {
     ++time_ms;
-    i2c_slave_counters_stats.err_count++;
 }

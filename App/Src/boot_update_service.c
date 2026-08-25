@@ -19,14 +19,20 @@
 
 static boot_update_service_stats_t service_stats;
 static uint8_t response_buffer[BOOT_PROTOCOL_MAX_FRAME_SIZE];
+#if !BOOT_ENABLE_LEGACY_UPDATE_SIMULATION
 static uint8_t verify_buffer[PACKET_DATA_SEGMENT_SIZE];
+#endif
 static bool erase_completed;
 static bool jump_requested;
 static bool arm_jump_after_publish;
 static uint32_t session_programmed_bytes;
 static uint32_t programmed_high_water;
 
+#if BOOT_ENABLE_LEGACY_ERASE && BOOT_ENABLE_FLASH_UPDATE
 static int32_t erase_application(void) {
+#if BOOT_ENABLE_LEGACY_UPDATE_SIMULATION
+    return BSP_FLASH_OK;
+#else
     const uint32_t first_sector = APP_FLASH_BASE / BSP_FLASH_SECTOR_SIZE;
     const uint16_t sector_count = bsp_flash_sector_count(APP_FLASH_MAX_SIZE);
 
@@ -36,9 +42,18 @@ static int32_t erase_application(void) {
             return result;
     }
     return BSP_FLASH_OK;
+#endif
 }
+#endif
 
+#if BOOT_ENABLE_LEGACY_DOWNLOAD && BOOT_ENABLE_FLASH_UPDATE
 static int32_t program_and_verify(uint32_t address, const uint8_t* data, uint16_t length) {
+#if BOOT_ENABLE_LEGACY_UPDATE_SIMULATION
+    (void)address;
+    (void)data;
+    (void)length;
+    return BSP_FLASH_OK;
+#else
     int32_t result = bsp_flash_write(address, data, length);
 
     if (result != BSP_FLASH_OK)
@@ -47,7 +62,9 @@ static int32_t program_and_verify(uint32_t address, const uint8_t* data, uint16_
     if (result != BSP_FLASH_OK)
         return result;
     return (memcmp(verify_buffer, data, length) == 0) ? BSP_FLASH_OK : -1;
+#endif
 }
+#endif
 
 /**
  * @brief Encodes a legacy response frame using the request sequence number and payload.
@@ -58,7 +75,9 @@ static int32_t program_and_verify(uint32_t address, const uint8_t* data, uint16_
 static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t payload_length) {
     uint16_t response_payload_length;
     uint16_t crc;
+#if (BOOT_ENABLE_LEGACY_ERASE && BOOT_ENABLE_FLASH_UPDATE) || (BOOT_ENABLE_LEGACY_DOWNLOAD && BOOT_ENABLE_FLASH_UPDATE)
     uint32_t flash_address;
+#endif
     uint8_t command;
     uint8_t result = PACKET_ACK_OK;
 
@@ -67,15 +86,20 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
         return 0;
 
     command = frame->payload[0U];
+#if (BOOT_ENABLE_LEGACY_ERASE && BOOT_ENABLE_FLASH_UPDATE) || (BOOT_ENABLE_LEGACY_DOWNLOAD && BOOT_ENABLE_FLASH_UPDATE)
     flash_address = (uint32_t)frame->payload[2U] | ((uint32_t)frame->payload[3U] << 8U)
                     | ((uint32_t)frame->payload[4U] << 16U) | ((uint32_t)frame->payload[5U] << 24U);
+#endif
 
     switch (command) {
+#if BOOT_ENABLE_LEGACY_HANDSHAKE
         case PACKET_CMD_HANDSHAKE:
             response_payload_length = payload_length;
             log_i("HANDSHAKE frame_number=%u", (unsigned int)frame->frame_number);
             break;
+#endif
 
+#if BOOT_ENABLE_LEGACY_ERASE && BOOT_ENABLE_FLASH_UPDATE
         case PACKET_CMD_ERASE_FLASH:
             response_payload_length = PACKET_INSTRUCT_SEGMENT_SIZE;
             if ((frame->payload[1U] != PACKET_CMD_TYPE_DATA) || (flash_address != APP_FLASH_BASE)) {
@@ -99,7 +123,9 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                 }
             }
             break;
+#endif
 
+#if BOOT_ENABLE_LEGACY_DOWNLOAD && BOOT_ENABLE_FLASH_UPDATE
         case PACKET_CMD_APP_DOWNLOAD: {
             bsp_status_led_set_mode(BOOT_LED_MODE_UPDATE_WINDOW);
             const uint16_t data_length = (uint16_t)(payload_length - PACKET_INSTRUCT_SEGMENT_SIZE);
@@ -126,7 +152,9 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
             }
             break;
         }
+#endif
 
+#if BOOT_ENABLE_LEGACY_JUMP && BOOT_ENABLE_APPLICATION_JUMP
         case PACKET_CMD_JUMP_TO_APP:
             response_payload_length = payload_length;
             if (!erase_completed || !boot_application_vector_is_valid()) {
@@ -139,6 +167,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                 log_i("JUMP_TO_APP accepted; waiting for ACK transmission");
             }
             break;
+#endif
 
         default:
             ++service_stats.unsupported_commands;
@@ -165,7 +194,9 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
 void BootUpdateServiceInit(void) {
     memset(&service_stats, 0, sizeof(service_stats));
     memset(response_buffer, 0, sizeof(response_buffer));
+#if !BOOT_ENABLE_LEGACY_UPDATE_SIMULATION
     memset(verify_buffer, 0, sizeof(verify_buffer));
+#endif
     erase_completed = false;
     jump_requested = false;
     arm_jump_after_publish = false;
@@ -180,10 +211,17 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
         return;
     ++service_stats.validated_frames;
 
+    if (!txBufferReserve()) {
+        ++service_stats.response_busy_drop;
+        return;
+    }
+
     arm_jump_after_publish = false;
     response_length = encode_response(frame, frame->payload_length);
-    if (response_length == 0U)
+    if (response_length == 0U) {
+        txBufferCancelWrite();
         return;
+    }
     if (txBufferWrite(response_buffer, response_length) == (int)response_length) {
         ++service_stats.responses_published;
         if (arm_jump_after_publish) {
@@ -198,7 +236,6 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
 
 void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* context) {
     (void)context;
-    basp_i2c_slave_err_reset();
     BootUpdateServiceHandleFrame(frame);
 }
 
@@ -208,6 +245,8 @@ void BootUpdateServiceGetStats(boot_update_service_stats_t* stats) {
 }
 
 bool BootUpdateServiceTakeJumpRequest(void) {
+    if (!jump_requested || (bsp_i2c_slave_get_state() != SLAVE_TX_DONE))
+        return false;
     const bool requested = jump_requested;
     jump_requested = false;
     return requested;

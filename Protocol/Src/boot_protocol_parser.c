@@ -147,9 +147,9 @@ bool BootProtocolParserPushByte(boot_protocol_parser_t* parser, uint8_t byte) {
     return false;
 }
 
-void BootProtocolParserProcess(boot_protocol_parser_t* parser) {
+size_t BootProtocolParserProcess(boot_protocol_parser_t* parser) {
     if (parser == NULL)
-        return;
+        return 0U;
 
     size_t copied_length = 0U;
     if (bsp_i2c_slave_get_state() == SLAVE_RX_DONE) {
@@ -164,14 +164,20 @@ void BootProtocolParserProcess(boot_protocol_parser_t* parser) {
     for (size_t i = 0U; i < copied_length; ++i) {
         BootProtocolParserPushByte(parser, local_buffer[i]);
     }
-    bsp_i2c_slave_update();
+    return copied_length;
 }
 
 void BootProtocolParserTimeout(boot_protocol_parser_t* parser) {
     if ((parser == NULL) || (parser->state == BOOT_PARSER_SYNC_1))
         return;
+    ++parser->stats.timeout;
     ++parser->stats.frame_drop;
     parser_reset_frame(parser);
+}
+
+void BootProtocolParserReset(boot_protocol_parser_t* parser) {
+    if (parser != NULL)
+        parser_reset_frame(parser);
 }
 
 void BootProtocolParserGetStats(const boot_protocol_parser_t* parser, boot_protocol_parser_stats_t* stats) {

@@ -1,8 +1,10 @@
 selectemubysn 20781318
+r1
 device HC32F460PETB-LQFP100
 si SWD
 speed 100
-ShowConf
 connect
-ShowConf
+r0
+reset
+go
 exit

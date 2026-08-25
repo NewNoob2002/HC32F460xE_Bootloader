@@ -42,9 +42,36 @@ static bool logging_init(void) {
 }
 #endif
 
-static void prepare_for_application(void) {
-    bsp_i2c_slave_deinit();
+#if BOOT_ENABLE_EASYLOGGER
+static void log_protocol_diagnostics(const boot_protocol_parser_t* parser) {
+    static uint32_t previous_fault_events;
+    bsp_i2c_slave_counters_t i2c;
+    boot_protocol_parser_stats_t protocol;
+    bsp_i2c_slave_get_counters(&i2c);
+    BootProtocolParserGetStats(parser, &protocol);
+    const uint32_t fault_events = i2c.rx_overflow + i2c.empty_tx_reads + i2c.response_busy + i2c.arbitration_lost
+                                  + i2c.recovery_active_stall + i2c.recovery_hw_busy
+                                  + i2c.recovery_init_failures + protocol.timeout;
+    if (fault_events == previous_fault_events)
+        return;
+    previous_fault_events = fault_events;
+    BOOT_LOG_WARN(
+        "I2C diag am_rx=%lu am_tx=%lu rx_b=%lu tx_b=%lu stop=%lu nack=%lu arlo=%lu ovf=%lu empty=%lu busy=%lu "
+        "timeout=%lu recover_active=%lu recover_busy=%lu init_fail=%lu sr=0x%08lx rec_sr=0x%08lx state=%u reason=%u",
+        (unsigned long)i2c.address_match_rx, (unsigned long)i2c.address_match_tx, (unsigned long)i2c.rx_bytes,
+        (unsigned long)i2c.tx_bytes, (unsigned long)i2c.stop_events, (unsigned long)i2c.nack_events,
+        (unsigned long)i2c.arbitration_lost, (unsigned long)i2c.rx_overflow, (unsigned long)i2c.empty_tx_reads,
+        (unsigned long)i2c.response_busy,
+        (unsigned long)protocol.timeout, (unsigned long)i2c.recovery_active_stall,
+        (unsigned long)i2c.recovery_hw_busy, (unsigned long)i2c.recovery_init_failures, (unsigned long)i2c.last_sr,
+        (unsigned long)i2c.last_recovery_sr, (unsigned)i2c.last_recovery_state,
+        (unsigned)i2c.last_recovery_reason);
 }
+#else
+static void log_protocol_diagnostics(const boot_protocol_parser_t* parser) {
+    (void)parser;
+}
+#endif
 
 static void fatal_safe_loop(bool timebase_ready, bool watchdog_ready, bool led_ready) {
     if (led_ready)
@@ -94,15 +121,14 @@ int main(void) {
     bool i2c_ready = bsp_i2c_slave_init();
     bsp_write_protection_restore();
     if (context.mode == BOOT_MODE_START_APPLICATION) {
-        prepare_for_application();
         (void)boot_jump_to_application(APP_FLASH_BASE);
         fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
     }
     if (!i2c_ready) {
-        BOOT_LOG_ERROR("I2C1 slave initialization failed %d", i2c_ready);
+        BOOT_LOG_ERROR("I2C slave initialization failed %d", i2c_ready);
         fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
     }
-    BOOT_LOG_INFO("ready addr=0x11 baud=400000 mode=%s", mode_name(context.mode));
+    BOOT_LOG_INFO("ready addr=0x11 baud=%lu mode=%s", (unsigned long)BOOT_I2C_BAUDRATE, mode_name(context.mode));
     BootUpdateServiceInit();
     BootProtocolParserInit(&protocol_parser);
     BootProtocolParserRegisterCallback(&protocol_parser, BootUpdateServiceFrameCallback, NULL);
@@ -111,14 +137,24 @@ int main(void) {
                                                                     : BOOT_LED_MODE_RECOVERY);
     while (1) {
         now_ms = boot_time_ms();
-        BootProtocolParserProcess(&protocol_parser);
+        if (BootProtocolParserProcess(&protocol_parser) > 0U)
+            protocol_last_byte_ms = now_ms;
+        if (BootProtocolParserHasPartialFrame(&protocol_parser)
+            && boot_time_elapsed(now_ms, protocol_last_byte_ms, BOOT_PROTOCOL_PARTIAL_TIMEOUT_MS)) {
+            BootProtocolParserTimeout(&protocol_parser);
+            protocol_last_byte_ms = now_ms;
+        }
+        if (bsp_i2c_slave_poll(now_ms)) {
+            BootProtocolParserReset(&protocol_parser);
+            protocol_last_byte_ms = now_ms;
+        }
+        log_protocol_diagnostics(&protocol_parser);
         bsp_external_watchdog_poll(now_ms);
         bsp_status_led_poll(now_ms);
         boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)
             context.jump_requested = false;
-        const bool update_jump_requested =
-            (bsp_i2c_slave_get_state() == SLAVE_TX_DONE) && BootUpdateServiceTakeJumpRequest();
+        const bool update_jump_requested = BootUpdateServiceTakeJumpRequest();
         if ((context.jump_requested && context.app_valid) || update_jump_requested) {
 #if BOOT_ENABLE_EASYLOGGER
             bsp_i2c_slave_counters_t i2c_counters;
@@ -131,7 +167,6 @@ int main(void) {
             BOOT_LOG_INFO("JUMP to application requested by %s",
                           update_jump_requested ? "update service" : "user");
 #endif
-            prepare_for_application();
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
         }

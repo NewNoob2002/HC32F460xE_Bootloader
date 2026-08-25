@@ -59,6 +59,8 @@ SECTIONS
     {
         KEEP(*(.icg_sec))
     } >FLASH
+    ASSERT(ADDR(.icg_sec) == 0x00000400, "ICG must start at 0x400")
+    ASSERT(SIZEOF(.icg_sec) == 0x20, "ICG must contain exactly eight 32-bit words")
 
     .text :
     {

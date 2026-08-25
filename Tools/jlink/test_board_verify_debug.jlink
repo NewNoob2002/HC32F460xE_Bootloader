@@ -2,7 +2,7 @@ selectemubysn 20781318
 device HC32F460PETB-LQFP100
 si SWD
 speed 100
-ShowConf
 connect
-ShowConf
+verifybin build/Debug/hc32f460_boot.bin 0x00000000
+mem32 0x00000000 4
 exit

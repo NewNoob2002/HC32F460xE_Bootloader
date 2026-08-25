@@ -4,6 +4,7 @@
 #include "boot_protocol_types.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef enum {
@@ -23,6 +24,7 @@ typedef struct {
     uint32_t length_error;
     uint32_t overflow_error;
     uint32_t frame_drop;
+    uint32_t timeout;
 } boot_protocol_parser_stats_t;
 
 typedef void (*boot_protocol_frame_callback_t)(const boot_protocol_frame_t* frame, void* context);
@@ -60,11 +62,14 @@ void BootProtocolParserRegisterCallback(boot_protocol_parser_t* parser, boot_pro
  */
 bool BootProtocolParserPushByte(boot_protocol_parser_t* parser, uint8_t byte);
 
-/** @brief Consumes currently available bytes through the I2C RX buffer API. */
-void BootProtocolParserProcess(boot_protocol_parser_t* parser);
+/** @brief Consumes available I2C bytes and returns the number consumed. */
+size_t BootProtocolParserProcess(boot_protocol_parser_t* parser);
 
 /** @brief Discards an incomplete frame after a caller-managed timeout. */
 void BootProtocolParserTimeout(boot_protocol_parser_t* parser);
+
+/** @brief Discards an incomplete frame without recording a parser timeout. */
+void BootProtocolParserReset(boot_protocol_parser_t* parser);
 
 /** @brief Copies parser statistics into caller-owned storage. */
 void BootProtocolParserGetStats(const boot_protocol_parser_t* parser, boot_protocol_parser_stats_t* stats);

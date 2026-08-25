@@ -1,0 +1,16 @@
+selectemubysn 20781318
+device HC32F460PETB-LQFP100
+si SWD
+speed 100
+connect
+halt
+regs
+mem32 0x4004E000 12
+mem32 0x1FFF8A04 25
+mem32 0x1FFF8C88 1
+mem32 0x40051068 4
+mem32 0x1FFF8EBC 4
+mem32 0xE000E100 1
+mem32 0xE000E200 1
+go
+exit
