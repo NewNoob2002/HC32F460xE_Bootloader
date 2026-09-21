@@ -19,6 +19,8 @@ Baseline: node 1 safety baseline and Phase 2 inbound transport boundary closed w
 
 ## Feature-gate baseline
 
+Default firmware builds enable real Flash erase/download and the upgrade jump command, with simulation disabled. Product-board end-to-end upgrade validation is still pending.
+
 `ERASE` and `DOWNLOAD` dispatch require both their Legacy command macro and `BOOT_ENABLE_FLASH_UPDATE`. `JUMP` requires both `BOOT_ENABLE_LEGACY_JUMP` and `BOOT_ENABLE_APPLICATION_JUMP`. Simulation exercises enabled command state transitions without calling the Flash erase/write/read BSP.
 
 ## Current boot decision

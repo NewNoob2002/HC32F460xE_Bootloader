@@ -1,7 +1,7 @@
 # J-Link workflows
 
 These scripts target the HC32F460xE pin-revised test board through J-Link
-serial `20781318`, SWD at 100 kHz. Run them from the repository root.
+serial `63728769`, SWD at 100 kHz. Run them from the repository root.
 
 Create a hardware safety preflight before Flash, reset/run or halt operations.
 For a raw BIN, verify its SHA-256, size and load address `0x00000000` first.

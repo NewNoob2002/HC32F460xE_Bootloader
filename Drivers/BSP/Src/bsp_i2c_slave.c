@@ -129,6 +129,8 @@ static void i2c_eei_callback(void) {
 
     if (SET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_MATCH_ADDR0)) {
         const bool transaction_is_read = SET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_TRA);
+        /* STOP/NACK may remain latched while their interrupts are disabled between transfers. */
+        I2C_ClearStatus(BOOT_I2C_UNIT, I2C_CLR_STOPFCLR | I2C_CLR_NACKFCLR);
         transaction_active = true;
         note_progress();
         if (transaction_is_read) {
@@ -173,8 +175,7 @@ static void i2c_eei_callback(void) {
     if (SET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_STOP)) {
         ++i2c_slave_counters_stats.stop_events;
         note_progress();
-        I2C_IntCmd(BOOT_I2C_UNIT,
-                   I2C_INT_TX_CPLT | I2C_INT_STOP | I2C_INT_NACK | I2C_INT_ARBITRATE_FAIL, DISABLE);
+        I2C_IntCmd(BOOT_I2C_UNIT, I2C_INT_TX_CPLT | I2C_INT_STOP | I2C_INT_NACK | I2C_INT_ARBITRATE_FAIL, DISABLE);
         NVIC_ClearPendingIRQ(BOOT_I2C_TEI_IRQn);
         I2C_ClearStatus(BOOT_I2C_UNIT, I2C_CLR_STOPFCLR | I2C_CLR_STARTFCLR);
         transaction_active = false;
@@ -182,8 +183,7 @@ static void i2c_eei_callback(void) {
             ++i2c_slave_counters_stats.rx_transactions;
             slave_state = SLAVE_RX_DONE;
         } else if (slave_state == SLAVE_TX) {
-            if (tx_transaction_has_response
-                && (tx_transaction_started_bytes >= tx_transaction_response_length)) {
+            if (tx_transaction_has_response && (tx_transaction_started_bytes >= tx_transaction_response_length)) {
                 ++i2c_slave_counters_stats.tx_complete_reads;
                 tx_transactions._BufferHead = 0U;
                 tx_transactions._BufferTail = 0U;

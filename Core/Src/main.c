@@ -51,8 +51,8 @@ static void log_protocol_diagnostics(const boot_protocol_parser_t* parser) {
     bsp_i2c_slave_get_counters(&i2c);
     BootProtocolParserGetStats(parser, &protocol);
     const uint32_t fault_events = i2c.rx_overflow + i2c.empty_tx_reads + i2c.response_busy + i2c.arbitration_lost
-                                  + i2c.recovery_active_stall + i2c.recovery_hw_busy
-                                  + i2c.recovery_init_failures + protocol.timeout;
+                                  + i2c.recovery_active_stall + i2c.recovery_hw_busy + i2c.recovery_init_failures
+                                  + protocol.timeout;
     if (fault_events == previous_fault_events)
         return;
     previous_fault_events = fault_events;
@@ -62,11 +62,9 @@ static void log_protocol_diagnostics(const boot_protocol_parser_t* parser) {
         (unsigned long)i2c.address_match_rx, (unsigned long)i2c.address_match_tx, (unsigned long)i2c.rx_bytes,
         (unsigned long)i2c.tx_bytes, (unsigned long)i2c.stop_events, (unsigned long)i2c.nack_events,
         (unsigned long)i2c.arbitration_lost, (unsigned long)i2c.rx_overflow, (unsigned long)i2c.empty_tx_reads,
-        (unsigned long)i2c.response_busy,
-        (unsigned long)protocol.timeout, (unsigned long)i2c.recovery_active_stall,
+        (unsigned long)i2c.response_busy, (unsigned long)protocol.timeout, (unsigned long)i2c.recovery_active_stall,
         (unsigned long)i2c.recovery_hw_busy, (unsigned long)i2c.recovery_init_failures, (unsigned long)i2c.last_sr,
-        (unsigned long)i2c.last_recovery_sr, (unsigned)i2c.last_recovery_state,
-        (unsigned)i2c.last_recovery_reason);
+        (unsigned long)i2c.last_recovery_sr, (unsigned)i2c.last_recovery_state, (unsigned)i2c.last_recovery_reason);
 }
 #else
 static void log_protocol_diagnostics(const boot_protocol_parser_t* parser) {
@@ -165,11 +163,9 @@ int main(void) {
             const uint32_t reset_flags = bsp_reset_capture();
             bsp_i2c_slave_get_counters(&i2c_counters);
             BOOT_LOG_INFO("JUMP ACK transmitted tx_reads=%lu rx=%lu PB3=%s RMU=0x%04lx",
-                          (unsigned long)i2c_counters.tx_complete_reads,
-                          (unsigned long)i2c_counters.rx_transactions,
+                          (unsigned long)i2c_counters.tx_complete_reads, (unsigned long)i2c_counters.rx_transactions,
                           bsp_power_hold_is_asserted() ? "high" : "fault", (unsigned long)reset_flags);
-            BOOT_LOG_INFO("JUMP to application requested by %s",
-                          update_jump_requested ? "update service" : "user");
+            BOOT_LOG_INFO("JUMP to application requested by %s", update_jump_requested ? "update service" : "user");
 #endif
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
