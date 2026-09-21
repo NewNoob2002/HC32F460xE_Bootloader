@@ -25,7 +25,8 @@ void boot_capture_reset_info(boot_context_t* context) {
     context->jump_requested = false;
 }
 void boot_select_mode(boot_context_t* context) {
-    boot_app_select_mode(context, context->app_valid, context->reset_info.software_reset);
+    const bool upgrade_completed = bsp_reset_take_upgrade_marker(context->reset_info.raw_flags);
+    boot_app_select_mode(context, context->app_valid, context->reset_info.software_reset, upgrade_completed);
 }
 void boot_timeout_poll(boot_context_t* context, uint32_t now_ms) {
     if (((uint32_t)(now_ms - context->update_started_ms) >= BOOT_UPDATE_WINDOW_MS)) {

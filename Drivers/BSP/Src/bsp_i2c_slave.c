@@ -18,6 +18,7 @@ static volatile bool tx_transaction_has_response;
 static volatile uint16_t tx_transaction_start_tail;
 static volatile uint16_t tx_transaction_response_length;
 static volatile uint16_t tx_transaction_started_bytes;
+static volatile uint16_t tx_transaction_completed_bytes;
 static volatile uint32_t progress_sequence;
 static bool tx_write_reserved;
 static bool poll_initialized;
@@ -140,6 +141,7 @@ static void i2c_eei_callback(void) {
             tx_transaction_start_tail = tx_transactions._BufferTail;
             tx_transaction_response_length = (uint16_t)txBufferAvailable();
             tx_transaction_started_bytes = 0U;
+            tx_transaction_completed_bytes = 0U;
             i2c_queue_next_byte();
             I2C_IntCmd(BOOT_I2C_UNIT, I2C_INT_TX_CPLT, ENABLE);
         } else {
@@ -155,8 +157,10 @@ static void i2c_eei_callback(void) {
         note_progress();
         I2C_IntCmd(BOOT_I2C_UNIT, I2C_INT_TX_CPLT, DISABLE);
         NVIC_ClearPendingIRQ(BOOT_I2C_TEI_IRQn);
-        if ((slave_state == SLAVE_TX) && tx_transaction_has_response)
+        if ((slave_state == SLAVE_TX) && tx_transaction_has_response) {
             tx_transactions._BufferTail = tx_transaction_start_tail;
+            tx_transaction_has_response = false;
+        }
         I2C_ClearStatus(BOOT_I2C_UNIT, I2C_FLAG_CLR_ARBITRATE_FAIL);
     }
 
@@ -164,7 +168,9 @@ static void i2c_eei_callback(void) {
         ++i2c_slave_counters_stats.nack_events;
         note_progress();
         I2C_ClearStatus(BOOT_I2C_UNIT, I2C_CLR_NACKFCLR);
-        if (SET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_TRA)) {
+        /* STOP may already have cleared TRA/TENDF when the final NACK is serviced. */
+        if (slave_state == SLAVE_TX) {
+            tx_transaction_completed_bytes = tx_transaction_started_bytes;
             I2C_IntCmd(BOOT_I2C_UNIT, I2C_INT_TX_CPLT, DISABLE);
             NVIC_ClearPendingIRQ(BOOT_I2C_TEI_IRQn);
             I2C_ClearStatus(BOOT_I2C_UNIT, I2C_FLAG_CLR_TX_CPLT);
@@ -183,7 +189,7 @@ static void i2c_eei_callback(void) {
             ++i2c_slave_counters_stats.rx_transactions;
             slave_state = SLAVE_RX_DONE;
         } else if (slave_state == SLAVE_TX) {
-            if (tx_transaction_has_response && (tx_transaction_started_bytes >= tx_transaction_response_length)) {
+            if (tx_transaction_has_response && (tx_transaction_completed_bytes >= tx_transaction_response_length)) {
                 ++i2c_slave_counters_stats.tx_complete_reads;
                 tx_transactions._BufferHead = 0U;
                 tx_transactions._BufferTail = 0U;
@@ -207,8 +213,11 @@ static void i2c_rxi_callback(void) {
 static void i2c_tei_callback(void) {
     i2c_slave_counters_stats.last_sr = BOOT_I2C_UNIT->SR;
     if ((SET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_TX_CPLT))
-        && (RESET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_NACKF)))
+        && (RESET == I2C_GetStatus(BOOT_I2C_UNIT, I2C_FLAG_NACKF))) {
+        /* Loading DTR alone does not mean that byte reached the master. */
+        tx_transaction_completed_bytes = tx_transaction_started_bytes;
         i2c_queue_next_byte();
+    }
 }
 
 static bool register_irq(IRQn_Type irq, en_int_src_t source, uint32_t priority, func_ptr_t callback) {
@@ -254,6 +263,7 @@ bool bsp_i2c_slave_init(void) {
     tx_transaction_start_tail = 0U;
     tx_transaction_response_length = 0U;
     tx_transaction_started_bytes = 0U;
+    tx_transaction_completed_bytes = 0U;
     tx_write_reserved = false;
     poll_initialized = false;
     I2C_Cmd(BOOT_I2C_UNIT, ENABLE);

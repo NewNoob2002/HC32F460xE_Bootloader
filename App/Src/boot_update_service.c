@@ -6,6 +6,7 @@
 #include "boot_config.h"
 #include "boot_memory_map.h"
 #include "boot_protocol_crc.h"
+#include "boot_timebase.h"
 #include "bsp_flash.h"
 #include "bsp_i2c_slave.h"
 #include "bsp_status_led.h"
@@ -24,6 +25,8 @@ static uint8_t verify_buffer[PACKET_DATA_SEGMENT_SIZE];
 #endif
 static bool erase_completed;
 static bool jump_requested;
+static uint32_t jump_requested_ms;
+static uint32_t jump_ack_reads_before;
 static bool arm_jump_after_publish;
 static uint32_t session_programmed_bytes;
 static uint32_t programmed_high_water;
@@ -162,7 +165,6 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                 log_w("JUMP_TO_APP rejected erased=%u bytes=%lu high=0x%08lX", erase_completed ? 1U : 0U,
                       (unsigned long)session_programmed_bytes, (unsigned long)programmed_high_water);
             } else {
-                bsp_status_led_set_mode(BOOT_LED_MODE_OFF);
                 arm_jump_after_publish = true;
                 log_i("JUMP_TO_APP accepted; waiting for ACK transmission");
             }
@@ -199,6 +201,8 @@ void BootUpdateServiceInit(void) {
 #endif
     erase_completed = false;
     jump_requested = false;
+    jump_requested_ms = 0U;
+    jump_ack_reads_before = 0U;
     arm_jump_after_publish = false;
     session_programmed_bytes = 0U;
     programmed_high_water = APP_FLASH_BASE;
@@ -211,7 +215,7 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
         return;
     ++service_stats.validated_frames;
 
-    if (!txBufferReserve()) {
+    if (jump_requested || !txBufferReserve()) {
         ++service_stats.response_busy_drop;
         return;
     }
@@ -221,6 +225,13 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
     if (response_length == 0U) {
         txBufferCancelWrite();
         return;
+    }
+    if (arm_jump_after_publish) {
+        bsp_i2c_slave_counters_t counters;
+        /* Snapshot before publication: the ISR may finish the ACK immediately. */
+        bsp_i2c_slave_get_counters(&counters);
+        jump_ack_reads_before = counters.tx_complete_reads;
+        jump_requested_ms = boot_time_ms();
     }
     if (txBufferWrite(response_buffer, response_length) == (int)response_length) {
         ++service_stats.responses_published;
@@ -244,10 +255,14 @@ void BootUpdateServiceGetStats(boot_update_service_stats_t* stats) {
         *stats = service_stats;
 }
 
-bool BootUpdateServiceTakeJumpRequest(void) {
-    if (!jump_requested || (bsp_i2c_slave_get_state() != SLAVE_TX_DONE))
+bool BootUpdateServiceTakeJumpRequest(uint32_t now_ms) {
+    if (!jump_requested)
         return false;
-    const bool requested = jump_requested;
+    bsp_i2c_slave_counters_t counters;
+    bsp_i2c_slave_get_counters(&counters);
+    if ((counters.tx_complete_reads == jump_ack_reads_before)
+        || !boot_time_elapsed(now_ms, jump_requested_ms, BOOT_APPLICATION_HANDOVER_GUARD_MS))
+        return false;
     jump_requested = false;
-    return requested;
+    return true;
 }

@@ -61,12 +61,16 @@ static void test_vector_validation(void) {
 static void test_mode_selection(void) {
     boot_context_t context = {0};
 
-    boot_app_select_mode(&context, false, false);
+    boot_app_select_mode(&context, false, false, false);
     assert(context.mode == BOOT_MODE_RECOVERY);
-    boot_app_select_mode(&context, true, true);
+    boot_app_select_mode(&context, true, true, false);
     assert(context.mode == BOOT_MODE_UPDATE_WINDOW);
-    boot_app_select_mode(&context, true, false);
+    boot_app_select_mode(&context, true, false, false);
     assert(context.mode == BOOT_MODE_START_APPLICATION);
+    boot_app_select_mode(&context, true, true, true);
+    assert(context.mode == BOOT_MODE_START_APPLICATION);
+    boot_app_select_mode(&context, false, true, true);
+    assert(context.mode == BOOT_MODE_RECOVERY);
 }
 
 int main(void) {

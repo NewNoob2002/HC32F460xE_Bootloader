@@ -99,14 +99,16 @@ int main(void) {
 
     now_ms = boot_time_ms();
     context.watchdog_ready = bsp_external_watchdog_init(now_ms);
-    context.led_ready = bsp_status_led_init();
-    if (context.led_ready)
-        bsp_status_led_set_mode(BOOT_LED_MODE_BOOTING);
     context.log_ready = logging_init();
     context.app_valid = boot_application_vector_is_valid();
     context.update_started_ms = boot_time_ms();
     context.jump_requested = false;
     boot_select_mode(&context);
+    if (context.mode != BOOT_MODE_START_APPLICATION) {
+        context.led_ready = bsp_status_led_init();
+        if (context.led_ready)
+            bsp_status_led_set_mode(BOOT_LED_MODE_BOOTING);
+    }
 
     BOOT_LOG_INFO("PB3 hold=%s", bsp_power_hold_is_asserted() ? "high" : "fault");
     BOOT_LOG_INFO("PSPCR=0x%04x", bsp_debug_port_pspcr());
@@ -156,7 +158,7 @@ int main(void) {
         boot_timeout_poll(&context, now_ms);
         if (context.mode == BOOT_MODE_RECOVERY)
             context.jump_requested = false;
-        const bool update_jump_requested = BootUpdateServiceTakeJumpRequest();
+        const bool update_jump_requested = BootUpdateServiceTakeJumpRequest(boot_time_ms());
         if ((context.jump_requested && context.app_valid) || update_jump_requested) {
 #if BOOT_ENABLE_EASYLOGGER
             bsp_i2c_slave_counters_t i2c_counters;
@@ -167,6 +169,8 @@ int main(void) {
                           bsp_power_hold_is_asserted() ? "high" : "fault", (unsigned long)reset_flags);
             BOOT_LOG_INFO("JUMP to application requested by %s", update_jump_requested ? "update service" : "user");
 #endif
+            if (update_jump_requested)
+                bsp_reset_after_upgrade();
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
         }

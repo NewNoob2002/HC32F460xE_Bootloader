@@ -37,3 +37,13 @@ target_compile_definitions(boot_core_tests PRIVATE BOOT_CFG_LOGGING=0 BOOT_HOST_
 target_compile_options(boot_core_tests PRIVATE -Wall -Wextra -Wshadow -Wconversion -Wundef)
 target_link_libraries(boot_core_tests PRIVATE project::options boot::config)
 add_test(NAME boot_core_tests COMMAND boot_core_tests)
+
+add_executable(boot_handover_tests
+    boot_handover_tests.c
+    ../Drivers/BSP/Src/bsp_i2c_slave.c
+    ../Drivers/BSP/Src/bsp_reset.c
+)
+target_include_directories(boot_handover_tests PRIVATE hc32_mock ../Drivers/BSP/Inc)
+target_compile_definitions(boot_handover_tests PRIVATE BOOT_CFG_LOGGING=0 BOOT_HOST_TEST=1)
+target_link_libraries(boot_handover_tests PRIVATE project::options boot::config)
+add_test(NAME boot_handover_tests COMMAND boot_handover_tests)

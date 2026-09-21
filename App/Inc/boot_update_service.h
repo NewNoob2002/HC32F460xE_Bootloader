@@ -98,7 +98,7 @@ void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* co
 /** @brief Copies service statistics into caller-owned storage. */
 void BootUpdateServiceGetStats(boot_update_service_stats_t* stats);
 
-/** @brief Consumes a validated jump request after its response has been transmitted. */
-bool BootUpdateServiceTakeJumpRequest(void);
+/** @brief Consumes a jump request after the complete response read and handover guard interval. */
+bool BootUpdateServiceTakeJumpRequest(uint32_t now_ms);
 
 #endif
