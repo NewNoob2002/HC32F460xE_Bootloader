@@ -98,6 +98,14 @@ void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* co
 /** @brief Copies service statistics into caller-owned storage. */
 void BootUpdateServiceGetStats(boot_update_service_stats_t* stats);
 
+/** @brief Reports a validated supported request (including handshake), even if busy or rejected.
+ * Main-loop only; latched until BootUpdateServiceInit(), independent of Flash operation success.
+ */
+bool BootUpdateServiceHasRequest(void);
+
+/** @brief Consumes successful erase/download/jump progress for the inactivity timer. */
+bool BootUpdateServiceTakeProgress(void);
+
 /** @brief Consumes a jump request after the complete response read and handover guard interval. */
 bool BootUpdateServiceTakeJumpRequest(uint32_t now_ms);
 

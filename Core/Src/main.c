@@ -73,8 +73,10 @@ static void log_protocol_diagnostics(const boot_protocol_parser_t* parser) {
 #endif
 
 static void fatal_safe_loop(bool timebase_ready, bool watchdog_ready, bool led_ready) {
+    if (!led_ready)
+        led_ready = bsp_status_led_init();
     if (led_ready)
-        bsp_status_led_set_mode(BOOT_LED_MODE_FATAL);
+        bsp_status_led_set_mode(timebase_ready ? BOOT_LED_MODE_FATAL : BOOT_LED_MODE_BOOTING);
     while (1) {
         bsp_power_hold_assert();
         if (timebase_ready) {
@@ -93,9 +95,11 @@ int main(void) {
     bsp_write_protection_unlock();
     bsp_debug_port_configure_for_boot_gpio();
     bsp_clock_init();
-    boot_timebase_init();
+    const bool timebase_ready = boot_timebase_init();
     bsp_power_init();
     boot_capture_reset_info(&context);
+    if (!timebase_ready)
+        fatal_safe_loop(false, false, false);
 
     now_ms = boot_time_ms();
     context.watchdog_ready = bsp_external_watchdog_init(now_ms);
@@ -120,6 +124,7 @@ int main(void) {
 
     BOOT_LOG_INFO("init begin %ums", (unsigned)(boot_time_ms() - now_ms));
     bool i2c_ready = bsp_i2c_slave_init();
+    context.update_started_ms = boot_time_ms();
     bsp_write_protection_restore();
     if (context.mode == BOOT_MODE_START_APPLICATION) {
         (void)boot_jump_to_application(APP_FLASH_BASE);
@@ -138,10 +143,25 @@ int main(void) {
                                                                     : BOOT_LED_MODE_RECOVERY);
     while (1) {
         now_ms = boot_time_ms();
+        if (context.shutdown_pending) {
+            (void)boot_timeout_poll(&context, now_ms);
+            bsp_external_watchdog_poll(now_ms);
+            bsp_status_led_poll(boot_time_ms());
+            continue;
+        }
         const size_t received = bsp_i2c_slave_read(transport_rx_buffer, sizeof(transport_rx_buffer));
         if (received > 0U) {
             (void)BootProtocolParserPushBytes(&protocol_parser, transport_rx_buffer, received);
             protocol_last_byte_ms = now_ms;
+        }
+        context.update_request_received = BootUpdateServiceHasRequest();
+        if (BootUpdateServiceTakeProgress())
+            context.update_started_ms = boot_time_ms();
+        /* Parse queued I2C bytes before deciding that the first request missed its deadline. */
+        if (boot_timeout_poll(&context, boot_time_ms())) {
+            bsp_external_watchdog_poll(boot_time_ms());
+            bsp_status_led_poll(boot_time_ms());
+            continue;
         }
         if (BootProtocolParserHasPartialFrame(&protocol_parser)
             && boot_time_elapsed(now_ms, protocol_last_byte_ms, BOOT_PROTOCOL_PARTIAL_TIMEOUT_MS)) {
@@ -154,8 +174,7 @@ int main(void) {
         }
         log_protocol_diagnostics(&protocol_parser);
         bsp_external_watchdog_poll(now_ms);
-        bsp_status_led_poll(now_ms);
-        boot_timeout_poll(&context, now_ms);
+        bsp_status_led_poll(boot_time_ms());
         if (context.mode == BOOT_MODE_RECOVERY)
             context.jump_requested = false;
         const bool update_jump_requested = BootUpdateServiceTakeJumpRequest(boot_time_ms());
@@ -169,8 +188,10 @@ int main(void) {
                           bsp_power_hold_is_asserted() ? "high" : "fault", (unsigned long)reset_flags);
             BOOT_LOG_INFO("JUMP to application requested by %s", update_jump_requested ? "update service" : "user");
 #endif
-            if (update_jump_requested)
+            if (update_jump_requested) {
+                bsp_status_led_off();
                 bsp_reset_after_upgrade();
+            }
             (void)boot_jump_to_application(APP_FLASH_BASE);
             fatal_safe_loop(true, context.watchdog_ready, context.led_ready);
         }

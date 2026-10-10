@@ -29,9 +29,10 @@ add_executable(boot_core_tests
     ../Core/Src/boot_memory_map.c
     ../App/Src/app_validator.c
     ../App/Src/boot_app.c
+    ../Drivers/BSP/Src/bsp_status_led.c
 )
 target_include_directories(boot_core_tests PRIVATE
-    ../Core/Inc ../App/Inc
+    ../Core/Inc ../App/Inc ../Drivers/BSP/Inc
 )
 target_compile_definitions(boot_core_tests PRIVATE BOOT_CFG_LOGGING=0 BOOT_HOST_TEST=1)
 target_compile_options(boot_core_tests PRIVATE -Wall -Wextra -Wshadow -Wconversion -Wundef)

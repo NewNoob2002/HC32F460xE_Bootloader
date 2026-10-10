@@ -30,6 +30,7 @@ static uint32_t mock_write_length;
 static uint8_t mock_write_data[BOOT_PROTOCOL_MAX_DATA_SIZE];
 static int32_t mock_flash_result;
 static bool mock_app_valid;
+static boot_led_mode_t mock_led_mode;
 
 void boot_protocol_crc_tests_run(void);
 
@@ -62,7 +63,7 @@ bool boot_application_vector_is_valid(void) {
 }
 
 void bsp_status_led_set_mode(boot_led_mode_t mode) {
-    (void)mode;
+    mock_led_mode = mode;
 }
 
 i2c_slave_state_t bsp_i2c_slave_get_state(void) {
@@ -299,7 +300,93 @@ static void test_chunk_and_legacy_callback(void) {
     assert(stats.responses_published == 1U);
 }
 
+static void test_first_update_request(void) {
+    boot_protocol_parser_t parser;
+    uint8_t payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE] = {PACKET_CMD_HANDSHAKE, PACKET_CMD_TYPE_CONTROL};
+    uint8_t frame[BOOT_PROTOCOL_MAX_FRAME_SIZE];
+    const size_t length = make_frame(frame, 1U, payload, sizeof(payload));
+
+    BootUpdateServiceInit();
+    BootProtocolParserInit(&parser);
+    BootProtocolParserRegisterCallback(&parser, BootUpdateServiceFrameCallback, NULL);
+    assert(!BootUpdateServiceHasRequest());
+    frame[length - 1U] ^= 1U;
+    assert(feed_bytes(&parser, frame, length) == 0U);
+    assert(!BootUpdateServiceHasRequest());
+
+    payload[0] = PACKET_CMD_APP_UPLOAD; /* Valid CRC, unsupported command. */
+    assert(feed_bytes(&parser, frame, make_frame(frame, 2U, payload, sizeof(payload))) == 1U);
+    assert(!BootUpdateServiceHasRequest());
+
+    payload[0] = PACKET_CMD_HANDSHAKE;
+    mock_tx_pending = true; /* A valid request still counts when the response is busy. */
+    assert(feed_bytes(&parser, frame, make_frame(frame, 3U, payload, sizeof(payload))) == 1U);
+    assert(BootUpdateServiceHasRequest());
+    mock_tx_pending = false;
+}
+
 #if BOOT_TEST_UPDATE_MODE != 0
+static void test_update_led_and_progress(void) {
+    boot_protocol_frame_t frame = {0};
+    frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 4U;
+    frame.payload[0] = PACKET_CMD_APP_DOWNLOAD;
+    frame.payload[1] = PACKET_CMD_TYPE_DATA;
+    frame.payload[3] = 0x80U;
+    mock_tx_pending = mock_tx_reserved = false;
+    mock_i2c_state = SLAVE_RX_DONE;
+    mock_flash_result = BSP_FLASH_OK;
+    mock_erase_count = 0U;
+    mock_led_mode = BOOT_LED_MODE_RECOVERY;
+    BootUpdateServiceInit();
+    assert(!BootUpdateServiceTakeProgress());
+    BootUpdateServiceHandleFrame(&frame); /* Download before erase is rejected. */
+    assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_RECOVERY && !BootUpdateServiceTakeProgress());
+
+    frame.payload[1] = PACKET_CMD_TYPE_CONTROL;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ADDR_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_RECOVERY && !BootUpdateServiceTakeProgress());
+    frame.payload[1] = PACKET_CMD_TYPE_DATA;
+    frame.payload[0] = PACKET_CMD_ERASE_FLASH;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
+    assert(!BootUpdateServiceTakeProgress());
+
+    frame.payload[0] = PACKET_CMD_APP_DOWNLOAD;
+    frame.payload[3] = 0U;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ADDR_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && !BootUpdateServiceTakeProgress());
+    frame.payload[3] = 0x80U;
+#if BOOT_TEST_UPDATE_MODE == 1
+    mock_flash_result = -1;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    mock_flash_result = BSP_FLASH_OK;
+#endif
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
+
+    frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
+    mock_app_valid = false;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_ERROR, frame.payload_length);
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    frame.payload[0] = PACKET_CMD_HANDSHAKE;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_HANDSHAKE, PACKET_ACK_OK, frame.payload_length);
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
+    mock_app_valid = true;
+    BootUpdateServiceHandleFrame(&frame);
+    assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, frame.payload_length);
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
+}
+
 /* Completion survives traffic even if main never observes TX_DONE. */
 static void assert_jump_after_guard(void) {
     const uint32_t guard = BOOT_APPLICATION_HANDOVER_GUARD_MS;
@@ -455,11 +542,13 @@ static void test_update_flash_failures(void) {
     BootUpdateServiceInit();
     BootUpdateServiceHandleFrame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
 
     mock_flash_result = BSP_FLASH_OK;
     mock_erase_count = 0U;
     BootUpdateServiceHandleFrame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     mock_app_valid = false;
     BootUpdateServiceHandleFrame(&frame);
@@ -553,9 +642,11 @@ int main(void) {
     test_maximum_and_timeout();
     test_push_bytes();
     test_chunk_and_legacy_callback();
+    test_first_update_request();
     test_update_command_responses();
     test_update_flash_failures();
 #if BOOT_TEST_UPDATE_MODE != 0
+    test_update_led_and_progress();
     test_jump_deadline();
 #endif
     puts("boot_protocol_tests: PASS");

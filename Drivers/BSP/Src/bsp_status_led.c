@@ -1,7 +1,7 @@
 #include "bsp_status_led.h"
 #include "boot_timebase.h"
 #include "bsp_board_config.h"
-#include "hc32_ll.h"
+#include <stddef.h>
 
 static uint32_t mode_interval(boot_led_mode_t mode) {
     if (mode == BOOT_LED_MODE_UPDATE_WINDOW)
@@ -17,12 +17,18 @@ static void led_write(led_scheduler_t* scheduler) {
         scheduler->write(scheduler->logical_on == scheduler->active_high, scheduler->write_context);
 }
 void led_scheduler_init(led_scheduler_t* scheduler, bool active_high, led_gpio_write_t write, void* context) {
+    scheduler->mode = BOOT_LED_MODE_OFF;
+    scheduler->previous_ms = 0U;
+    scheduler->interval_ms = 0U;
+    scheduler->logical_on = false;
     scheduler->active_high = active_high;
     scheduler->write = write;
     scheduler->write_context = context;
-    led_scheduler_set_mode(scheduler, BOOT_LED_MODE_OFF, 0U);
+    led_write(scheduler);
 }
 void led_scheduler_set_mode(led_scheduler_t* scheduler, boot_led_mode_t mode, uint32_t now_ms) {
+    if (scheduler->mode == mode)
+        return;
     scheduler->mode = mode;
     scheduler->previous_ms = now_ms;
     scheduler->interval_ms = mode_interval(mode);
@@ -43,8 +49,10 @@ void led_scheduler_poll(led_scheduler_t* scheduler, uint32_t now_ms) {
 }
 
 #if !defined(BOOT_HOST_TEST)
+#include "hc32_ll.h"
+
 static led_scheduler_t board_led;
-static bool board_ready;
+static volatile bool board_ready;
 
 static void board_gpio_write(bool level, void* context) {
     (void)context;
@@ -82,5 +90,9 @@ void bsp_status_led_off(void) {
 }
 bool bsp_status_led_is_ready(void) {
     return board_ready;
+}
+void bsp_status_led_fault_on(void) {
+    if (board_ready)
+        board_gpio_write(BOOT_STATUS_LED_ACTIVE_LEVEL != 0U, NULL);
 }
 #endif

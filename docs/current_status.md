@@ -31,7 +31,7 @@ Default firmware builds enable real Flash erase/download and the upgrade jump co
 | valid | yes | ten-minute update window |
 | valid | no | immediate application handover |
 
-The update timeout is currently polled in both update-window and Recovery modes. After expiry it waits one second and deasserts PB3 power hold; if power remains present, the condition remains true on subsequent polls.
+The ten-minute inactivity timeout applies in both update-window and Recovery modes. Successful erase/download/accepted jump commands refresh the deadline. Expiry stops command processing and starts a nonblocking one-second fast-blink warning, then turns the LED off and deasserts PB3 power hold once. LED and watchdog polling continue if external power remains. See [status LED contract](status_led_contract.md) for error and handover indications.
 
 ## Current safety and completeness limits
 

@@ -1,10 +1,12 @@
 #include "hc32f460_it.h"
 #include "hc32f460.h"
+#include "bsp_status_led.h"
 #include <stdbool.h>
 
 volatile boot_fault_snapshot_t g_boot_fault_snapshot __attribute__((section(".noinit.boot_fault"), used));
 
 void NMI_Handler(void) {
+    bsp_status_led_fault_on();
     while (1) {
         __NOP();
     }
@@ -66,6 +68,7 @@ __attribute__((noreturn)) void boot_hardfault_capture(uint32_t* frame, uint32_t 
     g_boot_fault_snapshot.faultmask = __get_FAULTMASK();
     g_boot_fault_snapshot.icsr = SCB->ICSR;
     g_boot_fault_snapshot.vtor = SCB->VTOR;
+    bsp_status_led_fault_on();
     __DSB();
     __ISB();
     __BKPT(0);

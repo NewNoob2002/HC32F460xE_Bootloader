@@ -24,6 +24,8 @@ static uint8_t response_buffer[BOOT_PROTOCOL_MAX_FRAME_SIZE];
 static uint8_t verify_buffer[PACKET_DATA_SEGMENT_SIZE];
 #endif
 static bool erase_completed;
+static bool update_progress;
+static bool request_received;
 static bool jump_requested;
 static uint32_t jump_requested_ms;
 static uint32_t jump_ack_reads_before;
@@ -116,6 +118,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                     ++service_stats.flash_errors;
                     result = PACKET_ACK_ERROR;
                     log_w("ERASE_FLASH failed");
+                    bsp_status_led_set_mode(BOOT_LED_MODE_FATAL);
                 } else {
                     erase_completed = true;
                     session_programmed_bytes = 0U;
@@ -130,7 +133,6 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
 
 #if BOOT_ENABLE_LEGACY_DOWNLOAD && BOOT_ENABLE_FLASH_UPDATE
         case PACKET_CMD_APP_DOWNLOAD: {
-            bsp_status_led_set_mode(BOOT_LED_MODE_UPDATE_WINDOW);
             const uint16_t data_length = (uint16_t)(payload_length - PACKET_INSTRUCT_SEGMENT_SIZE);
             response_payload_length = PACKET_INSTRUCT_SEGMENT_SIZE;
             if ((frame->payload[1U] != PACKET_CMD_TYPE_DATA) || (flash_address < APP_FLASH_BASE)
@@ -143,6 +145,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
                        != BSP_FLASH_OK) {
                 ++service_stats.flash_errors;
                 result = PACKET_ACK_ERROR;
+                bsp_status_led_set_mode(BOOT_LED_MODE_FATAL);
                 log_w("APP_DOWNLOAD failed address=0x%08lX length=%u", (unsigned long)flash_address,
                       (unsigned int)data_length);
             } else {
@@ -162,6 +165,7 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
             response_payload_length = payload_length;
             if (!erase_completed || !boot_application_vector_is_valid()) {
                 result = PACKET_ACK_ERROR;
+                bsp_status_led_set_mode(BOOT_LED_MODE_FATAL);
                 log_w("JUMP_TO_APP rejected erased=%u bytes=%lu high=0x%08lX", erase_completed ? 1U : 0U,
                       (unsigned long)session_programmed_bytes, (unsigned long)programmed_high_water);
             } else {
@@ -175,6 +179,13 @@ static uint16_t encode_response(const boot_protocol_frame_t* frame, uint16_t pay
             ++service_stats.unsupported_commands;
             log_w("Unsupported boot command=0x%02X", (unsigned int)command);
             return 0;
+    }
+
+    if ((result == PACKET_ACK_OK)
+        && ((command == PACKET_CMD_ERASE_FLASH) || (command == PACKET_CMD_APP_DOWNLOAD)
+            || (command == PACKET_CMD_JUMP_TO_APP))) {
+        update_progress = true;
+        bsp_status_led_set_mode(BOOT_LED_MODE_UPDATE_WINDOW);
     }
 
     response_buffer[FRAME_HEAD_INDEX] = BOOT_MSG_SYN_BYTE1;
@@ -200,6 +211,8 @@ void BootUpdateServiceInit(void) {
     memset(verify_buffer, 0, sizeof(verify_buffer));
 #endif
     erase_completed = false;
+    update_progress = false;
+    request_received = false;
     jump_requested = false;
     jump_requested_ms = 0U;
     jump_ack_reads_before = 0U;
@@ -214,6 +227,16 @@ void BootUpdateServiceHandleFrame(const boot_protocol_frame_t* frame) {
     if (frame == NULL)
         return;
     ++service_stats.validated_frames;
+    if ((frame->payload_length >= PACKET_INSTRUCT_SEGMENT_SIZE)
+        && (frame->payload_length <= BOOT_PROTOCOL_MAX_PAYLOAD_SIZE)) {
+        const uint8_t command = frame->payload[0U];
+        /* Latch even if TX is busy or Flash later fails: update traffic is established. */
+        if ((BOOT_ENABLE_LEGACY_HANDSHAKE && (command == PACKET_CMD_HANDSHAKE))
+            || (BOOT_ENABLE_LEGACY_ERASE && BOOT_ENABLE_FLASH_UPDATE && (command == PACKET_CMD_ERASE_FLASH))
+            || (BOOT_ENABLE_LEGACY_DOWNLOAD && BOOT_ENABLE_FLASH_UPDATE && (command == PACKET_CMD_APP_DOWNLOAD))
+            || (BOOT_ENABLE_LEGACY_JUMP && BOOT_ENABLE_APPLICATION_JUMP && (command == PACKET_CMD_JUMP_TO_APP)))
+            request_received = true;
+    }
 
     if (jump_requested || !txBufferReserve()) {
         ++service_stats.response_busy_drop;
@@ -253,6 +276,16 @@ void BootUpdateServiceFrameCallback(const boot_protocol_frame_t* frame, void* co
 void BootUpdateServiceGetStats(boot_update_service_stats_t* stats) {
     if (stats != NULL)
         *stats = service_stats;
+}
+
+bool BootUpdateServiceHasRequest(void) {
+    return request_received;
+}
+
+bool BootUpdateServiceTakeProgress(void) {
+    const bool progress = update_progress;
+    update_progress = false;
+    return progress;
 }
 
 bool BootUpdateServiceTakeJumpRequest(uint32_t now_ms) {

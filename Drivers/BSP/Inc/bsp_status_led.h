@@ -26,5 +26,7 @@ bool bsp_status_led_init(void);
 void bsp_status_led_set_mode(boot_led_mode_t mode);
 void bsp_status_led_poll(uint32_t now_ms);
 void bsp_status_led_off(void);
+/* Terminal fault only: drive an initialized LED on without a clock or scheduler. */
+void bsp_status_led_fault_on(void);
 bool bsp_status_led_is_ready(void);
 #endif
