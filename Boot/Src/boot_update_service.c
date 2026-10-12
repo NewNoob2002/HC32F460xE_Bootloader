@@ -238,7 +238,7 @@ void boot_update_service_handle_frame(const boot_protocol_frame_t* frame) {
             request_received = true;
     }
 
-    if (jump_requested || !tx_buffer_reserve()) {
+    if (jump_requested || !bsp_i2c_slave_tx_reserve()) {
         ++service_stats.response_busy_drop;
         return;
     }
@@ -246,7 +246,7 @@ void boot_update_service_handle_frame(const boot_protocol_frame_t* frame) {
     arm_jump_after_publish = false;
     response_length = encode_response(frame, frame->payload_length);
     if (response_length == 0U) {
-        tx_buffer_cancel_write();
+        bsp_i2c_slave_tx_cancel_write();
         return;
     }
     if (arm_jump_after_publish) {
@@ -256,7 +256,7 @@ void boot_update_service_handle_frame(const boot_protocol_frame_t* frame) {
         jump_ack_reads_before = counters.tx_complete_reads;
         jump_requested_ms = bsp_time_ms();
     }
-    if (tx_buffer_write(response_buffer, response_length) == (int)response_length) {
+    if (bsp_i2c_slave_tx_write(response_buffer, response_length) == (int)response_length) {
         ++service_stats.responses_published;
         if (arm_jump_after_publish) {
             jump_requested = true;

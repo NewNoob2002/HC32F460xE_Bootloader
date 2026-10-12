@@ -76,7 +76,7 @@ static void eei(uint32_t flags) {
 }
 static void read_address(uint32_t stale_flags) {
     eei(I2C_FLAG_MATCH_ADDR0 | I2C_FLAG_TRA | stale_flags);
-    assert(bsp_i2c_slave_get_state() == SLAVE_TX);
+    assert(bsp_i2c_slave_get_state() == BSP_I2C_SLAVE_STATE_TX);
     assert((mock_i2c.CR2 & I2C_INT_TX_CPLT) != 0U);
     assert(mock_i2c.DTR == 0xAAU);
 }
@@ -92,8 +92,8 @@ static void finish_read(void) {
     assert(mock_i2c.DTR == 0x18U);
     /* STOP clears TRA/TENDF before the EEI callback observes the final NACK. */
     eei(I2C_FLAG_NACKF | I2C_FLAG_STOP);
-    assert(bsp_i2c_slave_get_state() == SLAVE_TX_DONE);
-    assert(tx_buffer_available() == 0);
+    assert(bsp_i2c_slave_get_state() == BSP_I2C_SLAVE_STATE_TX_DONE);
+    assert(bsp_i2c_slave_tx_available() == 0);
 }
 
 static void test_response_completion(void) {
@@ -101,35 +101,35 @@ static void test_response_completion(void) {
     bsp_i2c_slave_counters_t before, after;
     assert(bsp_i2c_slave_init());
     bsp_i2c_slave_get_counters(&before);
-    assert(tx_buffer_reserve());
-    assert(tx_buffer_write(response, sizeof(response)) == (int)sizeof(response));
+    assert(bsp_i2c_slave_tx_reserve());
+    assert(bsp_i2c_slave_tx_write(response, sizeof(response)) == (int)sizeof(response));
     read_address(I2C_FLAG_STOP | I2C_FLAG_NACKF);
     ack_byte();
     ack_byte();
     /* The last byte is queued but has NOT been clocked by the master. */
     eei(I2C_FLAG_STOP);
-    assert(bsp_i2c_slave_get_state() != SLAVE_TX_DONE);
-    assert(tx_buffer_available() == (int)sizeof(response));
+    assert(bsp_i2c_slave_get_state() != BSP_I2C_SLAVE_STATE_TX_DONE);
+    assert(bsp_i2c_slave_tx_available() == (int)sizeof(response));
     bsp_i2c_slave_get_counters(&after);
     assert(after.tx_complete_reads == before.tx_complete_reads);
 
     read_address(0U);
     ack_byte();
     eei(I2C_FLAG_NACKF | I2C_FLAG_STOP);
-    assert(bsp_i2c_slave_get_state() != SLAVE_TX_DONE);
-    assert(tx_buffer_available() == (int)sizeof(response));
+    assert(bsp_i2c_slave_get_state() != BSP_I2C_SLAVE_STATE_TX_DONE);
+    assert(bsp_i2c_slave_tx_available() == (int)sizeof(response));
     finish_read();
     bsp_i2c_slave_get_counters(&after);
     assert(after.tx_complete_reads == before.tx_complete_reads + 1U);
 
-    assert(tx_buffer_reserve());
-    assert(tx_buffer_write(response, sizeof(response)) == (int)sizeof(response));
+    assert(bsp_i2c_slave_tx_reserve());
+    assert(bsp_i2c_slave_tx_write(response, sizeof(response)) == (int)sizeof(response));
     read_address(0U);
     ack_byte();
     ack_byte();
     eei(I2C_FLAG_ARBITRATE_FAIL | I2C_FLAG_NACKF | I2C_FLAG_STOP);
-    assert(bsp_i2c_slave_get_state() != SLAVE_TX_DONE);
-    assert(tx_buffer_available() == (int)sizeof(response));
+    assert(bsp_i2c_slave_get_state() != BSP_I2C_SLAVE_STATE_TX_DONE);
+    assert(bsp_i2c_slave_tx_available() == (int)sizeof(response));
     finish_read();
 }
 

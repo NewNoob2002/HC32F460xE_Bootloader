@@ -9,9 +9,15 @@
 
 #define I2C_EMPTY_TX_BYTE UINT8_C(0xFF)
 
-static rxtx_transaction_t rx_transactions;
-static rxtx_transaction_t tx_transactions;
-static volatile i2c_slave_state_t slave_state = SLAVE_RX;
+typedef struct {
+    uint8_t data[BSP_I2C_RX_CAPACITY];
+    volatile uint16_t buffer_head;
+    volatile uint16_t buffer_tail;
+} bsp_i2c_buffer_t;
+
+static bsp_i2c_buffer_t rx_transactions;
+static bsp_i2c_buffer_t tx_transactions;
+static volatile bsp_i2c_slave_state_t slave_state = BSP_I2C_SLAVE_STATE_RX;
 static volatile bool transaction_active;
 static volatile bool tx_transaction_has_response;
 static volatile uint16_t tx_transaction_start_tail;
@@ -29,19 +35,20 @@ static void note_progress(void) {
     ++progress_sequence;
 }
 
-int tx_buffer_available(void) {
+int bsp_i2c_slave_tx_available(void) {
     return (int)(tx_transactions.buffer_head - tx_transactions.buffer_tail);
 }
 
-uint8_t tx_buffer_read(void) {
-    if (tx_buffer_available() <= 0)
+static uint8_t tx_buffer_read(void) {
+    if (bsp_i2c_slave_tx_available() <= 0)
         return I2C_EMPTY_TX_BYTE;
     return tx_transactions.data[tx_transactions.buffer_tail++];
 }
 
-bool tx_buffer_reserve(void) {
+bool bsp_i2c_slave_tx_reserve(void) {
     const bsp_irq_state_t irq_state = bsp_enter_critical();
-    const bool available = !tx_write_reserved && (tx_buffer_available() == 0) && (slave_state != SLAVE_TX);
+    const bool available =
+        !tx_write_reserved && (bsp_i2c_slave_tx_available() == 0) && (slave_state != BSP_I2C_SLAVE_STATE_TX);
     if (available)
         tx_write_reserved = true;
     else
@@ -50,20 +57,20 @@ bool tx_buffer_reserve(void) {
     return available;
 }
 
-void tx_buffer_cancel_write(void) {
+void bsp_i2c_slave_tx_cancel_write(void) {
     const bsp_irq_state_t irq_state = bsp_enter_critical();
     tx_write_reserved = false;
     bsp_exit_critical(irq_state);
 }
 
-int tx_buffer_write(const uint8_t* buffer, uint16_t length) {
+int bsp_i2c_slave_tx_write(const uint8_t* buffer, uint16_t length) {
     if ((buffer == NULL) || (length == 0U) || (length > BSP_I2C_TX_CAPACITY)) {
-        tx_buffer_cancel_write();
+        bsp_i2c_slave_tx_cancel_write();
         return 0;
     }
 
     const bsp_irq_state_t irq_state = bsp_enter_critical();
-    if ((tx_buffer_available() != 0) || (slave_state == SLAVE_TX)) {
+    if ((bsp_i2c_slave_tx_available() != 0) || (slave_state == BSP_I2C_SLAVE_STATE_TX)) {
         tx_write_reserved = false;
         ++i2c_slave_counters_stats.response_busy;
         bsp_exit_critical(irq_state);
@@ -74,7 +81,7 @@ int tx_buffer_write(const uint8_t* buffer, uint16_t length) {
     tx_transactions.buffer_tail = 0U;
     tx_write_reserved = false;
     if (!transaction_active)
-        slave_state = SLAVE_RX;
+        slave_state = BSP_I2C_SLAVE_STATE_RX;
     bsp_exit_critical(irq_state);
     return (int)length;
 }
@@ -93,7 +100,7 @@ size_t bsp_i2c_slave_read(uint8_t* buffer, size_t capacity) {
     if ((buffer == NULL) || (capacity == 0U))
         return 0U;
     const bsp_irq_state_t irq_state = bsp_enter_critical();
-    if (slave_state == SLAVE_RX_DONE)
+    if (slave_state == BSP_I2C_SLAVE_STATE_RX_DONE)
         bytes_read = rx_buffer_read(buffer, capacity);
     bsp_exit_critical(irq_state);
     return bytes_read;
@@ -112,7 +119,7 @@ static void rx_buffer_write(uint8_t ch) {
 
 static void i2c_queue_next_byte(void) {
     uint8_t byte = I2C_EMPTY_TX_BYTE;
-    const bool has_response_byte = tx_transaction_has_response && (tx_buffer_available() > 0);
+    const bool has_response_byte = tx_transaction_has_response && (bsp_i2c_slave_tx_available() > 0);
     if (has_response_byte)
         byte = tx_buffer_read();
     I2C_WriteData(BSP_I2C_UNIT, byte);
@@ -135,17 +142,17 @@ static void i2c_eei_callback(void) {
         note_progress();
         if (transaction_is_read) {
             ++i2c_slave_counters_stats.address_match_tx;
-            slave_state = SLAVE_TX;
-            tx_transaction_has_response = tx_buffer_available() > 0;
+            slave_state = BSP_I2C_SLAVE_STATE_TX;
+            tx_transaction_has_response = bsp_i2c_slave_tx_available() > 0;
             tx_transaction_start_tail = tx_transactions.buffer_tail;
-            tx_transaction_response_length = (uint16_t)tx_buffer_available();
+            tx_transaction_response_length = (uint16_t)bsp_i2c_slave_tx_available();
             tx_transaction_started_bytes = 0U;
             tx_transaction_completed_bytes = 0U;
             i2c_queue_next_byte();
             I2C_IntCmd(BSP_I2C_UNIT, I2C_INT_TX_CPLT, ENABLE);
         } else {
             ++i2c_slave_counters_stats.address_match_rx;
-            slave_state = SLAVE_RX;
+            slave_state = BSP_I2C_SLAVE_STATE_RX;
         }
         I2C_IntCmd(BSP_I2C_UNIT, I2C_INT_STOP | I2C_INT_NACK | I2C_INT_ARBITRATE_FAIL, ENABLE);
         I2C_ClearStatus(BSP_I2C_UNIT, I2C_CLR_SLADDR0FCLR | I2C_CLR_STARTFCLR);
@@ -156,7 +163,7 @@ static void i2c_eei_callback(void) {
         note_progress();
         I2C_IntCmd(BSP_I2C_UNIT, I2C_INT_TX_CPLT, DISABLE);
         NVIC_ClearPendingIRQ(BSP_I2C_TEI_IRQn);
-        if ((slave_state == SLAVE_TX) && tx_transaction_has_response) {
+        if ((slave_state == BSP_I2C_SLAVE_STATE_TX) && tx_transaction_has_response) {
             tx_transactions.buffer_tail = tx_transaction_start_tail;
             tx_transaction_has_response = false;
         }
@@ -168,7 +175,7 @@ static void i2c_eei_callback(void) {
         note_progress();
         I2C_ClearStatus(BSP_I2C_UNIT, I2C_CLR_NACKFCLR);
         /* STOP may already have cleared TRA/TENDF when the final NACK is serviced. */
-        if (slave_state == SLAVE_TX) {
+        if (slave_state == BSP_I2C_SLAVE_STATE_TX) {
             tx_transaction_completed_bytes = tx_transaction_started_bytes;
             I2C_IntCmd(BSP_I2C_UNIT, I2C_INT_TX_CPLT, DISABLE);
             NVIC_ClearPendingIRQ(BSP_I2C_TEI_IRQn);
@@ -184,19 +191,19 @@ static void i2c_eei_callback(void) {
         NVIC_ClearPendingIRQ(BSP_I2C_TEI_IRQn);
         I2C_ClearStatus(BSP_I2C_UNIT, I2C_CLR_STOPFCLR | I2C_CLR_STARTFCLR);
         transaction_active = false;
-        if (slave_state == SLAVE_RX) {
+        if (slave_state == BSP_I2C_SLAVE_STATE_RX) {
             ++i2c_slave_counters_stats.rx_transactions;
-            slave_state = SLAVE_RX_DONE;
-        } else if (slave_state == SLAVE_TX) {
+            slave_state = BSP_I2C_SLAVE_STATE_RX_DONE;
+        } else if (slave_state == BSP_I2C_SLAVE_STATE_TX) {
             if (tx_transaction_has_response && (tx_transaction_completed_bytes >= tx_transaction_response_length)) {
                 ++i2c_slave_counters_stats.tx_complete_reads;
                 tx_transactions.buffer_head = 0U;
                 tx_transactions.buffer_tail = 0U;
-                slave_state = SLAVE_TX_DONE;
+                slave_state = BSP_I2C_SLAVE_STATE_TX_DONE;
             } else {
                 if (tx_transaction_has_response)
                     tx_transactions.buffer_tail = tx_transaction_start_tail;
-                slave_state = SLAVE_RX;
+                slave_state = BSP_I2C_SLAVE_STATE_RX;
             }
             tx_transaction_has_response = false;
         }
@@ -256,7 +263,7 @@ bool bsp_i2c_slave_init(void) {
         return false;
     }
     memset(&rx_transactions, 0, sizeof(rx_transactions));
-    slave_state = SLAVE_RX;
+    slave_state = BSP_I2C_SLAVE_STATE_RX;
     transaction_active = false;
     tx_transaction_has_response = false;
     tx_transaction_start_tail = 0U;
@@ -333,6 +340,6 @@ void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters) {
     *counters = i2c_slave_counters_stats;
 }
 
-i2c_slave_state_t bsp_i2c_slave_get_state(void) {
+bsp_i2c_slave_state_t bsp_i2c_slave_get_state(void) {
     return slave_state;
 }

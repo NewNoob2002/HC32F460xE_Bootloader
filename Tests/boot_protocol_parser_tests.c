@@ -21,7 +21,7 @@ static uint32_t mock_now_ms;
 static uint32_t mock_complete_reads;
 static bool mock_tx_pending;
 static bool mock_tx_reserved;
-static i2c_slave_state_t mock_i2c_state = SLAVE_RX_DONE;
+static bsp_i2c_slave_state_t mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
 static boot_protocol_frame_t callback_frame;
 static uint32_t callback_count;
 static uint32_t mock_erase_count;
@@ -79,22 +79,22 @@ void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters) {
     counters->tx_complete_reads = mock_complete_reads;
 }
 
-int tx_buffer_available(void) {
+int bsp_i2c_slave_tx_available(void) {
     return mock_tx_pending ? (int)mock_tx_length : 0;
 }
 
-bool tx_buffer_reserve(void) {
-    if (mock_tx_pending || mock_tx_reserved || (mock_i2c_state == SLAVE_TX))
+bool bsp_i2c_slave_tx_reserve(void) {
+    if (mock_tx_pending || mock_tx_reserved || (mock_i2c_state == BSP_I2C_SLAVE_STATE_TX))
         return false;
     mock_tx_reserved = true;
     return true;
 }
 
-void tx_buffer_cancel_write(void) {
+void bsp_i2c_slave_tx_cancel_write(void) {
     mock_tx_reserved = false;
 }
 
-int tx_buffer_write(const uint8_t* buffer, uint16_t length) {
+int bsp_i2c_slave_tx_write(const uint8_t* buffer, uint16_t length) {
     assert(buffer != NULL);
     assert(length <= sizeof(mock_tx));
     assert(mock_tx_reserved);
@@ -102,7 +102,7 @@ int tx_buffer_write(const uint8_t* buffer, uint16_t length) {
     mock_tx_length = length;
     mock_tx_pending = true;
     mock_tx_reserved = false;
-    mock_i2c_state = SLAVE_RX;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX;
     return (int)length;
 }
 
@@ -186,7 +186,7 @@ static void assert_response(uint8_t frame_number, uint8_t command, uint8_t resul
     assert(mock_tx[BOOT_PROTOCOL_HEADER_SIZE + payload_length] == (uint8_t)crc);
     assert(mock_tx[BOOT_PROTOCOL_HEADER_SIZE + payload_length + 1U] == (uint8_t)(crc >> 8U));
     mock_tx_pending = false;
-    mock_i2c_state = SLAVE_TX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_TX_DONE;
     ++mock_complete_reads;
 }
 
@@ -287,7 +287,7 @@ static void test_chunk_and_legacy_callback(void) {
     mock_tx_length = 0U;
     mock_tx_pending = false;
     mock_tx_reserved = false;
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
     boot_update_service_init();
     boot_protocol_parser_init(&parser);
     boot_protocol_parser_register_callback(&parser, boot_update_service_frame_callback, NULL);
@@ -333,7 +333,7 @@ static void test_update_led_and_progress(void) {
     frame.payload[1] = PACKET_CMD_TYPE_DATA;
     frame.payload[3] = 0x80U;
     mock_tx_pending = mock_tx_reserved = false;
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
     mock_flash_result = BSP_FLASH_OK;
     mock_erase_count = 0U;
     mock_led_mode = BOOT_LED_MODE_RECOVERY;
@@ -390,12 +390,12 @@ static void test_update_led_and_progress(void) {
 /* Completion survives traffic even if main never observes TX_DONE. */
 static void assert_jump_after_guard(void) {
     const uint32_t guard = BOOT_APPLICATION_HANDOVER_GUARD_MS;
-    mock_i2c_state = SLAVE_RX;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX;
     assert(!boot_update_service_take_jump_request(mock_now_ms + guard - 1U));
-    mock_i2c_state = SLAVE_TX;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_TX;
     assert(boot_update_service_take_jump_request(mock_now_ms + guard));
     assert(!boot_update_service_take_jump_request(mock_now_ms + guard + 1U));
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
 }
 static void test_jump_deadline(void) {
     for (unsigned late = 0U; late < 2U; ++late) {
@@ -406,7 +406,7 @@ static void test_jump_deadline(void) {
         frame.payload[3] = 0x80U;
         mock_tx_pending = false;
         mock_tx_reserved = false;
-        mock_i2c_state = SLAVE_RX_DONE;
+        mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
         mock_erase_count = 0U;
         mock_flash_result = BSP_FLASH_OK;
         mock_app_valid = true;
@@ -422,7 +422,7 @@ static void test_jump_deadline(void) {
         if (!late)
             assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, frame.payload_length);
         mock_now_ms = start + 90U;
-        mock_i2c_state = SLAVE_RX_DONE;
+        mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
         boot_update_service_handle_frame(&frame); /* Duplicate must not restart the deadline. */
         frame.payload[0] = PACKET_CMD_ERASE_FLASH;
         boot_update_service_handle_frame(&frame); /* Nor may ERASE cancel the handover. */
@@ -437,11 +437,11 @@ static void test_jump_deadline(void) {
         } else {
             assert(!boot_update_service_take_jump_request(start + 99U));
         }
-        mock_i2c_state = SLAVE_TX;
+        mock_i2c_state = BSP_I2C_SLAVE_STATE_TX;
         assert(boot_update_service_take_jump_request(start + (late ? 10000U : 100U)));
         assert(!boot_update_service_take_jump_request(start + 10001U));
     }
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
 }
 #endif
 
@@ -462,7 +462,7 @@ static void test_update_command_responses(void) {
     mock_app_valid = true;
     mock_tx_pending = false;
     mock_tx_reserved = false;
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
     boot_update_service_init();
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
     boot_update_service_handle_frame(&frame);
@@ -567,7 +567,7 @@ static void test_update_command_responses(void) {
     mock_app_valid = true;
     mock_tx_pending = false;
     mock_tx_reserved = false;
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
     boot_update_service_init();
 
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
@@ -611,7 +611,7 @@ static void test_update_command_responses(void) {
     mock_tx_length = 0U;
     mock_tx_pending = false;
     mock_tx_reserved = false;
-    mock_i2c_state = SLAVE_RX_DONE;
+    mock_i2c_state = BSP_I2C_SLAVE_STATE_RX_DONE;
     boot_update_service_init();
 
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;

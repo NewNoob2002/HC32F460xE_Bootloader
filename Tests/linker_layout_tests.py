@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Check Boot/App linker contracts with the real HC32 startup and GNU Arm tools."""
+import re
 import shutil
 import struct
 import subprocess
@@ -24,6 +25,8 @@ def require_success(command):
 def main(compiler):
     compiler = Path(shutil.which(compiler) or compiler).resolve()
     nm = compiler.with_name(compiler.name.replace("gcc", "nm"))
+    cxx = compiler.with_name(compiler.name.replace("gcc", "g++"))
+    objdump = compiler.with_name(compiler.name.replace("gcc", "objdump"))
     objcopy = compiler.with_name(compiler.name.replace("gcc", "objcopy"))
     startup = ROOT / "Drivers/CMSIS/Device/HDSC/hc32f4xx/Source/GCC/startup_hc32f460.S"
     common = ROOT / "Platform/HC32F460/Linker"
@@ -96,6 +99,91 @@ int main(void) { return (int)(initialized + zeroed + retained + ret_initialized 
             reject(objects + [pad, data], "Flash load image exceeds image region")
             print(f"{image}: vectors/startup/data/noinit and ICG/range/overflow guards PASS")
 
+        # 使用真实 G++/newlib，验证 C linkage 与静态构造函数，不复用上面的空 libc stub。
+        c_source = work / "mixed.c"
+        c_source.write_text('''#include "bsp_power.h"
+bool bsp_power_init(void) { return true; }
+''')
+        cpp_source = work / "constructor.cpp"
+        cpp_source.write_text('''#include <stdint.h>
+#include "bsp_board_config.h"
+#include "bsp_power.h"
+#include "bsp_debug_port.h"
+#include "bsp_external_watchdog.h"
+#include "bsp_status_led.h"
+#include "bsp_write_protection.h"
+#include "hc32_ll.h"
+volatile uint32_t constructed;
+struct Probe { Probe() { constructed = 0x12345678U; } };
+Probe probe;
+extern "C" void SystemInit(void) {}
+int main() { return bsp_power_init() && constructed == 0x12345678U ? 0 : 1; }
+''')
+        includes = [f"-I{ROOT / path}" for path in (
+            "Drivers/BSP/Inc", "Config", "Drivers/CMSIS/Include",
+            "Drivers/CMSIS/Device/HDSC/hc32f4xx/Include", "Drivers/hc32f4xx_ll_drivers/inc")]
+        require_success([str(compiler), *CPU_FLAGS, *includes, "-std=c11", "-c", str(c_source),
+                         "-o", str(work / "mixed.o")])
+        require_success([str(cxx), *CPU_FLAGS, *includes, "-std=c++17", "-fno-exceptions", "-fno-rtti",
+                         "-DHC32F460", "-D__PROGRAM_START=main", "-c", str(cpp_source),
+                         "-o", str(work / "constructor.o")])
+        output = work / "cpp_app.elf"
+        require_success([str(cxx), *CPU_FLAGS, f"-Wl,-L,{common}",
+                         f"-T{ROOT / 'App/Linker/HC32F460_app.ld'}", "-Wl,--gc-sections",
+                         "--specs=nano.specs", "--specs=nosys.specs", str(work / "startup.o"),
+                         str(work / "mixed.o"), str(work / "constructor.o"), "-o", str(output)])
+        symbols = require_success([str(nm), str(output)])
+        assert " T bsp_power_init" in symbols and " T __libc_init_array" in symbols
+        assert "_GLOBAL__sub_I_" in symbols
+        ctor_data = work / "constructors.bin"
+        require_success([str(objcopy), "-O", "binary", "--only-section=.init_array", str(output), str(ctor_data)])
+        assert len(ctor_data.read_bytes()) >= 4
+        constructor_addresses = struct.unpack(f"<{len(ctor_data.read_bytes()) // 4}I", ctor_data.read_bytes())
+        ctor_symbol = next(line for line in symbols.splitlines() if "_GLOBAL__sub_I_" in line)
+        assert (int(ctor_symbol.split()[0], 16) | 1) in constructor_addresses
+        startup_code = require_success([str(objdump), "-d", "--disassemble=Reset_Handler", str(output)])
+        assert startup_code.index("<__libc_init_array>") < startup_code.index("<main>")
+        print("App C++17: C linkage / real libc init / constructor table PASS")
+
+
+def check_actual_app(compiler, image):
+    compiler = Path(shutil.which(compiler) or compiler).resolve()
+    image = Path(image)
+    nm = compiler.with_name(compiler.name.replace("gcc", "nm"))
+    objdump = compiler.with_name(compiler.name.replace("gcc", "objdump"))
+    objcopy = compiler.with_name(compiler.name.replace("gcc", "objcopy"))
+    symbols = {}
+    for line in require_success([str(nm), str(image)]).splitlines():
+        fields = line.split()
+        if len(fields) == 3:
+            symbols[fields[2]] = int(fields[0], 16)
+    assert symbols["__Vectors"] == 0x8000
+    assert symbols["FLASH_LENGTH"] == 0x72000
+    assert not any(name.startswith(("boot_", "g_boot_")) for name in symbols)
+    assert not any(name.startswith(("_ZTI", "_ZTV", "__cxa_throw")) for name in symbols)
+    sections = require_success([str(objdump), "-h", str(image)]).splitlines()
+    for index, line in enumerate(sections[:-1]):
+        match = re.match(r"\s*\d+\s+(\S+)\s+([0-9a-f]+)\s+([0-9a-f]+)\s+([0-9a-f]+)", line)
+        if match:
+            name, size, _, lma = match.groups()
+            assert name != ".icg_sec" or int(size, 16) == 0
+            if "LOAD" in sections[index + 1] and int(size, 16):
+                assert 0x8000 <= int(lma, 16) < int(lma, 16) + int(size, 16) <= 0x7A000
+    with tempfile.TemporaryDirectory(prefix="x1-image-test-") as temp:
+        vectors = Path(temp) / "vectors.bin"
+        require_success([str(objcopy), "-O", "binary", "--only-section=.vectors", str(image), str(vectors)])
+        words = struct.unpack("<16I", vectors.read_bytes()[:64])
+        assert words[0] == symbols["__StackTop"] and words[0] % 8 == 0
+        for index, handler in ((1, "Reset_Handler"), (2, "NMI_Handler"), (3, "HardFault_Handler"),
+                               (4, "MemManage_Handler"), (5, "BusFault_Handler"), (6, "UsageFault_Handler"),
+                               (11, "SVC_Handler"), (12, "DebugMon_Handler"), (14, "PendSV_Handler"),
+                               (15, "SysTick_Handler")):
+            assert words[index] & 1 and (words[index] & ~1) == (symbols[handler] & ~1)
+            assert symbols[handler] != symbols["Default_Handler"]
+    print(f"{image}: actual X1 vectors / load ranges / no ICG or Boot dependency PASS")
+
 
 if __name__ == "__main__":
     main(sys.argv[1])
+    for app_image in sys.argv[2:]:
+        check_actual_app(sys.argv[1], app_image)

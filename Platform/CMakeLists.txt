@@ -9,7 +9,9 @@ target_include_directories(hc32_platform_headers INTERFACE
     ${HC32_ROOT}/Drivers/CMSIS/Device/HDSC/hc32f4xx/Include
     ${HC32_ROOT}/Drivers/hc32f4xx_ll_drivers/inc
 )
-target_compile_definitions(hc32_platform_headers INTERFACE HC32F460 USE_DDL_DRIVER)
+# 本项目 assembly startup 已清零/复制数据并调用构造函数；不使用 CMSIS 的 copy/zero table 启动。
+# 指定其公开启动配置，避免 GCC C++ 编译未使用的默认 __cmsis_start 局部类型 extern 表。
+target_compile_definitions(hc32_platform_headers INTERFACE HC32F460 USE_DDL_DRIVER __PROGRAM_START=main)
 target_compile_options(hc32_platform_headers INTERFACE
     -ffunction-sections -fdata-sections
     $<$<CONFIG:Debug>:-Og;-g3;-fno-omit-frame-pointer>

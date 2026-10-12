@@ -16,13 +16,19 @@
 #define BSP_I2C_SLAVE_ADDRESS              0x11U
 #define BSP_I2C_STALL_TIMEOUT_MS           2000UL
 
-_Static_assert(BSP_EXTERNAL_WATCHDOG_PULSE_MS > 0U, "watchdog pulse must be nonzero");
-_Static_assert(BSP_EXTERNAL_WATCHDOG_PULSE_MS < BSP_EXTERNAL_WATCHDOG_INTERVAL_MS,
-               "watchdog pulse must be shorter than its interval");
-_Static_assert(BSP_EXTERNAL_WATCHDOG_INTERVAL_MS < BSP_EXTERNAL_WATCHDOG_DEADLINE_MS,
-               "watchdog feed must precede the TPL5010 deadline");
-_Static_assert(BSP_EXTERNAL_WATCHDOG_IDLE_LEVEL != BSP_EXTERNAL_WATCHDOG_ACTIVE_LEVEL, "watchdog levels must differ");
-_Static_assert(BSP_STATUS_LED_ACTIVE_LEVEL != BSP_STATUS_LED_INACTIVE_LEVEL, "LED levels must differ");
+#ifdef __cplusplus
+#define BSP_BOARD_ASSERT static_assert
+#else
+#define BSP_BOARD_ASSERT _Static_assert
+#endif
+BSP_BOARD_ASSERT(BSP_EXTERNAL_WATCHDOG_PULSE_MS > 0U, "watchdog pulse must be nonzero");
+BSP_BOARD_ASSERT(BSP_EXTERNAL_WATCHDOG_PULSE_MS < BSP_EXTERNAL_WATCHDOG_INTERVAL_MS,
+                 "watchdog pulse must be shorter than its interval");
+BSP_BOARD_ASSERT(BSP_EXTERNAL_WATCHDOG_INTERVAL_MS < BSP_EXTERNAL_WATCHDOG_DEADLINE_MS,
+                 "watchdog feed must precede the TPL5010 deadline");
+BSP_BOARD_ASSERT(BSP_EXTERNAL_WATCHDOG_IDLE_LEVEL != BSP_EXTERNAL_WATCHDOG_ACTIVE_LEVEL, "watchdog levels must differ");
+BSP_BOARD_ASSERT(BSP_STATUS_LED_ACTIVE_LEVEL != BSP_STATUS_LED_INACTIVE_LEVEL, "LED levels must differ");
+#undef BSP_BOARD_ASSERT
 
 #if !defined(HC32_HOST_TEST)
 #define CONFIG_PERIPH_WE    (LL_PERIPH_GPIO | LL_PERIPH_EFM | LL_PERIPH_FCG | LL_PERIPH_PWC_CLK_RMU | LL_PERIPH_SRAM)

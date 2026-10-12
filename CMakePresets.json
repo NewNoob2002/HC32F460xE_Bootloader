@@ -28,7 +28,8 @@
             "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "BOOT_ENABLE_LOGGING": "OFF"
+                "BOOT_ENABLE_LOGGING": "OFF",
+                "APP_ENABLE_LOGGING": "OFF"
             }
         },
         {
