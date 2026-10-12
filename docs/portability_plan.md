@@ -1,5 +1,7 @@
 # Cross-platform bootloader plan
 
+结构调整后，帧解析代码位于 `Common/Protocol/`，升级执行及交接策略位于 `Boot/`；见 [project_structure.md](project_structure.md)。下面的跨 MCU 分阶段计划仍保留，当前任务未启动后续协议/管理器重构。
+
 Status: phases 1 and 2 closed with target evidence on 2026-08-25; phases 3-8 have not started. The current HC32 behavior remains the baseline while boundaries are extracted incrementally.
 
 ## Objective

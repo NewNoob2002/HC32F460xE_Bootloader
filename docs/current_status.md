@@ -1,5 +1,9 @@
 # Current implementation status
 
+本次结构调整：Boot 集中到 `Boot/`，协议位于 `Common/Protocol/`，板级驱动/时基/日志端口供 Boot/App 共用；三个 App 产品提供独立配置入口。Boot 链接容量固定 **32 KiB**，App 起始地址仍为 `0x00008000`。用户已完成此前 Boot 和升级功能验证；本次结构调整的软件回归与接入说明见 [project_structure.md](project_structure.md)，硬件未在本次会话中复测。
+
+下方为此前阶段的状态与验证记录，源码路径对应当时目录；原 `Core/Inc/boot_config.h` 现为 `Boot/Inc/boot_config.h`，原 `Protocol/` 现为 `Common/Protocol/`。
+
 Baseline: node 1 safety baseline and Phase 2 inbound transport boundary closed with target evidence on 2026-08-25. This document describes reachable code, not only the feature macros in `Core/Inc/boot_config.h`.
 
 ## Implemented and reachable

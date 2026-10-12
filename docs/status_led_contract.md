@@ -2,6 +2,8 @@
 
 Current implementation status: [current_status.md](current_status.md).
 
+The shared `Drivers/BSP` LED driver owns GPIO initialization and logical on/off writes. `Boot/Src/boot_status_led.c` owns the modes and scheduler below; App can reuse `bsp_status_led_write()` without depending on Boot policy.
+
 PB5 drives the `NET_STATE` 2N7002 gate as a CMOS push-pull output. The external 4.7 kOhm pull-down and firmware preload keep it off initially. PB5 high turns the LED on; PB5 low turns it off.
 
 LED initialization normally happens after application validation and mode selection, in Recovery or the update window. A normal boot with a valid application leaves PB5 uninitialized by Boot. The fatal loop also attempts initialization if needed.

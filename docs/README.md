@@ -1,5 +1,7 @@
 # Documentation index
 
+当前目录、共用模块和三产品 App 接入以 [project_structure.md](project_structure.md) 为准。`current_status.md` 下方保留早期验证记录，历史报告不代表本次结构调整已完成硬件复测。
+
 The authoritative implementation status is [current_status.md](current_status.md). The cross-platform restructuring plan is [portability_plan.md](portability_plan.md). When an older investigation report conflicts with current source, the current-status document and source code take precedence.
 
 ## Current contracts

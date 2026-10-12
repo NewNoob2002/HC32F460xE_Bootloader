@@ -39,8 +39,8 @@ typedef struct {
 
 typedef struct {
     uint8_t data[BSP_I2C_RX_CAPACITY];
-    volatile uint16_t _BufferHead;
-    volatile uint16_t _BufferTail;
+    volatile uint16_t buffer_head;
+    volatile uint16_t buffer_tail;
 } rxtx_transaction_t;
 
 bool bsp_i2c_slave_init(void);
@@ -50,10 +50,10 @@ size_t bsp_i2c_slave_read(uint8_t* buffer, size_t capacity);
 void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters);
 i2c_slave_state_t bsp_i2c_slave_get_state(void);
 
-bool txBufferReserve(void);
-void txBufferCancelWrite(void);
-int txBufferAvailable(void);
-uint8_t txBufferRead(void);
-int txBufferWrite(const uint8_t* buffer, uint16_t length);
+bool tx_buffer_reserve(void);
+void tx_buffer_cancel_write(void);
+int tx_buffer_available(void);
+uint8_t tx_buffer_read(void);
+int tx_buffer_write(const uint8_t* buffer, uint16_t length);
 
 #endif

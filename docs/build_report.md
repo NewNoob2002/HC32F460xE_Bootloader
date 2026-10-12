@@ -1,5 +1,7 @@
 # Current build report
 
+最新结构与验证见 [project_structure.md](project_structure.md)：Boot 使用 `Boot/Linker/HC32F460_boot.ld`，App 使用 `App/Linker/HC32F460_app.ld`，二者复用公共段布局。下方保留早期构建记录中的路径、工具版本、尺寸和校验值。
+
 Verified locally on 2026-08-23. Capability and residual-risk context is in [current_status.md](current_status.md).
 
 ## Toolchain

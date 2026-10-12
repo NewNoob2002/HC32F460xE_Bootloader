@@ -61,33 +61,32 @@ void watchdog_scheduler_stop_low(watchdog_scheduler_t* scheduler) {
     }
 }
 
-#if !defined(BOOT_HOST_TEST)
+#if !defined(HC32_HOST_TEST)
 static watchdog_scheduler_t board_scheduler;
 static bool board_ready;
 
 static void board_gpio_write(bool level, void* context) {
     (void)context;
     if (level)
-        GPIO_SetPins(BOOT_EXTERNAL_WATCHDOG_PORT, BOOT_EXTERNAL_WATCHDOG_PIN);
+        GPIO_SetPins(BSP_EXTERNAL_WATCHDOG_PORT, BSP_EXTERNAL_WATCHDOG_PIN);
     else
-        GPIO_ResetPins(BOOT_EXTERNAL_WATCHDOG_PORT, BOOT_EXTERNAL_WATCHDOG_PIN);
+        GPIO_ResetPins(BSP_EXTERNAL_WATCHDOG_PORT, BSP_EXTERNAL_WATCHDOG_PIN);
 }
 
 bool bsp_external_watchdog_init(uint32_t now_ms) {
     stc_gpio_init_t init;
     board_ready = false;
-    GPIO_ResetPins(BOOT_EXTERNAL_WATCHDOG_PORT, BOOT_EXTERNAL_WATCHDOG_PIN);
+    GPIO_ResetPins(BSP_EXTERNAL_WATCHDOG_PORT, BSP_EXTERNAL_WATCHDOG_PIN);
     (void)GPIO_StructInit(&init);
     init.u16PinState = PIN_STAT_RST;
     init.u16PinDir = PIN_DIR_OUT;
     init.u16PinOutputType = PIN_OUT_TYPE_CMOS;
-    if (GPIO_Init(BOOT_EXTERNAL_WATCHDOG_PORT, BOOT_EXTERNAL_WATCHDOG_PIN, &init) != LL_OK)
+    if (GPIO_Init(BSP_EXTERNAL_WATCHDOG_PORT, BSP_EXTERNAL_WATCHDOG_PIN, &init) != LL_OK)
         return false;
-    if (GPIO_ReadOutputPins(BOOT_EXTERNAL_WATCHDOG_PORT, BOOT_EXTERNAL_WATCHDOG_PIN) != PIN_RESET)
+    if (GPIO_ReadOutputPins(BSP_EXTERNAL_WATCHDOG_PORT, BSP_EXTERNAL_WATCHDOG_PIN) != PIN_RESET)
         return false;
-    watchdog_scheduler_init(&board_scheduler, now_ms, BOOT_EXTERNAL_WATCHDOG_INTERVAL_MS,
-                            BOOT_EXTERNAL_WATCHDOG_PULSE_MS, BOOT_EXTERNAL_WATCHDOG_ACTIVE_LEVEL != 0U,
-                            board_gpio_write, NULL);
+    watchdog_scheduler_init(&board_scheduler, now_ms, BSP_EXTERNAL_WATCHDOG_INTERVAL_MS, BSP_EXTERNAL_WATCHDOG_PULSE_MS,
+                            BSP_EXTERNAL_WATCHDOG_ACTIVE_LEVEL != 0U, board_gpio_write, NULL);
     board_ready = board_scheduler.enabled;
     return board_ready;
 }
