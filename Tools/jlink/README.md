@@ -35,3 +35,32 @@ arm-none-eabi-nm -n -S build/Debug/hc32f460_boot.elf | \
 
 Raw safety preflights and lab transcripts are local scratch data under the
 ignored `debug_artifacts/` directory. Durable results belong in project docs.
+
+## X1 HC32F460JEUA
+
+The current X1 board uses HC32F460JEUA. J-Link V9.76a lists the corresponding
+512 KiB family entry `HC32F460xE`; the older scripts above retain their historical
+package names and target evidence.
+
+| Script | Purpose | Final state |
+| --- | --- | --- |
+| `x1_flash_debug.jlink` | Program and verify Boot at 0 and X1 App at `0x8000` | halted |
+| `x1_verify_run_debug.jlink` | Fresh-session reset/halt, verify both BINs, then reset/run | running |
+
+Build Debug and check both BIN hashes/addresses first. Stop any active J-Link
+GDB Server before opening Commander. Preserve the current Flash and calibration
+before overwriting; neither script mass-erases or touches the last three sectors.
+The second script deliberately verifies after reset/halt: a previous verification
+in an inherited running context gave a transient mismatch.
+
+```sh
+cmake --preset Debug
+cmake --build --preset Debug
+sha256sum build/Debug/hc32f460_boot.bin build/Debug/hc32f460_app_x1.bin
+JLinkExe -NoGui 1 -ExitOnError 1 -CommandFile Tools/jlink/x1_flash_debug.jlink
+JLinkExe -NoGui 1 -ExitOnError 1 -CommandFile Tools/jlink/x1_verify_run_debug.jlink
+```
+
+Runtime diagnosis loads `hc32f460_app_x1.elf` as symbols only. Use its actual
+`_SEGGER_RTT` symbol rather than an address from a prior build. HIL results and
+limits are recorded in [X1 test version](../../docs/x1_hil_test_version.md).
