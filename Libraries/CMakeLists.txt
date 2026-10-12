@@ -12,3 +12,15 @@ target_include_directories(firmware_logging INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/easylogger/inc
 )
 target_link_libraries(firmware_logging INTERFACE hc32::headers)
+
+# X1 按运行时探测选充电方案；芯片驱动不拥有产品状态，不再依赖 Arduino/Wire。
+add_library(firmware_battery_devices INTERFACE)
+add_library(firmware::battery_devices ALIAS firmware_battery_devices)
+target_sources(firmware_battery_devices INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bq40z50/bq40z50.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Mp2762a/mp2762a.cpp
+)
+target_include_directories(firmware_battery_devices INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bq40z50 ${CMAKE_CURRENT_SOURCE_DIR}/Mp2762a
+)
+target_link_libraries(firmware_battery_devices INTERFACE hc32::headers)

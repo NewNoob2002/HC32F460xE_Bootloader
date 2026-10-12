@@ -60,6 +60,24 @@ add_product_test(X1 0 0)
 add_product_test(X1Pro 1 1)
 add_product_test(XBase 1 1)
 
+function(configure_x1_test target)
+    target_include_directories(${target} PRIVATE
+        ../App/Shared/Inc ../App/Shared/Protocol/Inc ../Drivers/BSP/Inc
+        ../Libraries/Bq40z50 ../Libraries/Mp2762a)
+    target_compile_features(${target} PRIVATE cxx_std_17)
+    target_compile_definitions(${target} PRIVATE FIRMWARE_CFG_LOGGING=0)
+    target_link_libraries(${target} PRIVATE app::X1 project::options)
+    set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+    add_test(NAME ${target} COMMAND ${target})
+endfunction()
+add_executable(x1_battery_tests x1_battery_tests.cpp ../App/Shared/Src/app_battery.cpp
+    ../Libraries/Bq40z50/bq40z50.cpp ../Libraries/Mp2762a/mp2762a.cpp)
+configure_x1_test(x1_battery_tests)
+add_executable(i2c_master_tests i2c_master_tests.c ../Drivers/BSP/Src/bsp_i2c_master.c)
+target_include_directories(i2c_master_tests PRIVATE i2c_master_mock ../Drivers/BSP/Inc)
+target_link_libraries(i2c_master_tests PRIVATE project::options)
+add_test(NAME i2c_master_tests COMMAND i2c_master_tests)
+
 find_program(HC32_ARM_GCC arm-none-eabi-gcc)
 if(HC32_ARM_GCC)
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
