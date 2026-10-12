@@ -19,6 +19,15 @@ Index:
 
 ---
 If:
+  PathMatch: Tests/.*
+CompileFlags:
+  CompilationDatabase: build/HostTests
+  Compiler: gcc
+  Remove:
+    - --target=arm-none-eabi
+
+---
+If:
   PathMatch: .*\.(c|h)$
 CompileFlags:
   Compiler: arm-none-eabi-gcc
