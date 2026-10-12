@@ -1,11 +1,11 @@
 #include "boot_config.h"
+#include "boot_memory_map.h"
 #include "boot_protocol_crc.h"
 #include "boot_protocol_parser.h"
+#include "boot_status_led.h"
 #include "boot_update_service.h"
-#include "boot_memory_map.h"
 #include "bsp_flash.h"
 #include "bsp_i2c_slave.h"
-#include "bsp_status_led.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -62,7 +62,7 @@ bool boot_application_vector_is_valid(void) {
     return mock_app_valid;
 }
 
-void bsp_status_led_set_mode(boot_led_mode_t mode) {
+void boot_status_led_set_mode(boot_led_mode_t mode) {
     mock_led_mode = mode;
 }
 
@@ -70,7 +70,7 @@ i2c_slave_state_t bsp_i2c_slave_get_state(void) {
     return mock_i2c_state;
 }
 
-uint32_t boot_time_ms(void) {
+uint32_t bsp_time_ms(void) {
     return mock_now_ms;
 }
 
@@ -79,22 +79,22 @@ void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters) {
     counters->tx_complete_reads = mock_complete_reads;
 }
 
-int txBufferAvailable(void) {
+int tx_buffer_available(void) {
     return mock_tx_pending ? (int)mock_tx_length : 0;
 }
 
-bool txBufferReserve(void) {
+bool tx_buffer_reserve(void) {
     if (mock_tx_pending || mock_tx_reserved || (mock_i2c_state == SLAVE_TX))
         return false;
     mock_tx_reserved = true;
     return true;
 }
 
-void txBufferCancelWrite(void) {
+void tx_buffer_cancel_write(void) {
     mock_tx_reserved = false;
 }
 
-int txBufferWrite(const uint8_t* buffer, uint16_t length) {
+int tx_buffer_write(const uint8_t* buffer, uint16_t length) {
     assert(buffer != NULL);
     assert(length <= sizeof(mock_tx));
     assert(mock_tx_reserved);
@@ -115,7 +115,7 @@ static void capture_frame(const boot_protocol_frame_t* frame, void* context) {
 
 /** @brief Encodes a valid frame using the production CRC implementation. */
 static size_t make_frame(uint8_t* output, uint8_t frame_number, const uint8_t* payload, uint16_t payload_length) {
-    const uint16_t crc = BootProtocolCrcCalculate(payload, payload_length);
+    const uint16_t crc = boot_protocol_crc_calculate(payload, payload_length);
     const size_t frame_length = BOOT_PROTOCOL_HEADER_SIZE + payload_length + BOOT_PROTOCOL_CRC_SIZE;
 
     output[0] = BOOT_PROTOCOL_SYNC_1;
@@ -133,7 +133,7 @@ static size_t make_frame(uint8_t* output, uint8_t frame_number, const uint8_t* p
 
 /** @brief Feeds bytes individually and returns the valid-frame completion count. */
 static uint32_t feed_bytes(boot_protocol_parser_t* parser, const uint8_t* bytes, size_t length) {
-    return (uint32_t)BootProtocolParserPushBytes(parser, bytes, length);
+    return (uint32_t)boot_protocol_parser_push_bytes(parser, bytes, length);
 }
 
 /** @brief Verifies chunk input preserves state and counts every completed frame. */
@@ -146,16 +146,16 @@ static void test_push_bytes(void) {
     const size_t first_length = make_frame(first, 0x21U, payload, sizeof(payload));
     const size_t second_length = make_frame(second, 0x22U, payload, sizeof(payload));
 
-    BootProtocolParserInit(&parser);
-    BootProtocolParserRegisterCallback(&parser, capture_frame, NULL);
+    boot_protocol_parser_init(&parser);
+    boot_protocol_parser_register_callback(&parser, capture_frame, NULL);
     callback_count = 0U;
-    assert(BootProtocolParserPushBytes(NULL, first, first_length) == 0U);
-    assert(BootProtocolParserPushBytes(&parser, NULL, first_length) == 0U);
-    assert(BootProtocolParserPushBytes(&parser, first, 0U) == 0U);
+    assert(boot_protocol_parser_push_bytes(NULL, first, first_length) == 0U);
+    assert(boot_protocol_parser_push_bytes(&parser, NULL, first_length) == 0U);
+    assert(boot_protocol_parser_push_bytes(&parser, first, 0U) == 0U);
 
-    assert(BootProtocolParserPushBytes(&parser, first, 3U) == 0U);
-    assert(BootProtocolParserHasPartialFrame(&parser));
-    assert(BootProtocolParserPushBytes(&parser, &first[3U], first_length - 3U) == 1U);
+    assert(boot_protocol_parser_push_bytes(&parser, first, 3U) == 0U);
+    assert(boot_protocol_parser_has_partial_frame(&parser));
+    assert(boot_protocol_parser_push_bytes(&parser, &first[3U], first_length - 3U) == 1U);
     assert(callback_count == 1U);
     assert(callback_frame.frame_number == 0x21U);
 
@@ -164,14 +164,14 @@ static void test_push_bytes(void) {
     stream[2] = 0x00U;
     memcpy(&stream[3U], first, first_length);
     memcpy(&stream[3U + first_length], second, second_length);
-    assert(BootProtocolParserPushBytes(&parser, stream, 3U + first_length + second_length) == 2U);
+    assert(boot_protocol_parser_push_bytes(&parser, stream, 3U + first_length + second_length) == 2U);
     assert(callback_count == 3U);
     assert(callback_frame.frame_number == 0x22U);
 }
 
 /** @brief Checks the common response header, result byte, and payload CRC. */
 static void assert_response(uint8_t frame_number, uint8_t command, uint8_t result, uint16_t payload_length) {
-    const uint16_t crc = BootProtocolCrcCalculate(&mock_tx[BOOT_PROTOCOL_HEADER_SIZE], payload_length);
+    const uint16_t crc = boot_protocol_crc_calculate(&mock_tx[BOOT_PROTOCOL_HEADER_SIZE], payload_length);
 
     assert(mock_tx_length == BOOT_PROTOCOL_HEADER_SIZE + payload_length + BOOT_PROTOCOL_CRC_SIZE);
     assert(mock_tx[0] == BOOT_PROTOCOL_SYNC_1);
@@ -199,8 +199,8 @@ static void test_sync_and_callback(void) {
     static const uint8_t noise[] = {0x55U, 0xAAU, 0x44U, 0x00U, 0xAAU, 0xAAU, 0xAAU};
     const size_t length = make_frame(frame, 7U, payload, sizeof(payload));
 
-    BootProtocolParserInit(&parser);
-    BootProtocolParserRegisterCallback(&parser, capture_frame, NULL);
+    boot_protocol_parser_init(&parser);
+    boot_protocol_parser_register_callback(&parser, capture_frame, NULL);
     callback_count = 0U;
     memcpy(stream, noise, sizeof(noise));
     memcpy(&stream[sizeof(noise)], frame, length);
@@ -220,8 +220,8 @@ static void test_rejection_and_recovery(void) {
     uint8_t invalid[BOOT_PROTOCOL_MAX_FRAME_SIZE];
     const size_t length = make_frame(frame, 3U, payload, sizeof(payload));
 
-    BootProtocolParserInit(&parser);
-    BootProtocolParserRegisterCallback(&parser, capture_frame, NULL);
+    boot_protocol_parser_init(&parser);
+    boot_protocol_parser_register_callback(&parser, capture_frame, NULL);
     callback_count = 0U;
     memcpy(invalid, frame, length);
     invalid[4] = 0U;
@@ -246,7 +246,7 @@ static void test_rejection_and_recovery(void) {
     assert(feed_bytes(&parser, invalid, length) == 0U);
     assert(callback_count == 0U);
     assert(feed_bytes(&parser, frame, length) == 1U);
-    BootProtocolParserGetStats(&parser, &stats);
+    boot_protocol_parser_get_stats(&parser, &stats);
     assert(stats.length_error == 3U);
     assert(stats.crc_error == 2U);
     assert(callback_count == 1U);
@@ -262,20 +262,20 @@ static void test_maximum_and_timeout(void) {
     const size_t length = make_frame(frame, 9U, payload, sizeof(payload));
 
     assert(length == BOOT_PROTOCOL_MAX_FRAME_SIZE);
-    BootProtocolParserInit(&parser);
-    BootProtocolParserRegisterCallback(&parser, capture_frame, NULL);
+    boot_protocol_parser_init(&parser);
+    boot_protocol_parser_register_callback(&parser, capture_frame, NULL);
     assert(feed_bytes(&parser, frame, 8U) == 0U);
-    assert(BootProtocolParserHasPartialFrame(&parser));
-    BootProtocolParserTimeout(&parser);
-    assert(!BootProtocolParserHasPartialFrame(&parser));
+    assert(boot_protocol_parser_has_partial_frame(&parser));
+    boot_protocol_parser_timeout(&parser);
+    assert(!boot_protocol_parser_has_partial_frame(&parser));
     boot_protocol_parser_stats_t stats;
-    BootProtocolParserGetStats(&parser, &stats);
+    boot_protocol_parser_get_stats(&parser, &stats);
     assert(stats.timeout == 1U);
     assert(feed_bytes(&parser, frame, length) == 1U);
     assert(feed_bytes(&parser, frame, length) == 1U);
 }
 
-/** @brief Verifies chunk input produces the legacy handshake response through txBufferWrite. */
+/** @brief Verifies chunk input produces the legacy handshake response through tx_buffer_write. */
 static void test_chunk_and_legacy_callback(void) {
     static const uint8_t request[] = {0xAAU, 0x44U, 0x18U, 0x01U, 0xFEU, 0x0CU, 0x00U, 0x20U, 0x11U, 0U,   0U,
                                       0U,    0U,    0U,    0U,    0U,    0U,    0U,    0U,    0xD4U, 0xE3U};
@@ -288,14 +288,14 @@ static void test_chunk_and_legacy_callback(void) {
     mock_tx_pending = false;
     mock_tx_reserved = false;
     mock_i2c_state = SLAVE_RX_DONE;
-    BootUpdateServiceInit();
-    BootProtocolParserInit(&parser);
-    BootProtocolParserRegisterCallback(&parser, BootUpdateServiceFrameCallback, NULL);
-    assert(BootProtocolParserPushBytes(&parser, request, sizeof(request)) == 1U);
+    boot_update_service_init();
+    boot_protocol_parser_init(&parser);
+    boot_protocol_parser_register_callback(&parser, boot_update_service_frame_callback, NULL);
+    assert(boot_protocol_parser_push_bytes(&parser, request, sizeof(request)) == 1U);
     assert(mock_tx_length == sizeof(response));
     assert(memcmp(mock_tx, response, sizeof(response)) == 0);
     assert_response(1U, PACKET_CMD_HANDSHAKE, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    BootUpdateServiceGetStats(&stats);
+    boot_update_service_get_stats(&stats);
     assert(stats.validated_frames == 1U);
     assert(stats.responses_published == 1U);
 }
@@ -306,22 +306,22 @@ static void test_first_update_request(void) {
     uint8_t frame[BOOT_PROTOCOL_MAX_FRAME_SIZE];
     const size_t length = make_frame(frame, 1U, payload, sizeof(payload));
 
-    BootUpdateServiceInit();
-    BootProtocolParserInit(&parser);
-    BootProtocolParserRegisterCallback(&parser, BootUpdateServiceFrameCallback, NULL);
-    assert(!BootUpdateServiceHasRequest());
+    boot_update_service_init();
+    boot_protocol_parser_init(&parser);
+    boot_protocol_parser_register_callback(&parser, boot_update_service_frame_callback, NULL);
+    assert(!boot_update_service_has_request());
     frame[length - 1U] ^= 1U;
     assert(feed_bytes(&parser, frame, length) == 0U);
-    assert(!BootUpdateServiceHasRequest());
+    assert(!boot_update_service_has_request());
 
     payload[0] = PACKET_CMD_APP_UPLOAD; /* Valid CRC, unsupported command. */
     assert(feed_bytes(&parser, frame, make_frame(frame, 2U, payload, sizeof(payload))) == 1U);
-    assert(!BootUpdateServiceHasRequest());
+    assert(!boot_update_service_has_request());
 
     payload[0] = PACKET_CMD_HANDSHAKE;
     mock_tx_pending = true; /* A valid request still counts when the response is busy. */
     assert(feed_bytes(&parser, frame, make_frame(frame, 3U, payload, sizeof(payload))) == 1U);
-    assert(BootUpdateServiceHasRequest());
+    assert(boot_update_service_has_request());
     mock_tx_pending = false;
 }
 
@@ -337,64 +337,64 @@ static void test_update_led_and_progress(void) {
     mock_flash_result = BSP_FLASH_OK;
     mock_erase_count = 0U;
     mock_led_mode = BOOT_LED_MODE_RECOVERY;
-    BootUpdateServiceInit();
-    assert(!BootUpdateServiceTakeProgress());
-    BootUpdateServiceHandleFrame(&frame); /* Download before erase is rejected. */
+    boot_update_service_init();
+    assert(!boot_update_service_take_progress());
+    boot_update_service_handle_frame(&frame); /* Download before erase is rejected. */
     assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_RECOVERY && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_RECOVERY && !boot_update_service_take_progress());
 
     frame.payload[1] = PACKET_CMD_TYPE_CONTROL;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ADDR_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_RECOVERY && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_RECOVERY && !boot_update_service_take_progress());
     frame.payload[1] = PACKET_CMD_TYPE_DATA;
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
-    assert(!BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && boot_update_service_take_progress());
+    assert(!boot_update_service_take_progress());
 
     frame.payload[0] = PACKET_CMD_APP_DOWNLOAD;
     frame.payload[3] = 0U;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ADDR_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && !boot_update_service_take_progress());
     frame.payload[3] = 0x80U;
 #if BOOT_TEST_UPDATE_MODE == 1
     mock_flash_result = -1;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !boot_update_service_take_progress());
     mock_flash_result = BSP_FLASH_OK;
 #endif
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && boot_update_service_take_progress());
 
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     mock_app_valid = false;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_ERROR, frame.payload_length);
-    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !boot_update_service_take_progress());
     frame.payload[0] = PACKET_CMD_HANDSHAKE;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_HANDSHAKE, PACKET_ACK_OK, frame.payload_length);
-    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !boot_update_service_take_progress());
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     mock_app_valid = true;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, frame.payload_length);
-    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && boot_update_service_take_progress());
 }
 
 /* Completion survives traffic even if main never observes TX_DONE. */
 static void assert_jump_after_guard(void) {
     const uint32_t guard = BOOT_APPLICATION_HANDOVER_GUARD_MS;
     mock_i2c_state = SLAVE_RX;
-    assert(!BootUpdateServiceTakeJumpRequest(mock_now_ms + guard - 1U));
+    assert(!boot_update_service_take_jump_request(mock_now_ms + guard - 1U));
     mock_i2c_state = SLAVE_TX;
-    assert(BootUpdateServiceTakeJumpRequest(mock_now_ms + guard));
-    assert(!BootUpdateServiceTakeJumpRequest(mock_now_ms + guard + 1U));
+    assert(boot_update_service_take_jump_request(mock_now_ms + guard));
+    assert(!boot_update_service_take_jump_request(mock_now_ms + guard + 1U));
     mock_i2c_state = SLAVE_RX_DONE;
 }
 static void test_jump_deadline(void) {
@@ -410,36 +410,36 @@ static void test_jump_deadline(void) {
         mock_erase_count = 0U;
         mock_flash_result = BSP_FLASH_OK;
         mock_app_valid = true;
-        BootUpdateServiceInit();
-        BootUpdateServiceHandleFrame(&frame);
+        boot_update_service_init();
+        boot_update_service_handle_frame(&frame);
         assert_response(0U, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, frame.payload_length);
         mock_complete_reads = UINT32_MAX;
         mock_now_ms = UINT32_MAX - 50U;
         const uint32_t start = mock_now_ms;
         frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
-        BootUpdateServiceHandleFrame(&frame);
-        assert(!BootUpdateServiceTakeJumpRequest(start + 10000U));
+        boot_update_service_handle_frame(&frame);
+        assert(!boot_update_service_take_jump_request(start + 10000U));
         if (!late)
             assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, frame.payload_length);
         mock_now_ms = start + 90U;
         mock_i2c_state = SLAVE_RX_DONE;
-        BootUpdateServiceHandleFrame(&frame); /* Duplicate must not restart the deadline. */
+        boot_update_service_handle_frame(&frame); /* Duplicate must not restart the deadline. */
         frame.payload[0] = PACKET_CMD_ERASE_FLASH;
-        BootUpdateServiceHandleFrame(&frame); /* Nor may ERASE cancel the handover. */
+        boot_update_service_handle_frame(&frame); /* Nor may ERASE cancel the handover. */
         boot_update_service_stats_t stats;
-        BootUpdateServiceGetStats(&stats);
+        boot_update_service_get_stats(&stats);
         assert(stats.responses_published == 2U);
         assert(stats.erase_commands == 1U);
         assert(stats.response_busy_drop == 2U);
         if (late) {
-            assert(!BootUpdateServiceTakeJumpRequest(start + 10000U));
+            assert(!boot_update_service_take_jump_request(start + 10000U));
             assert_response(0U, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, frame.payload_length);
         } else {
-            assert(!BootUpdateServiceTakeJumpRequest(start + 99U));
+            assert(!boot_update_service_take_jump_request(start + 99U));
         }
         mock_i2c_state = SLAVE_TX;
-        assert(BootUpdateServiceTakeJumpRequest(start + (late ? 10000U : 100U)));
-        assert(!BootUpdateServiceTakeJumpRequest(start + 10001U));
+        assert(boot_update_service_take_jump_request(start + (late ? 10000U : 100U)));
+        assert(!boot_update_service_take_jump_request(start + 10001U));
     }
     mock_i2c_state = SLAVE_RX_DONE;
 }
@@ -463,13 +463,13 @@ static void test_update_command_responses(void) {
     mock_tx_pending = false;
     mock_tx_reserved = false;
     mock_i2c_state = SLAVE_RX_DONE;
-    BootUpdateServiceInit();
+    boot_update_service_init();
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert(mock_erase_count == bsp_flash_sector_count(APP_FLASH_MAX_SIZE));
 
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert(mock_erase_count == bsp_flash_sector_count(APP_FLASH_MAX_SIZE));
 
@@ -479,7 +479,7 @@ static void test_update_command_responses(void) {
     frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 1U] = 0x22U;
     frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 2U] = 0x33U;
     frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 3U] = 0x44U;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert(mock_write_address == APP_FLASH_BASE);
     assert(mock_write_length == 4U);
@@ -488,21 +488,21 @@ static void test_update_command_responses(void) {
     mock_now_ms = UINT32_MAX - BOOT_APPLICATION_HANDOVER_GUARD_MS / 2U;
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE;
-    BootUpdateServiceHandleFrame(&frame);
-    assert(!BootUpdateServiceTakeJumpRequest(0U));
-    assert(!BootUpdateServiceTakeJumpRequest(mock_now_ms + BOOT_APPLICATION_HANDOVER_GUARD_MS - 1U));
+    boot_update_service_handle_frame(&frame);
+    assert(!boot_update_service_take_jump_request(0U));
+    assert(!boot_update_service_take_jump_request(mock_now_ms + BOOT_APPLICATION_HANDOVER_GUARD_MS - 1U));
     assert_response(frame.frame_number, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert_jump_after_guard();
 
     frame.payload[0] = PACKET_CMD_HANDSHAKE;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert(mock_tx_pending);
     uint8_t unread_response[BOOT_PROTOCOL_MAX_FRAME_SIZE];
     const uint16_t unread_length = mock_tx_length;
     memcpy(unread_response, mock_tx, unread_length);
     const uint32_t erase_count_before_busy = mock_erase_count;
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert(mock_erase_count == erase_count_before_busy);
     assert(mock_tx_length == unread_length);
     assert(memcmp(mock_tx, unread_response, unread_length) == 0);
@@ -511,15 +511,14 @@ static void test_update_command_responses(void) {
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
     frame.payload[2] = 0U;
     frame.payload[3] = 0U;
-    BootUpdateServiceHandleFrame(&frame);
-    assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_ADDR_ERROR,
-                    BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    boot_update_service_handle_frame(&frame);
+    assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_ADDR_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
 
     mock_tx_length = 0U;
     frame.payload[0] = PACKET_CMD_APP_UPLOAD;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert(mock_tx_length == 0U);
-    BootUpdateServiceGetStats(&stats);
+    boot_update_service_get_stats(&stats);
     assert(stats.validated_frames == 8U);
     assert(stats.responses_published == 6U);
     assert(stats.unsupported_commands == 1U);
@@ -539,21 +538,21 @@ static void test_update_flash_failures(void) {
     frame.payload[3] = 0x80U;
     mock_erase_count = 0U;
     mock_flash_result = -1;
-    BootUpdateServiceInit();
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_init();
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_FATAL && !boot_update_service_take_progress());
 
     mock_flash_result = BSP_FLASH_OK;
     mock_erase_count = 0U;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && BootUpdateServiceTakeProgress());
+    assert(mock_led_mode == BOOT_LED_MODE_UPDATE_WINDOW && boot_update_service_take_progress());
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     mock_app_valid = false;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
-    assert(!BootUpdateServiceTakeJumpRequest(0U));
+    assert(!boot_update_service_take_jump_request(0U));
 }
 #elif BOOT_TEST_UPDATE_MODE == 2
 static void test_update_command_responses(void) {
@@ -569,29 +568,29 @@ static void test_update_command_responses(void) {
     mock_tx_pending = false;
     mock_tx_reserved = false;
     mock_i2c_state = SLAVE_RX_DONE;
-    BootUpdateServiceInit();
+    boot_update_service_init();
 
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_ERASE_FLASH, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert(mock_erase_count == 0U);
 
     frame.payload[0] = PACKET_CMD_APP_DOWNLOAD;
     frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE + 4U;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert_response(frame.frame_number, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert(mock_write_length == 0U);
 
     mock_now_ms = UINT32_MAX - BOOT_APPLICATION_HANDOVER_GUARD_MS / 2U;
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE;
-    BootUpdateServiceHandleFrame(&frame);
-    assert(!BootUpdateServiceTakeJumpRequest(0U));
-    assert(!BootUpdateServiceTakeJumpRequest(mock_now_ms + BOOT_APPLICATION_HANDOVER_GUARD_MS - 1U));
+    boot_update_service_handle_frame(&frame);
+    assert(!boot_update_service_take_jump_request(0U));
+    assert(!boot_update_service_take_jump_request(mock_now_ms + BOOT_APPLICATION_HANDOVER_GUARD_MS - 1U));
     assert_response(frame.frame_number, PACKET_CMD_JUMP_TO_APP, PACKET_ACK_OK, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
     assert_jump_after_guard();
 
-    BootUpdateServiceGetStats(&stats);
+    boot_update_service_get_stats(&stats);
     assert(stats.erase_commands == 1U);
     assert(stats.programmed_bytes == 4U);
     assert(stats.flash_errors == 0U);
@@ -613,20 +612,20 @@ static void test_update_command_responses(void) {
     mock_tx_pending = false;
     mock_tx_reserved = false;
     mock_i2c_state = SLAVE_RX_DONE;
-    BootUpdateServiceInit();
+    boot_update_service_init();
 
     frame.payload[0] = PACKET_CMD_ERASE_FLASH;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     frame.payload[0] = PACKET_CMD_APP_DOWNLOAD;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
-    BootUpdateServiceHandleFrame(&frame);
+    boot_update_service_handle_frame(&frame);
     assert(mock_tx_length == 0U);
     assert(!mock_tx_pending);
     assert(mock_erase_count == 0U);
     assert(mock_write_length == 0U);
-    assert(!BootUpdateServiceTakeJumpRequest(0U));
-    BootUpdateServiceGetStats(&stats);
+    assert(!boot_update_service_take_jump_request(0U));
+    boot_update_service_get_stats(&stats);
     assert(stats.validated_frames == 3U);
     assert(stats.responses_published == 0U);
     assert(stats.unsupported_commands == 3U);

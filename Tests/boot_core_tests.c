@@ -2,7 +2,7 @@
 #include "boot_app.h"
 #include "boot_config.h"
 #include "boot_memory_map.h"
-#include "bsp_status_led.h"
+#include "boot_status_led.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -12,17 +12,17 @@
 static boot_led_mode_t mock_led_mode;
 static unsigned mock_led_writes, mock_power_releases, mock_upgrade_resets;
 
-void bsp_reset_after_upgrade(void) {
+void boot_reset_after_upgrade(void) {
     assert(mock_led_mode == BOOT_LED_MODE_OFF);
     ++mock_upgrade_resets;
 }
 
-void bsp_status_led_set_mode(boot_led_mode_t mode) {
+void boot_status_led_set_mode(boot_led_mode_t mode) {
     mock_led_mode = mode;
     ++mock_led_writes;
 }
-void bsp_status_led_off(void) {
-    bsp_status_led_set_mode(BOOT_LED_MODE_OFF);
+void boot_status_led_off(void) {
+    boot_status_led_set_mode(BOOT_LED_MODE_OFF);
 }
 void bsp_power_hold_deassert(void) {
     assert(mock_led_mode == BOOT_LED_MODE_OFF);
