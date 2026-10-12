@@ -60,6 +60,15 @@ add_product_test(X1 0 0)
 add_product_test(X1Pro 1 1)
 add_product_test(XBase 1 1)
 
+add_executable(x1_runtime_tests x1_runtime_tests.cpp ../App/Shared/Src/app_runtime.cpp)
+target_include_directories(x1_runtime_tests PRIVATE x1_mock ../App/Shared/Inc ../Drivers/BSP/Inc ../Libraries/Bq40z50)
+target_compile_features(x1_runtime_tests PRIVATE cxx_std_17)
+target_compile_definitions(x1_runtime_tests PRIVATE FIRMWARE_CFG_LOGGING=0)
+target_link_libraries(x1_runtime_tests PRIVATE app::X1 project::options)
+set_target_properties(x1_runtime_tests PROPERTIES
+    CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+add_test(NAME x1_runtime_tests COMMAND x1_runtime_tests)
+
 function(configure_x1_test target)
     target_include_directories(${target} PRIVATE
         ../App/Shared/Inc ../App/Shared/Protocol/Inc ../Drivers/BSP/Inc
@@ -70,6 +79,14 @@ function(configure_x1_test target)
     set_target_properties(${target} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
     add_test(NAME ${target} COMMAND ${target})
 endfunction()
+add_executable(x1_panel_tests x1_panel_tests.cpp ../App/Shared/Src/app_panel.cpp
+    ../App/Shared/Src/app_recording.cpp ../App/Shared/Src/app_power.cpp ../App/Shared/Protocol/Src/panel_protocol.cpp)
+configure_x1_test(x1_panel_tests)
+add_executable(x1_power_tests x1_power_tests.cpp ../App/Shared/Src/app_power.cpp ../App/Shared/Src/app_keys.cpp
+    ../App/Shared/Src/app_recording.cpp ../Drivers/BSP/Src/bsp_keys.c ../Libraries/MultiButton/multi_button.c)
+configure_x1_test(x1_power_tests)
+target_include_directories(x1_power_tests PRIVATE x1_mock ../Libraries/MultiButton)
+set_source_files_properties(../Libraries/MultiButton/multi_button.c PROPERTIES COMPILE_OPTIONS "-Wno-conversion")
 add_executable(x1_battery_tests x1_battery_tests.cpp ../App/Shared/Src/app_battery.cpp
     ../Libraries/Bq40z50/bq40z50.cpp ../Libraries/Mp2762a/mp2762a.cpp)
 configure_x1_test(x1_battery_tests)
