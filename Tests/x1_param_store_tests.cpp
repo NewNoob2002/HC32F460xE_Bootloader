@@ -8,7 +8,8 @@
 
 namespace {
 constexpr uint32_t record_size = 16U;
-constexpr uint32_t slot_count = APP_PARAM_SECTOR_SIZE / record_size;
+constexpr uint32_t slot_count = (APP_PARAM_DATA_END - APP_PARAM_SECTOR_BASE) / record_size;
+static_assert(slot_count == 509U);
 // 用 Python struct/zlib 独立生成：版本 1、序号 1、offset 3、IEEE CRC32。
 constexpr uint8_t golden[] = {0x58U, 0x31U, 0x50U, 0x01U, 0x01U, 0x00U, 0x00U, 0x00U,
                               0x03U, 0x00U, 0x00U, 0x00U, 0x3AU, 0x43U, 0x36U, 0xD8U};
@@ -30,8 +31,8 @@ void reset() {
     fail_verify = corrupt_verify = next_read_fails = next_read_corrupt = false;
 }
 void check_range(uint32_t address, uint32_t length) {
-    check(address >= APP_PARAM_SECTOR_BASE && address < APP_PARAM_SECTOR_END);
-    check(length == record_size && length <= APP_PARAM_SECTOR_END - address);
+    check(address >= APP_PARAM_SECTOR_BASE && address < 0x0007FFDCUL);
+    check(length == record_size && length <= 0x0007FFDCUL - address);
     check((address - APP_PARAM_SECTOR_BASE) % record_size == 0U);
 }
 void put_word(uint8_t* bytes, uint32_t value) {
@@ -218,12 +219,22 @@ int main() {
         expect_offset(3U);
     }
 
-    // 写满 512 条才擦除；同值、擦除失败及未完整擦除均不能误写。
+    // 控制尾部即使看起来是有效新记录，也不能作为业务数据扫描。
+    reset();
+    seed(0U, 1U, 3U);
+    auto* control_tail = flash + 0x1FE0U;
+    memcpy(control_tail, golden, sizeof(golden));
+    put_word(control_tail + 4U, UINT32_MAX);
+    control_tail[8U] = 9U;
+    crc(control_tail);
+    expect_offset(3U);
+
+    // 写满 509 条才擦除；同值、擦除失败及未完整擦除均不能误写。
     reset();
     for (uint32_t slot = 0U; slot < slot_count; ++slot)
-        check(app_param_store_save(static_cast<uint8_t>(slot % 2U)));
+        check(app_param_store_save(static_cast<uint8_t>((slot + 1U) % 2U)));
     check(writes == slot_count && erases == 0U);
-    check(last_write == APP_PARAM_SECTOR_END - record_size);
+    check(last_write == 0x0007FFC0UL);
     check(app_param_store_save(1U));
     check(erases == 0U && writes == slot_count);
     erase_fails = true;

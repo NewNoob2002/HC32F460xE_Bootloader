@@ -1,6 +1,6 @@
 # Current implementation status
 
-本次结构调整：Boot 集中到 `Boot/`，协议位于 `Common/Protocol/`，板级驱动/时基/日志端口供 Boot/App 共用；三个 App 产品提供独立配置入口；X1 已接入 C++17 可烧录测试镜像，旧 `x1-hil1` 已完成V1.3/V1.5双版本充电与Linux轮询基础HIL，见 [V1.5记录](x1_v15_hil.md) 和 [测试基线HIL](x1_hil_test_version.md)。本轮 `x1-p3` 复用MultiButton，实现按键、冷启动、正常/强制关机、低电量停录制/关机及复位ACK等待；HostTests 14/14和三配置Boot/App构建通过，**新镜像尚未烧录，P3实板待验收**。完整LED、SOC存储及产品电气验收未完成。详见 [X1实施计划](x1_app_implementation_plan.md)、[产品契约](x1_product_contract.md) 和 [App构建说明](../App/README.md)。Boot链接容量固定 **32 KiB**，App起始地址仍为`0x00008000`；分节点提交前干净重编译的Boot Debug BIN与旧HIL基线不同，当前哈希见App构建说明，旧HIL不能替代当前镜像的硬件验收。用户已完成此前Boot和升级功能验证；结构调整的软件回归见 [project_structure.md](project_structure.md)。
+本次结构调整：Boot 集中到 `Boot/`，协议位于 `Common/Protocol/`，板级驱动/时基/日志端口供 Boot/App 共用；三个 App 产品提供独立配置入口；X1 已接入 C++17 可烧录测试镜像，旧 `x1-hil1` 已完成V1.3/V1.5双版本充电与Linux轮询基础HIL，见 [V1.5记录](x1_v15_hil.md) 和 [测试基线HIL](x1_hil_test_version.md)。本轮 `x1-p5` 保留MultiButton与P3按键/电源/低电量/复位ACK业务，并完成三灯与SOC补偿参数保存集成；HostTests 18/18、三配置Boot/App构建、布局及改动文件的clang-format/clang-tidy检查通过。B5提交 `5b2f86e` 已部署并独立verifybin到V1.5目标；[B6实板记录](x1_b6_hil.md) 给出单次编程约196.69 µs、擦除约18.05008 ms和Boot参数隔离证据，参数/Flash尾部恢复且最终运行正常。**B6擦除与Linux事务精确重叠的通信验收尚未完成，P3按键/开关机及产品电气验收仍待完成**。D6 已由用户批准从 512 修订为 509 条、避开 `0x7FFDC` 控制字；改动主机回归与三配置/clang-format/Host+ARM clang-tidy 通过，新 Debug App `0ff3b7a1…` 已部署并验证，Boot 未变。SSH 公钥接入 `192.168.10.12` 后，正常 D7 完成 509-record 满扇区回收并写入序号 1/offset 0。覆盖保存前后的 83.25 s Linux 抓取有 329 帧长度/CRC 正确、329 次 transfer 成功、0 overrun；原全 FF 参数与 metadata 尾部已恢复，核心 Running、无 fault。尚未确定具体事务与约 18 ms 擦除的精确重叠。用户已确认外部看门狗超时为 60 s，取消 PA6 波形测量验收，该项不再阻塞 B6；既有每 3000 ms 输出 1 ms DONE 脉冲的策略保持。详见 [X1实施计划](x1_app_implementation_plan.md)、[产品契约](x1_product_contract.md) 和 [App构建说明](../App/README.md)。Boot链接容量固定 **32 KiB**，App起始地址仍为`0x00008000`；分节点提交前干净重编译的Boot Debug BIN与旧HIL基线不同，当前哈希见App构建说明，旧HIL不能替代当前镜像的硬件验收。用户已完成此前Boot和升级功能验证；结构调整的软件回归见 [project_structure.md](project_structure.md)。
 
 下方为此前阶段的状态与验证记录，源码路径对应当时目录；原 `Core/Inc/boot_config.h` 现为 `Boot/Inc/boot_config.h`，原 `Protocol/` 现为 `Common/Protocol/`。
 
@@ -30,7 +30,7 @@ Default firmware builds enable real Flash erase/download and the upgrade jump co
 ## Current boot decision
 
 | Application vector | Software reset | Mode |
-|---|---|---|
+| --- | --- | --- |
 | invalid | either | Recovery |
 | valid | yes | ten-minute update window |
 | valid | no | immediate application handover |

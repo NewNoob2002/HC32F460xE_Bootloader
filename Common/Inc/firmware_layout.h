@@ -25,6 +25,12 @@
 #define APP_PARAM_SECTOR_BASE BOOT_RESERVED_SECTOR_BASE
 #define APP_PARAM_SECTOR_SIZE BOOT_METADATA_SECTOR_SIZE
 #define APP_PARAM_SECTOR_END  (APP_PARAM_SECTOR_BASE + APP_PARAM_SECTOR_SIZE)
+/* HC32 LL hc32_ll_efm.h：EFM_SWAP_ADDR=0x7FFDC 为换 Bank 控制字；从该地址起不得写业务记录。
+ * 16 字节记录在此之前仅容纳 509 条，最后一条结束于 0x7FFD0，扇区擦除单位仍为 8 KiB。 */
+#define APP_PARAM_DATA_END    0x0007FFDCUL
+#if (APP_PARAM_DATA_END <= APP_PARAM_SECTOR_BASE) || (APP_PARAM_DATA_END > APP_PARAM_SECTOR_END)
+#error "App parameter data must exclude the Flash swap/control tail"
+#endif
 #if (APP_PARAM_SECTOR_BASE < (BOOT_METADATA_B_BASE + BOOT_METADATA_SECTOR_SIZE))                                       \
     || (APP_PARAM_SECTOR_END > PHYSICAL_FLASH_END_EXCLUSIVE)
 #error "App parameter sector must not overlap the App image or Boot metadata"

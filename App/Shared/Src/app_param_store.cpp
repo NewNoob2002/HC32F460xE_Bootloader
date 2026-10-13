@@ -6,7 +6,7 @@
 
 namespace {
 constexpr uint32_t record_size = 16U;
-constexpr uint32_t slot_count = APP_PARAM_SECTOR_SIZE / record_size;
+constexpr uint32_t slot_count = (APP_PARAM_DATA_END - APP_PARAM_SECTOR_BASE) / record_size;
 constexpr uint32_t magic_version = 0x01503158U; // 小端 "X1P" + 版本 1。
 static_assert(APP_PARAM_SECTOR_SIZE == BSP_FLASH_SECTOR_SIZE);
 static_assert(APP_PARAM_SECTOR_BASE % BSP_FLASH_SECTOR_SIZE == 0U);
