@@ -49,6 +49,7 @@ if(NOT BOOT_BUILD_HOST_TESTS)
         ${PROJECT_SOURCE_DIR}/Drivers/BSP/Src/bsp_i2c_master.c
         ${PROJECT_SOURCE_DIR}/Drivers/BSP/Src/bsp_charger_gpio.c
         ${PROJECT_SOURCE_DIR}/Drivers/BSP/Src/bsp_keys.c
+        ${PROJECT_SOURCE_DIR}/Drivers/BSP/Src/bsp_indicator_led.c
         Shared/Src/hc32f460_it.cpp
     )
     target_include_directories(${APP_TARGET} PRIVATE Shared/Inc Shared/Protocol/Inc

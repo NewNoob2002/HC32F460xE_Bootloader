@@ -20,6 +20,15 @@
     || (PHYSICAL_FLASH_END_EXCLUSIVE != (BOOT_RESERVED_SECTOR_BASE + BOOT_METADATA_SECTOR_SIZE))
 #error "Boot/App Flash boundaries must be contiguous, 8 KiB aligned, with a 32 KiB Boot"
 #endif
+/* App 参数区（X1 SOC 补偿）占用原保留扇区；Boot 擦除/下载只覆盖 App 区，参数在升级后保留。
+ * Flash BSP 可访问整个物理 Flash，参数存储调用方须自行限制在本区间内。 */
+#define APP_PARAM_SECTOR_BASE BOOT_RESERVED_SECTOR_BASE
+#define APP_PARAM_SECTOR_SIZE BOOT_METADATA_SECTOR_SIZE
+#define APP_PARAM_SECTOR_END  (APP_PARAM_SECTOR_BASE + APP_PARAM_SECTOR_SIZE)
+#if (APP_PARAM_SECTOR_BASE < (BOOT_METADATA_B_BASE + BOOT_METADATA_SECTOR_SIZE))                                       \
+    || (APP_PARAM_SECTOR_END > PHYSICAL_FLASH_END_EXCLUSIVE)
+#error "App parameter sector must not overlap the App image or Boot metadata"
+#endif
 #define HC32_SRAM_BASE     0x1FFF8000UL
 #define HC32_SRAM_END      0x20027000UL
 #define HC32_RET_SRAM_BASE 0x200F0000UL

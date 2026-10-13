@@ -55,6 +55,8 @@ int main(void) {
     assert(BOOT_FLASH_BASE == 0U && BOOT_FLASH_SIZE == 32UL * 1024UL);
     assert(APP_FLASH_BASE == BOOT_FLASH_BASE + BOOT_FLASH_SIZE);
     assert(APP_FLASH_END == BOOT_METADATA_A_BASE);
+    assert(APP_PARAM_SECTOR_BASE == 0x0007E000UL && APP_PARAM_SECTOR_SIZE == 8UL * 1024UL);
+    assert(APP_PARAM_SECTOR_END == PHYSICAL_FLASH_END_EXCLUSIVE);
     assert(!bsp_time_elapsed(99U, 0U, 100U));
     assert(bsp_time_elapsed(100U, 0U, 100U));
     assert(!bsp_time_elapsed(3U, UINT32_MAX - 5U, 10U));

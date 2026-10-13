@@ -69,7 +69,7 @@ V1.3已有识别、采样、关闭输出与Linux读取证据；V1.5现已通过�
 
 当前公共地址契约保持不变：Metadata A 为 `[0x7A000,0x7C000)`，Metadata B 为 `[0x7C000,0x7E000)`，保留扇区为 `[0x7E000,0x80000)`。旧 `FLASH_OFFSET_ADDR=0x7A000` 禁止使用。
 
-保留扇区是 SOC 参数区候选，尚未正式分配或启用写入。当前 Boot 升级执行代码把擦除/下载限制在 App 区域，但 Flash BSP 本身可操作物理 Flash，未来存储调用方仍须检查自己的分区边界。P5 正式分配时同步公共宏、范围回归和文档。
+保留扇区已于2026-10-12正式分配为App参数区 `APP_PARAM_SECTOR_BASE/SIZE/END`（`Common/Inc/firmware_layout.h`，编译期检查不与App/Metadata重叠），存放X1 SOC补偿记录，格式与写入时机见 [P5计划](x1_p5_plan.md) D6/D7；尚无写入代码。Boot升级执行代码把擦除/下载限制在App区域，主机回归断言升级擦除不越过 `APP_FLASH_END` 且拒绝下载到参数区。Flash BSP本身可操作物理Flash，参数存储调用方须自行限制在该区间。
 
 ## 阶段依赖
 

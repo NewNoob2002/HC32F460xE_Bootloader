@@ -7,6 +7,7 @@
 #include "app_runtime.h"
 #include "bsp_debug_port.h"
 #include "bsp_external_watchdog.h"
+#include "bsp_indicator_led.h"
 #include "bsp_power.h"
 #include "bsp_reset.h"
 #include "bsp_status_led.h"
@@ -15,7 +16,7 @@
 #include "hc32_ll.h"
 
 namespace {
-enum Stage { Power = 1, Hold, Debug, Clock, Pll, Xtal, Timebase, Led, Watchdog, Battery, Panel, Keys };
+enum Stage { Power = 1, Hold, Debug, Clock, Pll, Xtal, Timebase, Led, Indicator, Watchdog, Battery, Panel, Keys };
 unsigned stage;
 unsigned fail_stage;
 bool unlocked;
@@ -89,6 +90,9 @@ uint32_t bsp_time_ms(void) {
 bool bsp_status_led_init(void) {
     return next_stage(Led);
 }
+bool bsp_indicator_led_init(void) {
+    return next_stage(Indicator);
+}
 bool bsp_external_watchdog_init(uint32_t time) {
     assert(time == now_ms);
     return next_stage(Watchdog);
@@ -134,7 +138,8 @@ void app_power_poll(uint32_t time) {
 
 int main() {
     // 任一关键初始化失败都应短路、恢复写保护并保持中断关闭。
-    const unsigned failures[] = {Power, Hold, Clock, Pll, Xtal, Timebase, Led, Watchdog, Battery, Panel, Keys};
+    const unsigned failures[] = {Power, Hold,      Clock,    Pll,     Xtal,  Timebase,
+                                 Led,   Indicator, Watchdog, Battery, Panel, Keys};
     for (unsigned failure : failures) {
         reset(failure);
         assert(!app_runtime_init());

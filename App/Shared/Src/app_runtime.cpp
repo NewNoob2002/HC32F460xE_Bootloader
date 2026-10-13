@@ -8,6 +8,7 @@
 #include "bsp_critical.h"
 #include "bsp_debug_port.h"
 #include "bsp_external_watchdog.h"
+#include "bsp_indicator_led.h"
 #include "bsp_power.h"
 #include "bsp_reset.h"
 #include "bsp_status_led.h"
@@ -42,8 +43,9 @@ bool initialize_hardware() {
     if ((SystemCoreClock != 200000000UL) || (CLK_GetStableStatus(CLK_STB_FLAG_PLL) != SET)
         || (CLK_GetStableStatus(CLK_STB_FLAG_XTAL) != SET))
         return false;
-    return bsp_timebase_init() && bsp_status_led_init() && bsp_external_watchdog_init(bsp_time_ms()) && logging_init()
-           && app_battery_init() && app_panel_init() && app_keys_init(bsp_time_ms());
+    return bsp_timebase_init() && bsp_status_led_init() && bsp_indicator_led_init()
+           && bsp_external_watchdog_init(bsp_time_ms()) && logging_init() && app_battery_init() && app_panel_init()
+           && app_keys_init(bsp_time_ms());
 }
 } // namespace
 

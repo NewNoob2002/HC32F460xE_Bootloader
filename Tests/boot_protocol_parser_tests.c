@@ -36,11 +36,14 @@ void boot_protocol_crc_tests_run(void);
 
 int32_t bsp_flash_erase_sector(uint32_t sector) {
     assert(sector == (APP_FLASH_BASE / BSP_FLASH_SECTOR_SIZE) + mock_erase_count);
+    /* 升级擦除不得进入 Metadata 或 App 参数区。 */
+    assert(((sector + 1U) * BSP_FLASH_SECTOR_SIZE) <= APP_FLASH_END);
     ++mock_erase_count;
     return mock_flash_result;
 }
 
 int32_t bsp_flash_write(uint32_t address, const uint8_t* data, uint32_t length) {
+    assert((address >= APP_FLASH_BASE) && (length <= (APP_FLASH_END - address)));
     mock_write_address = address;
     mock_write_length = length;
     memcpy(mock_write_data, data, length);
@@ -485,6 +488,18 @@ static void test_update_command_responses(void) {
     assert(mock_write_length == 4U);
     assert(memcmp(mock_write_data, &frame.payload[BOOT_PROTOCOL_MIN_PAYLOAD_SIZE], 4U) == 0);
 
+    /* 参数区地址必须按越界拒绝，且不触发 Flash 写入。 */
+    mock_write_length = 0U;
+    frame.payload[2] = (uint8_t)APP_PARAM_SECTOR_BASE;
+    frame.payload[3] = (uint8_t)(APP_PARAM_SECTOR_BASE >> 8U);
+    frame.payload[4] = (uint8_t)(APP_PARAM_SECTOR_BASE >> 16U);
+    boot_update_service_handle_frame(&frame);
+    assert_response(frame.frame_number, PACKET_CMD_APP_DOWNLOAD, PACKET_ACK_ADDR_ERROR, BOOT_PROTOCOL_MIN_PAYLOAD_SIZE);
+    assert(mock_write_length == 0U);
+    frame.payload[2] = 0x00U;
+    frame.payload[3] = 0x80U;
+    frame.payload[4] = 0x00U;
+
     mock_now_ms = UINT32_MAX - BOOT_APPLICATION_HANDOVER_GUARD_MS / 2U;
     frame.payload[0] = PACKET_CMD_JUMP_TO_APP;
     frame.payload_length = BOOT_PROTOCOL_MIN_PAYLOAD_SIZE;
@@ -519,8 +534,8 @@ static void test_update_command_responses(void) {
     boot_update_service_handle_frame(&frame);
     assert(mock_tx_length == 0U);
     boot_update_service_get_stats(&stats);
-    assert(stats.validated_frames == 8U);
-    assert(stats.responses_published == 6U);
+    assert(stats.validated_frames == 9U);
+    assert(stats.responses_published == 7U);
     assert(stats.unsupported_commands == 1U);
     assert(stats.response_busy_drop == 1U);
     assert(stats.erase_commands == 1U);
