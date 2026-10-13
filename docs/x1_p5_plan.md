@@ -132,6 +132,8 @@ D3、D6、D7 已确认，可实现；D1/D2/D4/D5/D8/D9 按推荐值实施，实�
 - 验证 Boot 升级流程擦除/下载后 `0x7E000` 内容保持。
 - **进度（2026-10-13，部分完成）**：已在此前 V1.5 目标部署并独立验证 B5；整片 Flash 先备份，参数原为全 FF。通过准确 ELF、独立 GDB batch 与 DWT 测得真实 BSP 单次 16 字节编程 39,338 cycles（约 196.69 µs）、8 KiB 擦除 3,610,016 cycles（约 18.05008 ms），回读成功。实际 Boot ERASE/DOWNLOAD 处理分支保留一条 seeded offset-0 记录，下载到 `0x7E000` 返回 ADDR_ERROR；此方法绕过 parser/ACK，并非完整 Linux uploader 验收。实验后恢复原参数与完整 B5、清除断点，Boot/App/参数 verifybin 通过，最终运行中样本有 244 次完整响应、通信/恢复错误为 0，整个 Flash 尾部与原备份相同。正常 Linux 基线已取得 12 帧 CRC/长度正确及 12 次 transfer 成功。追加满准备中 8192 字节 bulk write 返回 -1，具体原因未确认；SDK `EFM_SWAP_ADDR=0x7FFDC` 与原 512-record 布局重叠，509-slot revision 已形成可审查提案，提前实施后先撤回并恢复原 B5；用户随后明确批准修订 D6，现源码与目标均为 509-slot 实现，三配置/HostTests 18/18/clang-format/Host+ARM clang-tidy 通过。全 509 条 fixture 已成功写入并回读。用户配置 SSH 公钥并指定 `root@192.168.10.12` 后，完成正常 D7 满扇区回收，独立回读为序号 1/offset 0 的 CRC-valid 记录及其余全 FF，pending 清除、save_failures=0。83.25 s Linux ftrace 捕获 329 帧长度/CRC 正确、329 次 transfer 成功、0 overrun；markers 尚不足以确定具体事务与真实擦除区间重叠。测试后原参数及整个 metadata/参数尾部均恢复、debug server 停止、核心正常运行，临时 trace 和串口 holder 已清理。用户已确认外部看门狗超时为 60 s，取消 PA6 波形测量验收；约 18.05 ms 擦除样本提供时序裕量依据，PA6 不再阻塞 B6。B6 仍待事务/擦除精确重叠的通信验收，D7 未据此修改。完整方法、失败、哈希及原始证据见 [B6实板记录](x1_b6_hil.md)。
 
+- **进度（2026-10-13，完成）**：MCU 侧 NVIC pending 探针在真实 D7 门控位置执行 1100 次 sector 63 擦除（18.04–18.05 ms），42 次擦除窗口内出现 I2C 地址匹配（13 次为写入）；事务被时钟拉伸至最长约 23 ms，Linux 613 次传输全部成功，受支持请求响应 CRC 全部正确，MCU 无溢出/恢复/CRC 错误。D7 不需收紧，不需 RAM 执行。另发现 Surveyor 发送 X1 未实现的 ID 6、8–13 并得到空读，待协议决定。详见 [B6记录](x1_b6_hil.md)。
+
 ### B7 收尾
 
 - Debug/Release/ReleaseNoLog 的 Boot+App 构建、布局检查、HostTests；更新 `x1_app_implementation_plan.md` 进度表、`App/README.md` 哈希、`current_status.md`。

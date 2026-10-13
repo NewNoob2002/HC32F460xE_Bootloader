@@ -2,7 +2,7 @@
 
 日期：2026-10-13 UTC。B5 提交为 `5b2f86e`。用户要求“review and commit B5, then do B6”；B5 review 无阻塞问题，HostTests 18/18、Debug/Release/ReleaseNoLog 构建、实际 App 布局及改动文件的 clang-format/Host+ARM clang-tidy 检查通过。
 
-**状态：B6 部分完成。** 已完成真实 Flash BSP 的单次 cycle 计量、回读验证、Boot 擦除/下载处理路径的参数隔离验证，以及一次正常 D7 主循环满扇区回收。包含该保存的 Linux 抓取取得 329 帧长度/CRC 正确、329 次传输成功；尚未确定具体事务与擦除的精确重叠，不能宣布 B6 完成。用户已确认外部看门狗超时为 60 s，取消 PA6 波形测量验收，该项不再阻塞 B6。D7 窗口未修改。
+**状态：B6 完成（2026-10-13）。** 真实 Flash BSP 单次计量、回读验证、Boot 擦除/下载处理路径参数隔离、一次正常 D7 满扇区回收均已完成；擦除/Linux 事务重叠由 MCU 侧 NVIC pending 探针直接证明（42 次重叠，含 13 次写入），Linux 1100 次擦除期间 613 次传输全部成功、受支持请求的响应 CRC 全部正确，见文末“擦除与 Linux 事务重叠验收”。用户已确认外部看门狗超时为 60 s，取消 PA6 波形测量验收。D7 窗口未修改。
 
 ## 目标与部署
 
@@ -78,7 +78,7 @@
 - 调试中多次 halt/resume、Boot service 测试和镜像恢复打断了正常时间线；不能据这些区间声明连续 Linux 通信或精确 watchdog 波形通过。最终已恢复并确认运行。
 - 用户随后确认已连接 EG25-G USB，设备新枚举为 `2c7c:0125`、产品 EG25-G；`ttyUSB1..ttyUSB5` 分别为 USB interface 00..04。8 s 被动采集只在 `/dev/ttyUSB5`（interface 04）取得 690 字节可读控制台输出，包括 `X1 login:`、`mdm-perf 202003131021 X1 /dev/ttyGS1`。已确认 Linux console 稳定路径为 `/dev/serial/by-id/usb-Quectel_EG25-G-if04-port0`；采集保持原 USB baud 元数据 9600，并未猜测物理 UART。没有发送用户名/密码或改变 modem 配置，当时需要已认证 shell。原始证据 `ttyUSB5_passive.bin`、`serial_passive_summary.json`。`ttyUSB0` 为独立 CH340，`ttyACM0` 用途未确认；PC I2C adapter 未扫描/写入。
 - 用户确认没有 capture equipment；未取得 PA6/SCL/SDA 同步 trace。PA6 波形测量要求随后由用户取消。
-- **待完成**：同步确定 Linux 事务与真实擦除区间的重叠，确认该区间的 NACK/重试与字节对齐结果。正常 D7 满后擦除已实际执行，下面 SSH 抓取覆盖保存前后，但不能单凭宽时间标记关闭“擦除期间发起读写”的要求。实测不满足时才据证据收紧 D7，必要时再评估 RAM 执行。
+- **已由文末重叠验收关闭**：同步确定 Linux 事务与真实擦除区间的重叠，确认该区间的 NACK/重试与字节对齐结果。正常 D7 满后擦除已实际执行，下面 SSH 抓取覆盖保存前后，但不能单凭宽时间标记关闭“擦除期间发起读写”的要求。实测不满足时才据证据收紧 D7，必要时再评估 RAM 执行。
 
 ## Linux 基线、追加满准备与 D6 修订发现过程
 
@@ -149,3 +149,31 @@
 Debug/Release/ReleaseNoLog 三个实际 App ELF 的向量、Flash load 范围、无 ICG/Boot 依赖检查也通过。SSH 认证阻塞已解除，PA6 波形测量要求已由用户取消；B6 仅剩擦除/事务精确重叠的通信验收，LED/完整产品验收仍按上位计划进行。
 
 可恢复的全 Flash、参数备份、preflight、脚本与原始结果均保留在忽略目录 `debug_artifacts/x1_b6/`。
+
+## 擦除与 Linux 事务重叠验收（2026-10-13）
+
+前次会话曾尝试主机侧按时钟同步预测 Linux 写入时刻并触发擦除（`overlap_*` 文件，attempt 1–4），未形成结论；其遗留的参数扇区为一条序号 1、offset 0 的有效记录（与 `overlap_4_params.bin` 相同），本轮测试擦除后已按原 all-FF 备份恢复。
+
+**方法**：不依赖跨设备时钟同步，改为 MCU 侧直接判定。在独立 git worktree 中对已提交 `87b80f0` 加 scratch 探针（`b6probe_harness.patch`，ID `x1-b6probe`，App SHA-256 `570b7db3…`，未提交到仓库），位置为 `app_runtime_poll` 中真实 D7 门控之后（Running/Off、无未读响应、看门狗非高脉冲）。探针按 RAM 可调周期调用真实 `bsp_flash_erase_sector(63)`（扇区本已为空），擦除前 `__disable_irq` 并记录 I2C1 EEI/RXI/TEI（INT005/006/004）NVIC pending，擦除后再读取；仅擦除期间新出现的 pending 计为重叠。`EFM_BUS_HOLD` 下 CPU 取指本已停顿、ISR 无法执行，屏蔽中断只把 ISR 推迟到擦除返回后的数个指令。Linux 侧经 SSH 用独立 ftrace instance 只记录 adapter 2 / 地址 `0x11`。探针使能、周期与上限均为运行中 SWD 写 RAM，未 halt。
+
+| 轮次 | 周期 | 擦除次数 | 擦除耗时 | 重叠（任意 / 地址 EEI / RX） | Linux 传输 / 失败 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 211 ms | 400 | 18.039–18.053 ms | 1 / 1 / 1 | 349 / 0 |
+| 2 | 100 ms | 400（含抓取后） | 同上 | 26 / 26 / 0 | 175 / 0 |
+| 3 | 25 ms | 300 | 同上 | 15 / 14 / 12 | 89 / 0 |
+
+合计 1100 次擦除、0 次 BSP 失败、42 次擦除窗口内 I2C 地址匹配（13 次含 RX）。三轮 MCU 计数增量：RX overflow、arbitration、response busy、恢复 active/busy/init failure、parser CRC/长度/超时错误均为 0；`rx_transactions` 与 parser `valid_frames` 相等（174/87/45）；`max_poll_gap_ms`/`max_work_ms` 为 2/2（取样时探针已停止，擦除轮次因 SysTick 停顿不能由此量测）。DHCSR 始终 `0x01010001`，CFSR/HFSR 为 0。ftrace overrun 0。
+
+**观测**：
+- 擦除期间开始的事务由从机时钟拉伸到擦除结束：读最长 19.92 ms、写最长 22.81 ms，Linux `i2c_result` 全部 `n=1 ret=1`，没有 NACK 返回。重叠写入在 MCU 端全部解析为 CRC 正确帧。
+- 受支持请求（ID 1/2/3）在三轮中全部得到 CRC 正确的响应（含被拉伸的写之后）；第 1 轮周期 211 ms 时擦除被 D7 “无未读响应”门控锁相到响应读取之后，仅取得 1 次重叠，因此追加 100/25 ms 两轮扫描相位以覆盖写入。
+- 所有被拉伸的读均为“无待发响应”的空读（全 `0xFF`）：D7 门控使擦除不会与待读响应重叠，这正是设计意图。
+- 分析脚本将 112 字节 ID 6 写入标为无效，原因是 ftrace 只打印前 64 字节，不是线路错误。
+
+**独立发现（非擦除问题）**：Linux 启动后 Surveyor 周期性发送 ID 6、8–13 请求（每约 15 s 各一次），X1 仅实现 1–5，不发布响应，随后 Linux 读取得到 26 字节全 `0xFF`（MCU `empty_tx_reads` 计数）。三轮中未支持 ID 的空读与请求 7/7 一一对应，与是否擦除无关。之前 uptime 417 s 的抓取未出现这些 ID。是否需要实现或显式拒绝这些消息属于协议范围，待用户确认。
+
+**限制**：Linux `i2c_result` 只反映 adapter 最终结果，不能证明驱动内部无重试；没有 SCL/SDA 波形。探针擦除未经过 `app_param_store_save` 的扫描/追加，但使用相同 BSP 擦除函数与相同 D7 门控位置。
+
+**副作用与恢复**：两次以 normal reset 烧录（探针镜像、恢复镜像）均使 MCU 复位并经 PB3 导致 Linux 重启（boot ID `69a2dcc4…`、`e91c3ea8…`），Surveyor 自动恢复。扇区 63 本轮新增约 1100 次擦除。最终重新部署批准的 509-record App（`0ff3b7a1…`），Boot/App/原 all-FF 参数扇区三项 verifybin 成功；最终运行 DHCSR `0x01010001`、VTOR `0x8000`、CFSR/HFSR 0，参数扇区与 `before_params.bin` 相同；ftrace instance 已移除。
+
+证据：`b6probe_harness.patch`、`b6probe_app.{bin,elf}`、`flash_b6probe.log`、`b6probe{,2,3}_run.sh`、`b6probe{,2,3}_{pre,post}_*.bin`、`b6probe{,2,3}_linux_trace.log`、`b6probe{,2,3}_result.json`、`analyze_b6probe{,2,3}.py`、`restore_after_b6probe.log`、`probe_final_snapshot.log`、`b6probe_linux_final.log`。
