@@ -1,5 +1,6 @@
 #define LOG_TAG "Battery"
 #include "app_battery.h"
+#include "app_battery_compensation.h"
 #include "bsp_charger_gpio.h"
 #include "bsp_i2c_master.h"
 #include "bsp_timebase.h"
@@ -8,6 +9,7 @@
 
 namespace {
 AppBatterySnapshot battery{};
+AppSocCompensation compensation{};
 uint32_t last_sample_ms;
 uint32_t last_control_ms;
 uint32_t plugged_ms;
@@ -93,6 +95,7 @@ void update_charger(uint32_t now_ms) {
 
 bool app_battery_init() {
     battery = {};
+    app_soc_compensation_init(compensation, 0U); // TODO(B5): 从 app_param_store 加载已保存偏移。
     sample_started = false;
     control_started = false;
     plug_started = false;
@@ -128,12 +131,17 @@ void app_battery_poll(uint32_t now_ms) {
         control_started = true;
         last_control_ms = now_ms;
         update_charger(now_ms);
+        // 终止态 3 也计入：V1.5 终止后原始 SOC 常停在 98–99%，正是需补偿的场景。
+        app_soc_compensation_update(compensation, battery.valid && !bsp_time_elapsed(now_ms, battery.sampled_ms, 6000U),
+                                    battery.sample.soc_percent, battery.charger_valid && (battery.charge_state != 0U),
+                                    now_ms);
     }
 }
 
 AppBatterySnapshot app_battery_snapshot(uint32_t now_ms) {
     auto result = battery;
     result.valid = result.valid && !bsp_time_elapsed(now_ms, result.sampled_ms, 6000U);
+    result.percent = app_soc_compensation_percent(compensation, result.sample.soc_percent);
     return result;
 }
 

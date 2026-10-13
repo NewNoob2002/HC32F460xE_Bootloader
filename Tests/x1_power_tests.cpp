@@ -23,7 +23,7 @@ void initialize(bool cold = false, uint32_t time = 0U) {
     now = time;
     releases = resets = 0U;
     power_pressed = function_pressed = false;
-    battery = {AppHardware::GpioV13, {3000U, 7800U, 100U}, now, true, true, false, false, 0U};
+    battery = {AppHardware::GpioV13, {3000U, 7800U, 100U}, now, true, true, false, false, 0U, 100U};
     app_recording_init();
     app_power_init(cold, now);
     assert(app_keys_init(now));

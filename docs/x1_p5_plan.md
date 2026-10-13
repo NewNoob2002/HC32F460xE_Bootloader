@@ -101,12 +101,13 @@ D3、D6、D7 已确认，可实现；D1/D2/D4/D5/D8/D9 按推荐值实施，实�
 
 **B2 `app_led`（`App/Shared/{Inc,Src}/app_led.*`）**
 - 纯函数 `app_led_select(输入快照) -> {三灯模式}` + 带时间的输出推进；主机测试覆盖 §5 每行、优先级切换、翻转回绕、0%/9%/10%/13%/14%/100% 边界。
-- **进度（2026-10-12，待提交）**：`app_led_select` 新增 `charge_done`（state 3）常亮规则，`charging` 收窄为 state 1/2，与 `app_panel` 充电判定一致；翻转相位每次调用前移到一个周期内，避免 2³² ms 回绕后错相。`x1_led_tests` 覆盖 §5 各行、终止态、长时间运行；HostTests 16/16 通过。`check()` 替代 assert，因为 `app_led_level` 有副作用。未接入 app_runtime。
+- **进度（2026-10-12，已提交 `5654e63`）**：`app_led_select` 新增 `charge_done`（state 3）常亮规则，`charging` 收窄为 state 1/2，与 `app_panel` 充电判定一致；翻转相位每次调用前移到一个周期内，避免 2³² ms 回绕后错相。`x1_led_tests` 覆盖 §5 各行、终止态、长时间运行；HostTests 16/16 通过。`check()` 替代 assert，因为 `app_led_level` 有副作用。未接入 app_runtime。
 
 **B3 SOC 补偿（放在电池业务内，例如 `app_battery_compensation.*`）**
 - 纯逻辑：输入（有效样本、原始 SOC、充电状态、now_ms），输出（当前 offset、是否需要保存）。充电状态 1/2/3 均计为充电：终止态 3 下 SOC 常停在 98–99%，若不计入，补偿永远不会把它推到 100%。
 - 回归：20 min 刚好/差 1 ms、中途 SOC 变化、样本陈旧、拔出、offset≥10、时间回绕、同值不重复请求保存。
 - `AppBatterySnapshot` 增加补偿后 SOC；按 D3 决定面板与 LED 消费哪个字段，`app_power` 低电量判断不改。
+- **进度（2026-10-12，软件完成）**：`app_battery_compensation.*` 纯逻辑（`AppSocCompensation`：offset、`session_done`、`save_pending`、`rejected` 诊断计数）。`app_battery` 每个 500 ms 控制周期推进，充电判定为 `charger_valid && charge_state!=0`，样本有效性复用快照的 6 s 陈旧判定；快照新增 `percent`（补偿后），面板 0x01 改用它，`app_power` 仍用 `sample.soc_percent`。初始偏移暂为 0，B5 从 `app_param_store` 加载；`save_pending` 由 B5 消费。`x1_battery_compensation_tests` 覆盖上述回归项；HostTests 17/17，三配置构建通过。未上板。
 
 **B4 参数存储（`app_param_store.*`）**
 - 仅操作 `APP_PARAM_SECTOR`，调用方自查边界；记录编码/扫描/追加/满后擦除；写后 `bsp_flash_read` 回读比对，失败不标记已保存。

@@ -13,6 +13,7 @@ struct AppBatterySnapshot {
     bool typec_present;
     bool charging_enabled;
     uint8_t charge_state;
+    uint8_t percent; /* 补偿后 SOC，供面板与 LED（D3）；低电量判断继续用 sample.soc_percent。 */
 };
 /** @brief 只初始化总线和状态，版本识别前不触碰旧版充电GPIO。 */
 bool app_battery_init();

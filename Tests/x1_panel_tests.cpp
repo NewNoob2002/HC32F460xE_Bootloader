@@ -14,7 +14,8 @@ size_t input_size, output_size;
 bool reserved, busy, publish_fails, recover;
 uint32_t completed;
 unsigned resets, releases;
-AppBatterySnapshot battery{AppHardware::GpioV13, {3000U, 7800U, 100U}, 0U, true, true, false, false, 0U};
+// 原始 95%、补偿后 100%：0x01 必须上报补偿值（D3）。
+AppBatterySnapshot battery{AppHardware::GpioV13, {3000U, 7800U, 95U}, 0U, true, true, false, false, 0U, 100U};
 
 void request(uint16_t id, uint8_t type, const uint8_t* payload, size_t size, uint32_t time) {
     input_size = panel_encode_response(id, type, payload, size, input, sizeof(input));

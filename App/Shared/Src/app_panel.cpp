@@ -60,7 +60,7 @@ void handle_frame(const PanelFrame& frame, void*) {
         memcpy(payload, hardware, strlen(hardware) + 1U);
         constexpr char version[] = "X1-P3";
         memcpy(payload + 8U, version, sizeof(version) - 1U);
-        put_word(payload + 18U, battery.sample.soc_percent);
+        put_word(payload + 18U, battery.percent);
         put_word(payload + 20U, battery.sample.temperature_dk);
         // 保持旧面板线缆的整数伏特字段，内部采样仍保留mV。
         put_word(payload + 22U, static_cast<uint16_t>(battery.sample.voltage_mv / 1000U));
