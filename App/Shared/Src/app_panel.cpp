@@ -21,6 +21,7 @@ uint32_t rejected_requests;
 uint32_t unsupported_requests;
 uint32_t busy_requests;
 uint32_t recovery_failures;
+bool linux_seen;
 bool response_pending;
 bool response_has_operation;
 bool response_has_reset;
@@ -32,6 +33,7 @@ void put_word(uint8_t* bytes, uint16_t value) {
 }
 
 void handle_frame(const PanelFrame& frame, void*) {
+    linux_seen = true; // 解析器仅对 CRC/长度正确的完整帧调用；不要求已支持该消息。
     // 对已支持消息验证实际消费的字段、消息类型和长度；未知消息不执行副作用。
     const bool query = (frame.id == 1U) || (frame.id == 2U);
     const bool set = (frame.id >= 3U) && (frame.id <= 5U);
@@ -58,7 +60,7 @@ void handle_frame(const PanelFrame& frame, void*) {
         payload_size = 36U;
         const char* hardware = app_hardware_name(battery.hardware);
         memcpy(payload, hardware, strlen(hardware) + 1U);
-        constexpr char version[] = "X1-P3";
+        constexpr char version[] = "X1-P5";
         memcpy(payload + 8U, version, sizeof(version) - 1U);
         put_word(payload + 18U, battery.percent);
         put_word(payload + 20U, battery.sample.temperature_dk);
@@ -111,6 +113,7 @@ void handle_frame(const PanelFrame& frame, void*) {
 
 bool app_panel_init() {
     parser = {};
+    linux_seen = false;
     app_recording_init();
     response_pending = false;
     response_has_operation = false;
@@ -127,6 +130,14 @@ bool app_panel_init() {
     completion_count = counters.tx_complete_reads;
     recovery_failures = counters.recovery_init_failures;
     return true;
+}
+
+bool app_panel_linux_seen() {
+    return linux_seen;
+}
+
+bool app_panel_response_pending() {
+    return response_pending;
 }
 
 void app_panel_poll(uint32_t time_ms) {

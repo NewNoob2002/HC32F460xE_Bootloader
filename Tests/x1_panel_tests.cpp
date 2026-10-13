@@ -21,11 +21,13 @@ void request(uint16_t id, uint8_t type, const uint8_t* payload, size_t size, uin
     input_size = panel_encode_response(id, type, payload, size, input, sizeof(input));
     assert(input_size);
     app_panel_poll(time);
+    assert(app_panel_response_pending() == busy);
 }
 void finish(uint32_t time = 0U) {
     busy = false;
     ++completed;
     app_panel_poll(time);
+    assert(!app_panel_response_pending());
 }
 } // namespace
 
@@ -121,11 +123,20 @@ int main() {
     assert(callbacks == 1U);
 
     assert(app_panel_init());
+    assert(!app_panel_linux_seen() && !app_panel_response_pending());
     app_power_init(false, 0U);
+    memcpy(input, linux_query, sizeof(linux_query));
+    input[sizeof(linux_query) - 1U] ^= 1U;
+    input_size = sizeof(linux_query);
+    app_panel_poll(0U);
+    assert(!app_panel_linux_seen() && !app_panel_response_pending());
     memcpy(input, linux_query, sizeof(linux_query));
     input_size = sizeof(linux_query);
     app_panel_poll(0U);
     assert(output_size == 32U && busy && output[17] == 1U);
+    assert(app_panel_linux_seen() && app_panel_response_pending());
+    app_panel_poll(0U);
+    assert(app_panel_response_pending()); // 无完整读取计数时保留未读状态。
     for (size_t i = 20U; i < 28U; ++i)
         assert(output[i] == 0U);
     finish();
@@ -133,6 +144,7 @@ int main() {
     request(1U, 0U, zero, sizeof(zero), 0U);
     assert(output_size == 60U && output[16] == 3U && output[17] == 1U);
     assert(memcmp(output + 20U, "V1.3", 4U) == 0);
+    assert(memcmp(output + 28U, "X1-P5", 5U) == 0);
     assert(output[38] == 100U && output[39] == 0U && output[40] == 0xB8U && output[41] == 0x0BU);
     assert(output[42] == 7U && output[46] == 1U);
     assert(output[43] == 0U && output[44] == 0U && output[45] == 0U); // 无旧响应残留。
@@ -155,7 +167,7 @@ int main() {
     app_recording_toggle(); // 响应发布后发生新操作。
     recover = true;
     app_panel_poll(0U); // 恢复不误清除未读操作。
-    assert(app_recording_snapshot().operation_pending);
+    assert(app_recording_snapshot().operation_pending && app_panel_response_pending());
     finish();
     assert(app_recording_snapshot().operation_pending);
     request(2U, 0U, zero, sizeof(zero), 0U);
@@ -238,5 +250,9 @@ int main() {
     request(3U, 2U, sync, sizeof(sync), 6002U);
     assert(output[20] == 0U && !app_recording_snapshot().active);
     finish(6003U);
+    assert(app_panel_init());
+    assert(!app_panel_linux_seen());
+    request(6U, 2U, sync, sizeof(sync), 6004U);
+    assert(app_panel_linux_seen() && !app_panel_response_pending()); // 未支持消息仍证明有效通信。
     puts("x1_panel_tests: real frame / bounds / busy / operation ownership / shutdown / reset ACK PASS");
 }

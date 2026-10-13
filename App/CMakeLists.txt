@@ -43,6 +43,7 @@ if(NOT BOOT_BUILD_HOST_TESTS)
         Shared/Src/app_battery.cpp
         Shared/Src/app_battery_compensation.cpp
         Shared/Src/app_param_store.cpp
+        Shared/Src/app_led.cpp
         Shared/Src/app_recording.cpp
         Shared/Src/app_power.cpp
         Shared/Src/app_keys.cpp
@@ -62,7 +63,7 @@ if(NOT BOOT_BUILD_HOST_TESTS)
     )
     target_compile_definitions(${APP_TARGET} PRIVATE
         FIRMWARE_CFG_LOGGING=$<BOOL:${APP_ENABLE_LOGGING}>
-        APP_BUILD_ID="x1-p3"
+        APP_BUILD_ID="x1-p5"
         $<$<CONFIG:Debug>:BUFFER_SIZE_UP=8192>
     )
     target_link_libraries(${APP_TARGET} PRIVATE app::X1 app::image firmware::battery_devices)

@@ -60,7 +60,8 @@ add_product_test(X1 0 0)
 add_product_test(X1Pro 1 1)
 add_product_test(XBase 1 1)
 
-add_executable(x1_runtime_tests x1_runtime_tests.cpp ../App/Shared/Src/app_runtime.cpp)
+add_executable(x1_runtime_tests x1_runtime_tests.cpp ../App/Shared/Src/app_runtime.cpp
+    ../App/Shared/Src/app_led.cpp)
 target_include_directories(x1_runtime_tests PRIVATE x1_mock ../App/Shared/Inc ../Drivers/BSP/Inc ../Libraries/Bq40z50)
 target_compile_features(x1_runtime_tests PRIVATE cxx_std_17)
 target_compile_definitions(x1_runtime_tests PRIVATE FIRMWARE_CFG_LOGGING=0)

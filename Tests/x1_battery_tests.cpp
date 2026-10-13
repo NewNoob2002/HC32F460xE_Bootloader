@@ -1,7 +1,9 @@
 #include <assert.h>
+#include <cstdlib>
 #include <stdio.h>
 #include <string.h>
 #include "app_battery.h"
+#include "app_param_store.h"
 #include "bsp_charger_gpio.h"
 #include "bsp_i2c_master.h"
 #include "mp2762a.h"
@@ -13,7 +15,14 @@ Bq40z50Sample gauge{2982U, 7800U, 50U};
 bool gauge_fails, mp_read_fails, mp_write_fails;
 bool gpio_enabled, gpio_typec, gpio_detect;
 unsigned gpio_inits, mp_writes;
-void reset(bsp_i2c_probe_result_t probe) {
+unsigned param_save_calls;
+uint8_t mock_charge_state, saved_offset;
+bool param_save_fails;
+void check(bool ok) {
+    if (!ok)
+        std::abort();
+}
+void reset(bsp_i2c_probe_result_t probe, uint8_t offset = 0U) {
     probe_result = probe;
     memset(registers, 0, sizeof(registers));
     registers[0] = 0x1EU;
@@ -23,8 +32,11 @@ void reset(bsp_i2c_probe_result_t probe) {
     gauge_fails = mp_read_fails = mp_write_fails = false;
     gpio_enabled = false;
     gpio_typec = gpio_detect = true;
-    gpio_inits = mp_writes = 0U;
-    assert(app_battery_init());
+    gpio_inits = mp_writes = param_save_calls = 0U;
+    mock_charge_state = 2U;
+    saved_offset = 0xFFU;
+    param_save_fails = false;
+    check(app_battery_init(offset));
 }
 } // namespace
 extern "C" {
@@ -49,7 +61,8 @@ bool bsp_i2c_master_write_byte(uint8_t address, uint8_t reg, uint8_t value) {
         return false;
     if (reg == 8U) {
         assert((value & 0xC1U) == 0U); // 不误触发REG_RST/WTD_RST/保留位。
-        registers[0x13] = (value & 0x10U) ? 0x0AU : 2U;
+        registers[0x13] =
+            (value & 0x10U) ? static_cast<uint8_t>(2U | (static_cast<uint32_t>(mock_charge_state) << 2U)) : 2U;
     }
     registers[reg] = value;
     return true;
@@ -84,6 +97,12 @@ void bsp_charger_gpio_enable(bool enabled) {
     gpio_enabled = enabled;
 }
 }
+bool app_param_store_save(uint8_t offset) {
+    ++param_save_calls;
+    saved_offset = offset;
+    return !param_save_fails;
+}
+
 int main() {
     reset(BSP_I2C_PROBE_IO_ERROR);
     const uint32_t t4[] = {0U, 200U, 400U, 600U};
@@ -146,5 +165,42 @@ int main() {
     gauge.soc_percent = 101U;
     Bq40z50Sample unchanged{1U, 2U, 3U};
     assert(!bq40z50_read_sample(unchanged) && unchanged.soc_percent == 3U);
-    puts("x1_battery_tests: both hardware paths / identity errors / lock / temperature / data failures PASS");
+    // 已保存偏移直接用于快照；没有新计算结果时不触碰 Flash。
+    reset(BSP_I2C_PROBE_PRESENT, 5U);
+    gauge.soc_percent = 9U;
+    app_battery_poll(0U);
+    check(app_battery_snapshot(0U).percent == 14U && app_battery_snapshot(0U).sample.soc_percent == 9U);
+    app_battery_save_compensation(0U);
+    check(param_save_calls == 0U);
+
+    // 真实电池业务经过 20 min：预充/快充/终止都生成 offset=2，失败重试跨回绕且成功后只保存一次。
+    constexpr uint32_t window_ms = 20U * 60U * 1000U;
+    const uint8_t charge_states[] = {1U, 2U, 3U};
+    for (uint8_t charge_state : charge_states) {
+        reset(BSP_I2C_PROBE_PRESENT, 5U);
+        mock_charge_state = charge_state;
+        gauge.soc_percent = 98U;
+        const uint32_t start = UINT32_MAX - window_ms - 1000U;
+        for (uint32_t elapsed = 0U; elapsed <= window_ms; elapsed += 500U)
+            app_battery_poll(start + elapsed);
+        const uint32_t save_ms = start + window_ms;
+        check(app_battery_snapshot(save_ms).charge_state == charge_state);
+        check(app_battery_snapshot(save_ms).percent == 100U);
+        check(param_save_calls == 0U);
+        param_save_fails = true;
+        app_battery_save_compensation(save_ms);
+        check(param_save_calls == 1U && saved_offset == 2U);
+        param_save_fails = false;
+        app_battery_save_compensation(save_ms + 2999U);
+        check(param_save_calls == 1U);
+        app_battery_save_compensation(save_ms + 3000U);
+        check(param_save_calls == 2U && saved_offset == 2U);
+        app_battery_save_compensation(save_ms + 6000U);
+        check(param_save_calls == 2U);
+        check(app_battery_init(2U));
+        app_battery_poll(0U);
+        app_battery_save_compensation(0U);
+        check(param_save_calls == 2U && app_battery_snapshot(0U).percent == 100U);
+    }
+    puts("x1_battery_tests: hardware / temperature / data failures / stored SOC / save retry PASS");
 }

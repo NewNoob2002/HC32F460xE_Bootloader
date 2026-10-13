@@ -2,7 +2,7 @@
 
 日期：2026-10-12。上位计划见 [X1 App 实施计划](x1_app_implementation_plan.md) §4 P3/P5，产品契约见 [x1_product_contract.md](x1_product_contract.md)。本文只安排下一轮工作，不修改已冻结的 P3 语义。
 
-## 1. 工作区现状（本次核对）
+## 1. 规划时基线（当前实施进度见 §6）
 
 - 分支 `feat/portability-node2-transport-boundary`，HEAD `cd2b38f`；近 5 个提交均为 X1 App 工作，分支名沿用旧移植阶段。
 - 未提交改动仅有删除 `docs/superpowers/{plans,specs}/2026-08-25-phase2-transport-boundary*.md`（Phase 2 已关闭）。本计划不处理，由用户决定提交或恢复。
@@ -14,7 +14,7 @@
 
 | 轨道 | 内容 | 前置条件 | 产出 |
 |---|---|---|---|
-| A：P3 实板验收 | 烧录当前 `x1-p3` Boot+App，按 §3 验收 | 用户授权刷写/上电刺激；V1.3 或 V1.5 板 + Linux 侧 | HIL 记录追加到 `x1_hil_test_version.md` 或新记录 |
+| A：P3 实板验收 | 烧录当前 `x1-p5` Boot+App（含 P3 行为），按 §3 验收 | 用户授权刷写/上电刺激；V1.3 或 V1.5 板 + Linux 侧 | HIL 记录追加到 `x1_hil_test_version.md` 或新记录 |
 | B：P5 软件 | §4–§6 | §4 决策冻结 | 代码、主机回归、三配置构建、文档 |
 
 A 只依赖硬件，B 只依赖决策；B 的 Flash 时序测量（§6 B6）需要上板，可与 A 同一次上板完成。
@@ -93,38 +93,46 @@ D3、D6、D7 已确认，可实现；D1/D2/D4/D5/D8/D9 按推荐值实施，实�
 
 每步完成后运行 `ctest --preset HostTests`；涉及 BSP/布局时追加三配置构建。
 
-**B1 布局与 BSP**
+### B1 布局与 BSP
+
 - `Common/Inc/firmware_layout.h`：新增 `APP_PARAM_SECTOR_BASE=BOOT_RESERVED_SECTOR_BASE` 等宏，`#error` 校验位于 App/Metadata 之外；同步 `boot_v2_memory_map.md`、产品契约参数区一节。
 - 回归：Boot 擦除/下载范围检查拒绝 `0x7E000`（扩展现有 boot_core 范围用例）。
 - `Drivers/BSP`：新增 X1 电源灯/充电灯 GPIO（`bsp_board_config.h` 加端口/引脚/有效电平，初始化为灭，C/C++ 均可用）。PB5 继续由 `bsp_status_led` 拥有，异常路径行为不变。
 - **进度（2026-10-12，软件完成）**：`APP_PARAM_SECTOR_BASE/SIZE/END` 及编译期重叠检查已加入；Boot 回归改在 `boot_protocol_parser_tests` 的 Flash mock 中断言擦除/写入不越过 `APP_FLASH_END`，并新增下载到 `0x7E000` 返回 `ADDR_ERROR` 且不写 Flash。LED 驱动沿用 `bsp_keys`/`bsp_charger_gpio` 的 App 专用驱动写法，引脚在 `bsp_indicator_led.c` 内而非公共 `bsp_board_config.h`；`app_runtime` 在 PB5 之后初始化 PC13/PH2 为低（熄灭），失败按初始化失败处理。新增 `x1_indicator_led_tests`，HostTests 15/15；Debug/Release/ReleaseNoLog 的 Boot+App 构建通过，Boot Debug BIN 哈希仍为 `8e9fbd7e…`，未变。App 镜像已变化但构建 ID 仍为 `x1-p3`，B5 统一改为 `x1-p5` 并在 B7 更新 `App/README.md` 哈希。未烧录；PC13/PH2 实物电平待轨道 A 确认。
 
-**B2 `app_led`（`App/Shared/{Inc,Src}/app_led.*`）**
+### B2 `app_led`（`App/Shared/{Inc,Src}/app_led.*`）
+
 - 纯函数 `app_led_select(输入快照) -> {三灯模式}` + 带时间的输出推进；主机测试覆盖 §5 每行、优先级切换、翻转回绕、0%/9%/10%/13%/14%/100% 边界。
 - **进度（2026-10-12，已提交 `5654e63`）**：`app_led_select` 新增 `charge_done`（state 3）常亮规则，`charging` 收窄为 state 1/2，与 `app_panel` 充电判定一致；翻转相位每次调用前移到一个周期内，避免 2³² ms 回绕后错相。`x1_led_tests` 覆盖 §5 各行、终止态、长时间运行；HostTests 16/16 通过。`check()` 替代 assert，因为 `app_led_level` 有副作用。未接入 app_runtime。
 
-**B3 SOC 补偿（放在电池业务内，例如 `app_battery_compensation.*`）**
+### B3 SOC 补偿（放在电池业务内，例如 `app_battery_compensation.*`）
+
 - 纯逻辑：输入（有效样本、原始 SOC、充电状态、now_ms），输出（当前 offset、是否需要保存）。充电状态 1/2/3 均计为充电：终止态 3 下 SOC 常停在 98–99%，若不计入，补偿永远不会把它推到 100%。
 - 回归：20 min 刚好/差 1 ms、中途 SOC 变化、样本陈旧、拔出、offset≥10、时间回绕、同值不重复请求保存。
 - `AppBatterySnapshot` 增加补偿后 SOC；按 D3 决定面板与 LED 消费哪个字段，`app_power` 低电量判断不改。
 - **进度（2026-10-12，已提交 `1f14918`）**：`app_battery_compensation.*` 纯逻辑（`AppSocCompensation`：offset、`session_done`、`save_pending`、`rejected` 诊断计数）。`app_battery` 每个 500 ms 控制周期推进，充电判定为 `charger_valid && charge_state!=0`，样本有效性复用快照的 6 s 陈旧判定；快照新增 `percent`（补偿后），面板 0x01 改用它，`app_power` 仍用 `sample.soc_percent`。初始偏移暂为 0，B5 从 `app_param_store` 加载；`save_pending` 由 B5 消费。`x1_battery_compensation_tests` 覆盖上述回归项；HostTests 17/17，三配置构建通过。未上板。
 
-**B4 参数存储（`app_param_store.*`）**
+### B4 参数存储（`app_param_store.*`）
+
 - 仅操作 `APP_PARAM_SECTOR`，调用方自查边界；记录编码/扫描/追加/满后擦除；写后 `bsp_flash_read` 回读比对，失败不标记已保存。
 - 主机测试用 Flash mock：擦除态、CRC 损坏、半写记录、扇区满、写/擦/回读失败、上电恢复取最新有效记录。
-- **进度（2026-10-12，软件完成）**：`app_param_store_load/save` 仅访问 `[0x7E000,0x80000)`；16 字节小端记录（`"X1P"` + 版本 1、序号、offset、3 字节零保留、`panel_crc32`），扫描全部 512 槽并取最大有效序号，相同序号取后槽。半写/损坏槽不重用，同值不写；满后擦除并验证全区已空，再从序号 1 重写。编程源使用字数组满足 EFM 的 32-bit 对齐/类型要求；写后逐字节回读，任何 Flash 失败均返回 false，重试重新扫描。`bsp_flash.h` 增加 C++ 的 C 链接声明。`x1_param_store_tests` 覆盖独立黄金记录、范围约束、CRC/格式损坏、各 32-bit 半写边界、读写擦除/回读失败、静默坏写/未完整擦除、扇区满与上电恢复；HostTests 18/18，Debug/Release/ReleaseNoLog 的 Boot+App 构建与 clang-format 检查通过。LSP 检查部分超时；后续按仓库 `.clang-tidy` 对 B3/B4 相关翻译单元完成 Host/ARM 检查（`--warnings-as-errors=*`），命名与隐式乘法扩宽告警均已修复。运行时加载/保存窗口留给 B5；未烧录，Flash 阻塞时序待 B6。
+- **进度（2026-10-12，已提交 `ed30f96`）**：`app_param_store_load/save` 仅访问 `[0x7E000,0x80000)`；16 字节小端记录（`"X1P"` + 版本 1、序号、offset、3 字节零保留、`panel_crc32`），扫描全部 512 槽并取最大有效序号，相同序号取后槽。半写/损坏槽不重用，同值不写；满后擦除并验证全区已空，再从序号 1 重写。编程源使用字数组满足 EFM 的 32-bit 对齐/类型要求；写后逐字节回读，任何 Flash 失败均返回 false，重试重新扫描。`bsp_flash.h` 增加 C++ 的 C 链接声明。`x1_param_store_tests` 覆盖独立黄金记录、范围约束、CRC/格式损坏、各 32-bit 半写边界、读写擦除/回读失败、静默坏写/未完整擦除、扇区满与上电恢复；HostTests 18/18，Debug/Release/ReleaseNoLog 的 Boot+App 构建与 clang-format 检查通过。LSP 检查部分超时；后续按仓库 `.clang-tidy` 对 B3/B4 相关翻译单元完成 Host/ARM 检查（`--warnings-as-errors=*`），命名与隐式乘法扩宽告警均已修复。运行时加载/保存窗口留给 B5；未烧录，Flash 阻塞时序待 B6。
 
-**B5 集成**
-- 输入映射：`charging` = 充电器有效且 state 1/2，`charge_done` = 充电器有效且 state 3，`fast_charging` = state 2；`linux_seen` 需要 `app_panel` 提供只读访问器（至少收到一次有效帧），目前不存在。
+### B5 集成
+
+- 输入映射：`charging` = 充电器有效且 state 1/2，`charge_done` = 充电器有效且 state 3，`fast_charging` = state 2；`linux_seen` 由 `app_panel` 只读访问器提供（至少收到一次 CRC/长度有效的完整帧，包括暂未支持消息）。
 - `app_runtime` 初始化加载参数（失败按 offset=0 继续，不阻止开机）；轮询中按 D7 条件执行一次保存，不在 ISR、不在看门狗高脉冲期间。
 - 构建 ID 更新为 `x1-p5`，版本字符串 `X1-P5`。
+- **进度（2026-10-12，软件完成）**：`app_runtime` 初始化读取 offset，读取失败记录日志并按 0 继续；通过 `app_battery_init(offset)` 初始化补偿状态。主循环把电源/电池/录制及 Linux 已出现状态映射给既有 `app_led_select/level`，PC13/PH2/PB5 每 100 ms 推进，模式变化当轮输出。新增 `app_panel_linux_seen/response_pending`，短读/恢复期间保留未读状态；仅 Running/Off 驻留、无未读响应、看门狗脉冲低时调用 `app_battery_save_compensation`。同步 I2C2 后重新推进看门狗再检查保存窗口；写后验证成功才清除 pending，失败保留并最早 3 s 后重试，保存耗时计入 runtime 工作时间。既有 runtime/battery/panel 回归扩展覆盖加载/失败默认、全部电源保存门控、脉冲/未读响应阻止写入、预充/快充/终止映射、补偿 SOC/录制门控/模式立即变化/100 ms 节拍、真实 20 min 补偿及失败重试回绕。HostTests 18/18，三配置 Boot+App 构建与实际 App 布局检查通过；所有改动 C/C++ 文件通过 `.clang-format`，相关 Host/ARM 翻译单元通过 `.clang-tidy --warnings-as-errors=*`，无项目诊断。未烧录；B6 实测与 B7 产物哈希收尾仍待执行。
 
-**B6 目标测量（与轨道 A 同次上板）**
+### B6 目标测量（与轨道 A 同次上板）
+
 - 实测单次 16 字节编程与 8 KiB 扇区擦除的阻塞时间（`EFM_BUS_HOLD` 下取指暂停，I2C1 从机中断同样被延迟）。
 - 在擦除期间发起 Linux 读写，确认无 NACK/数据错位，PA6 间隔仍在契约内。不满足时先收紧 D7 写入窗口；仍不满足再评估 RAM 执行，不先改平台方案。
 - 验证 Boot 升级流程擦除/下载后 `0x7E000` 内容保持。
 
-**B7 收尾**
+### B7 收尾
+
 - Debug/Release/ReleaseNoLog 的 Boot+App 构建、布局检查、HostTests；更新 `x1_app_implementation_plan.md` 进度表、`App/README.md` 哈希、`current_status.md`。
 
 ## 7. 完成判定

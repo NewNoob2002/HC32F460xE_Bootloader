@@ -18,7 +18,7 @@ extern volatile AppRuntimeDiagnostics app_runtime_diagnostics;
  * @note 仅主循环启动时调用一次。要求 Boot 交接到 App 向量表及 200 MHz 晶振/MPLL 配置。
  */
 bool app_runtime_init();
-/** @brief 主循环每轮调用；单次有界，服务看门狗并推进周期心跳，now_ms 允许回绕。 */
+/** @brief 主循环每轮调用；服务看门狗、业务/LED与安全窗口参数保存，now_ms 允许回绕；Flash 阻塞预算待实测。 */
 void app_runtime_poll(uint32_t now_ms);
 /** @brief 停止喂狗、指示故障并驻留，不释放电源；可从初始化失败或异常上下文调用。 */
 [[noreturn]] void app_runtime_fault();

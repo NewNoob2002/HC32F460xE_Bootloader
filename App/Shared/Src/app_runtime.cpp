@@ -2,8 +2,11 @@
 #include "app_runtime.h"
 #include "app_battery.h"
 #include "app_keys.h"
+#include "app_led.h"
 #include "app_panel.h"
+#include "app_param_store.h"
 #include "app_power.h"
+#include "app_recording.h"
 #include "bsp_board_config.h"
 #include "bsp_critical.h"
 #include "bsp_debug_port.h"
@@ -19,6 +22,26 @@
 
 namespace {
 uint32_t heartbeat_ms;
+uint32_t last_led_ms;
+bool led_started;
+AppLedChannel power_led{}, charge_led{}, function_led{};
+
+void update_leds(uint32_t now_ms) {
+    const auto battery = app_battery_snapshot(now_ms);
+    const auto pattern = app_led_select(
+        {app_power_snapshot().state, app_panel_linux_seen(), app_recording_snapshot().active, battery.valid,
+         battery.charger_valid && (battery.charge_state == 1U || battery.charge_state == 2U),
+         battery.charger_valid && (battery.charge_state == 2U), battery.charger_valid && (battery.charge_state == 3U),
+         battery.percent});
+    if (led_started && (power_led.mode == pattern.power) && (charge_led.mode == pattern.charge)
+        && (function_led.mode == pattern.function) && !bsp_time_elapsed(now_ms, last_led_ms, 100U))
+        return;
+    led_started = true;
+    last_led_ms = now_ms;
+    bsp_indicator_led_write(BSP_INDICATOR_LED_POWER, app_led_level(power_led, pattern.power, now_ms));
+    bsp_indicator_led_write(BSP_INDICATOR_LED_CHARGE, app_led_level(charge_led, pattern.charge, now_ms));
+    bsp_status_led_write(app_led_level(function_led, pattern.function, now_ms));
+}
 
 bool logging_init() {
 #if FIRMWARE_CFG_LOGGING
@@ -43,15 +66,23 @@ bool initialize_hardware() {
     if ((SystemCoreClock != 200000000UL) || (CLK_GetStableStatus(CLK_STB_FLAG_PLL) != SET)
         || (CLK_GetStableStatus(CLK_STB_FLAG_XTAL) != SET))
         return false;
-    return bsp_timebase_init() && bsp_status_led_init() && bsp_indicator_led_init()
-           && bsp_external_watchdog_init(bsp_time_ms()) && logging_init() && app_battery_init() && app_panel_init()
-           && app_keys_init(bsp_time_ms());
+    if (!bsp_timebase_init() || !bsp_status_led_init() || !bsp_indicator_led_init()
+        || !bsp_external_watchdog_init(bsp_time_ms()) || !logging_init())
+        return false;
+    uint8_t stored_offset = 0U;
+    if (!app_param_store_load(stored_offset)) {
+        stored_offset = 0U;
+        FIRMWARE_LOG_WARN("SOC offset load failed; using 0");
+    }
+    return app_battery_init(stored_offset) && app_panel_init() && app_keys_init(bsp_time_ms());
 }
 } // namespace
 
 volatile AppRuntimeDiagnostics app_runtime_diagnostics;
 
 bool app_runtime_init() {
+    power_led = charge_led = function_led = {};
+    led_started = false;
     app_runtime_diagnostics.poll_count = 0U;
     app_runtime_diagnostics.last_poll_ms = 0U;
     app_runtime_diagnostics.max_poll_gap_ms = 0U;
@@ -86,6 +117,13 @@ void app_runtime_poll(uint32_t now_ms) {
     if (!bsp_external_watchdog_is_pulse_active())
         app_battery_poll(now_ms);
     app_power_poll(bsp_time_ms()); // 新样本/完整 ACK 当轮推进，不在 ISR 执行业务或复位。
+    update_leds(bsp_time_ms());
+    // I2C2 操作可能跨过喂狗截止时刻；再次推进脉冲，再选择 Flash 写入窗口。
+    bsp_external_watchdog_poll(bsp_time_ms());
+    const auto power = app_power_snapshot().state;
+    if ((power == AppPowerState::Running || power == AppPowerState::Off) && !app_panel_response_pending()
+        && !bsp_external_watchdog_is_pulse_active())
+        app_battery_save_compensation(bsp_time_ms());
     const uint32_t work_ms = bsp_time_ms() - now_ms;
     if (work_ms > app_runtime_diagnostics.max_work_ms)
         app_runtime_diagnostics.max_work_ms = work_ms;

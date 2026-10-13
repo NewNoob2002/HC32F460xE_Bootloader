@@ -1,7 +1,7 @@
 # App 产品维护入口
 
 | 产品 | 独立配置 | OLED / LVGL |
-|---|---|---|
+| --- | --- | --- |
 | X1 | [Products/X1/product.cmake](Products/X1/product.cmake) | 关闭 / 关闭 |
 | X1Pro | [Products/X1Pro/product.cmake](Products/X1Pro/product.cmake) | 开启 / 开启 |
 | XBase | [Products/XBase/product.cmake](Products/XBase/product.cmake) | 继承 X1Pro，按本产品需求增减 |
@@ -11,7 +11,7 @@
 X1 采用与 Boot 相同的职责分离：
 
 | 文件 | 职责 |
-|---|---|
+| --- | --- |
 | `Products/X1/main.cpp` | 产品初始化入口与主循环编排 |
 | `Shared/Inc/app_runtime.h` | 启动、轮询与故障公开契约 |
 | `Shared/Src/app_runtime.cpp` | 接管电源/时钟/时基/看门狗、日志与周期心跳 |
@@ -25,7 +25,7 @@ X1 采用与 Boot 相同的职责分离：
 | `Drivers/BSP/bsp_i2c_master.*`、`bsp_charger_gpio.*`、`bsp_keys.*` | I2C2、V1.3充电GPIO及PA0/PA15按键输入 |
 | `Libraries/Bq40z50`、`Libraries/Mp2762a` | 移除 Wire/Arduino 依赖后的有界芯片访问 |
 
-启动要求 Boot 已完成交接；App 验证继承的 200 MHz 时钟，准备 SysTick/看门狗和日志后恢复中断。初始化失败保持中断关闭、保留电源输出并停止喂狗，供外部看门狗恢复。当前`x1-p3`已接入MultiButton、按键及电源业务：纯上电复位等待电源键2 s确认，10 s超时释放PB3；运行时2 s请求关机、功能键8 s强制断电。`0x05=1`是Linux关机完成确认，8 s后断电且受最初20 s兜底约束；`0x04=1`等ACK完整读出才复位，5 s未读取消。SOC≤9%有效未充电时停录制，持续180 s请求关机。PB3释放后若仍有外部供电，继续充电/喂狗/通信并驻留，不自动复位或重新保持电源。详细边界见 [X1产品契约](../docs/x1_product_contract.md)。P5 LED/参数写入尚未接入。双版本充电按运行时可靠响应/NACK区分并锁定，错误不作为方案切换依据。
+启动要求 Boot 已完成交接；App 验证继承的 200 MHz 时钟，准备 SysTick/看门狗和日志后恢复中断。初始化失败保持中断关闭、保留电源输出并停止喂狗，供外部看门狗恢复。当前`x1-p5`保留MultiButton、按键及电源业务：纯上电复位等待电源键2 s确认，10 s超时释放PB3；运行时2 s请求关机、功能键8 s强制断电。`0x05=1`是Linux关机完成确认，8 s后断电且受最初20 s兜底约束；`0x04=1`等ACK完整读出才复位，5 s未读取消。SOC≤9%有效未充电时停录制，持续180 s请求关机。PB3释放后若仍有外部供电，继续充电/喂狗/通信并驻留，不自动复位或重新保持电源。详细边界见 [X1产品契约](../docs/x1_product_contract.md)。P5 已接入三灯、SOC 补偿与参数加载/保存；读取失败按 0 继续，保存由 Running/Off、未读响应和看门狗脉冲条件门控，失败保留 pending 并最早 3 s 后重试。HostTests 18/18、三配置/布局与改动文件的 clang-format/clang-tidy 检查通过，实板时序待 [P5计划](../docs/x1_p5_plan.md) B6，P5产物哈希待B7收尾。双版本充电按运行时可靠响应/NACK区分并锁定，错误不作为方案切换依据。
 
 完整构建边界、链接地址与接入要求见 [工程结构](../docs/project_structure.md)。Boot 固定 32 KiB，App 从 `0x00008000` 开始。
 
@@ -49,12 +49,14 @@ python3 Tests/linker_layout_tests.py arm-none-eabi-gcc \
   build/ReleaseNoLog/hc32f460_app_x1.elf
 ```
 
-产物位于 `build/<preset>/hc32f460_app_x1.{elf,hex,bin,map}`，BIN 的编程基址是 `0x00008000`。旧阶段生成的 [Debug合并BIN](../build/Debug/hc32f460_x1_combined.bin) 不会自动随P3构建更新；烧录时使用本轮独立App BIN，或用 `Tools/merge_bin.py` 重新生成到不存在的输出文件。Boot 产物路径保持不变。`APP_ENABLE_LOGGING` 独立于 `BOOT_ENABLE_LOGGING`；`ReleaseNoLog` 显式关闭两者。CI 已配置三种固件构建和 X1 产物收集，本地尚未执行远端 CI。
+产物位于 `build/<preset>/hc32f460_app_x1.{elf,hex,bin,map}`，BIN 的编程基址是 `0x00008000`。旧阶段生成的 [Debug合并BIN](../build/Debug/hc32f460_x1_combined.bin) 不会自动随 App 构建更新；烧录时使用本轮独立App BIN，或用 `Tools/merge_bin.py` 重新生成到不存在的输出文件。Boot 产物路径保持不变。`APP_ENABLE_LOGGING` 独立于 `BOOT_ENABLE_LOGGING`；`ReleaseNoLog` 显式关闭两者。CI 已配置三种固件构建和 X1 产物收集，本地尚未执行远端 CI。
+
+以下大小、哈希和软件验证为历史 P3 基线，不能用于校验当前 P5 产物。
 
 P3软件验证：上述三配置及Boot构建通过，HostTests **14/14**；实际X1镜像通过向量、异常入口、无ICG、Flash装载范围和Boot依赖检查。混合C/C++调用、真实newlib构造函数表及startup调用顺序通过链接回归。新增回归使用真实MultiButton与BSP GPIO mock，覆盖电平/上拉、单击/双击、冷启动、单次长按、关机/确认重复、强制断电、低电量0%/无效陈旧/充电中断、复位ACK超时与时间回绕。新版实板验收尚未执行。
 
 | 配置 | P3 BIN字节数（含初始化数据） | SRAM静态布局含2 KiB栈预留 |
-|---|---:|---:|
+| --- | ---: | ---: |
 | Debug | 24,456 | 14,496 |
 | Release | 20,848 | 6,560 |
 | ReleaseNoLog | 14,160 | 4,992 |

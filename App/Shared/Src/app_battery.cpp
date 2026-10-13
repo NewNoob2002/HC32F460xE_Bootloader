@@ -1,6 +1,7 @@
 #define LOG_TAG "Battery"
 #include "app_battery.h"
 #include "app_battery_compensation.h"
+#include "app_param_store.h"
 #include "bsp_charger_gpio.h"
 #include "bsp_i2c_master.h"
 #include "bsp_timebase.h"
@@ -15,11 +16,14 @@ uint32_t last_control_ms;
 uint32_t plugged_ms;
 uint32_t read_failures;
 uint32_t charger_failures;
+uint32_t save_failures;
+uint32_t last_save_ms;
 uint8_t absent_confirmations;
 bool sample_started;
 bool control_started;
 bool plug_started;
 bool charger_initialized;
+bool save_attempted;
 
 void identify_hardware(bool gauge_healthy) {
     if (battery.hardware != AppHardware::Unknown)
@@ -93,9 +97,10 @@ void update_charger(uint32_t now_ms) {
 }
 } // namespace
 
-bool app_battery_init() {
+bool app_battery_init(uint8_t stored_offset) {
     battery = {};
-    app_soc_compensation_init(compensation, 0U); // TODO(B5): 从 app_param_store 加载已保存偏移。
+    app_soc_compensation_init(compensation, stored_offset);
+    save_attempted = false;
     sample_started = false;
     control_started = false;
     plug_started = false;
@@ -103,6 +108,7 @@ bool app_battery_init() {
     absent_confirmations = 0U;
     read_failures = 0U;
     charger_failures = 0U;
+    save_failures = 0U;
     return bsp_i2c_master_init();
 }
 
@@ -135,6 +141,18 @@ void app_battery_poll(uint32_t now_ms) {
         app_soc_compensation_update(compensation, battery.valid && !bsp_time_elapsed(now_ms, battery.sampled_ms, 6000U),
                                     battery.sample.soc_percent, battery.charger_valid && (battery.charge_state != 0U),
                                     now_ms);
+    }
+}
+
+void app_battery_save_compensation(uint32_t now_ms) {
+    if (!compensation.save_pending || (save_attempted && !bsp_time_elapsed(now_ms, last_save_ms, 3000U)))
+        return;
+    save_attempted = true;
+    last_save_ms = now_ms;
+    if (app_param_store_save(compensation.offset)) {
+        compensation.save_pending = false;
+    } else if (++save_failures == 1U) {
+        FIRMWARE_LOG_WARN("SOC offset save failed; keeping pending value for retry");
     }
 }
 
