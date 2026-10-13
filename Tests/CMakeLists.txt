@@ -90,6 +90,8 @@ set_source_files_properties(../Libraries/MultiButton/multi_button.c PROPERTIES C
 add_executable(x1_battery_tests x1_battery_tests.cpp ../App/Shared/Src/app_battery.cpp
     ../Libraries/Bq40z50/bq40z50.cpp ../Libraries/Mp2762a/mp2762a.cpp)
 configure_x1_test(x1_battery_tests)
+add_executable(x1_led_tests x1_led_tests.cpp ../App/Shared/Src/app_led.cpp)
+configure_x1_test(x1_led_tests)
 add_executable(x1_indicator_led_tests x1_indicator_led_tests.cpp ../Drivers/BSP/Src/bsp_indicator_led.c)
 configure_x1_test(x1_indicator_led_tests)
 target_include_directories(x1_indicator_led_tests PRIVATE x1_mock)
