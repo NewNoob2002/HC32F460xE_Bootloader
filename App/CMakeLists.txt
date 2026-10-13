@@ -42,6 +42,7 @@ if(NOT BOOT_BUILD_HOST_TESTS)
         Shared/Src/app_panel.cpp
         Shared/Src/app_battery.cpp
         Shared/Src/app_battery_compensation.cpp
+        Shared/Src/app_param_store.cpp
         Shared/Src/app_recording.cpp
         Shared/Src/app_power.cpp
         Shared/Src/app_keys.cpp

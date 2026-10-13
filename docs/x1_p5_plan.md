@@ -107,11 +107,12 @@ D3、D6、D7 已确认，可实现；D1/D2/D4/D5/D8/D9 按推荐值实施，实�
 - 纯逻辑：输入（有效样本、原始 SOC、充电状态、now_ms），输出（当前 offset、是否需要保存）。充电状态 1/2/3 均计为充电：终止态 3 下 SOC 常停在 98–99%，若不计入，补偿永远不会把它推到 100%。
 - 回归：20 min 刚好/差 1 ms、中途 SOC 变化、样本陈旧、拔出、offset≥10、时间回绕、同值不重复请求保存。
 - `AppBatterySnapshot` 增加补偿后 SOC；按 D3 决定面板与 LED 消费哪个字段，`app_power` 低电量判断不改。
-- **进度（2026-10-12，软件完成）**：`app_battery_compensation.*` 纯逻辑（`AppSocCompensation`：offset、`session_done`、`save_pending`、`rejected` 诊断计数）。`app_battery` 每个 500 ms 控制周期推进，充电判定为 `charger_valid && charge_state!=0`，样本有效性复用快照的 6 s 陈旧判定；快照新增 `percent`（补偿后），面板 0x01 改用它，`app_power` 仍用 `sample.soc_percent`。初始偏移暂为 0，B5 从 `app_param_store` 加载；`save_pending` 由 B5 消费。`x1_battery_compensation_tests` 覆盖上述回归项；HostTests 17/17，三配置构建通过。未上板。
+- **进度（2026-10-12，已提交 `1f14918`）**：`app_battery_compensation.*` 纯逻辑（`AppSocCompensation`：offset、`session_done`、`save_pending`、`rejected` 诊断计数）。`app_battery` 每个 500 ms 控制周期推进，充电判定为 `charger_valid && charge_state!=0`，样本有效性复用快照的 6 s 陈旧判定；快照新增 `percent`（补偿后），面板 0x01 改用它，`app_power` 仍用 `sample.soc_percent`。初始偏移暂为 0，B5 从 `app_param_store` 加载；`save_pending` 由 B5 消费。`x1_battery_compensation_tests` 覆盖上述回归项；HostTests 17/17，三配置构建通过。未上板。
 
 **B4 参数存储（`app_param_store.*`）**
 - 仅操作 `APP_PARAM_SECTOR`，调用方自查边界；记录编码/扫描/追加/满后擦除；写后 `bsp_flash_read` 回读比对，失败不标记已保存。
 - 主机测试用 Flash mock：擦除态、CRC 损坏、半写记录、扇区满、写/擦/回读失败、上电恢复取最新有效记录。
+- **进度（2026-10-12，软件完成）**：`app_param_store_load/save` 仅访问 `[0x7E000,0x80000)`；16 字节小端记录（`"X1P"` + 版本 1、序号、offset、3 字节零保留、`panel_crc32`），扫描全部 512 槽并取最大有效序号，相同序号取后槽。半写/损坏槽不重用，同值不写；满后擦除并验证全区已空，再从序号 1 重写。编程源使用字数组满足 EFM 的 32-bit 对齐/类型要求；写后逐字节回读，任何 Flash 失败均返回 false，重试重新扫描。`bsp_flash.h` 增加 C++ 的 C 链接声明。`x1_param_store_tests` 覆盖独立黄金记录、范围约束、CRC/格式损坏、各 32-bit 半写边界、读写擦除/回读失败、静默坏写/未完整擦除、扇区满与上电恢复；HostTests 18/18，Debug/Release/ReleaseNoLog 的 Boot+App 构建与 clang-format 检查通过。LSP 检查部分超时；后续按仓库 `.clang-tidy` 对 B3/B4 相关翻译单元完成 Host/ARM 检查（`--warnings-as-errors=*`），命名与隐式乘法扩宽告警均已修复。运行时加载/保存窗口留给 B5；未烧录，Flash 阻塞时序待 B6。
 
 **B5 集成**
 - 输入映射：`charging` = 充电器有效且 state 1/2，`charge_done` = 充电器有效且 state 3，`fast_charging` = state 2；`linux_seen` 需要 `app_panel` 提供只读访问器（至少收到一次有效帧），目前不存在。

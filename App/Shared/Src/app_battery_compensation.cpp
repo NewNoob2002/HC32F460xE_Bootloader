@@ -2,13 +2,13 @@
 #include "bsp_timebase.h"
 
 namespace {
-constexpr uint32_t STABLE_WINDOW_MS = 20U * 60U * 1000U;
-constexpr uint8_t MAX_OFFSET = 9U;
+constexpr uint32_t stable_window_ms = 20U * 60U * 1000U;
+constexpr uint8_t max_offset = 9U;
 } // namespace
 
 void app_soc_compensation_init(AppSocCompensation& comp, uint8_t stored_offset) {
     comp = {};
-    comp.offset = stored_offset <= MAX_OFFSET ? stored_offset : 0U;
+    comp.offset = stored_offset <= max_offset ? stored_offset : 0U;
 }
 
 void app_soc_compensation_update(AppSocCompensation& comp, bool sample_valid, uint16_t raw_soc, bool charging,
@@ -28,12 +28,12 @@ void app_soc_compensation_update(AppSocCompensation& comp, bool sample_valid, ui
         comp.stable_since_ms = now_ms;
         return;
     }
-    if (!bsp_time_elapsed(now_ms, comp.stable_since_ms, STABLE_WINDOW_MS))
+    if (!bsp_time_elapsed(now_ms, comp.stable_since_ms, stable_window_ms))
         return;
     comp.timing = false;
     comp.session_done = true;
     const uint16_t offset = raw_soc >= 100U ? 0U : static_cast<uint16_t>(100U - raw_soc);
-    if (offset > MAX_OFFSET) {
+    if (offset > max_offset) {
         // D2：旧代码不保存但仍在 RAM 生效；这里整体丢弃，保持原偏移。
         ++comp.rejected;
         return;

@@ -93,6 +93,9 @@ configure_x1_test(x1_battery_tests)
 add_executable(x1_battery_compensation_tests x1_battery_compensation_tests.cpp
     ../App/Shared/Src/app_battery_compensation.cpp)
 configure_x1_test(x1_battery_compensation_tests)
+add_executable(x1_param_store_tests x1_param_store_tests.cpp ../App/Shared/Src/app_param_store.cpp
+    ../App/Shared/Protocol/Src/panel_protocol.cpp)
+configure_x1_test(x1_param_store_tests)
 add_executable(x1_led_tests x1_led_tests.cpp ../App/Shared/Src/app_led.cpp)
 configure_x1_test(x1_led_tests)
 add_executable(x1_indicator_led_tests x1_indicator_led_tests.cpp ../Drivers/BSP/Src/bsp_indicator_led.c)

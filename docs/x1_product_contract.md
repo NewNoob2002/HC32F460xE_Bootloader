@@ -69,7 +69,7 @@ V1.3已有识别、采样、关闭输出与Linux读取证据；V1.5现已通过�
 
 当前公共地址契约保持不变：Metadata A 为 `[0x7A000,0x7C000)`，Metadata B 为 `[0x7C000,0x7E000)`，保留扇区为 `[0x7E000,0x80000)`。旧 `FLASH_OFFSET_ADDR=0x7A000` 禁止使用。
 
-保留扇区已于2026-10-12正式分配为App参数区 `APP_PARAM_SECTOR_BASE/SIZE/END`（`Common/Inc/firmware_layout.h`，编译期检查不与App/Metadata重叠），存放X1 SOC补偿记录，格式与写入时机见 [P5计划](x1_p5_plan.md) D6/D7；尚无写入代码。Boot升级执行代码把擦除/下载限制在App区域，主机回归断言升级擦除不越过 `APP_FLASH_END` 且拒绝下载到参数区。Flash BSP本身可操作物理Flash，参数存储调用方须自行限制在该区间。
+保留扇区已于2026-10-12正式分配为App参数区 `APP_PARAM_SECTOR_BASE/SIZE/END`（`Common/Inc/firmware_layout.h`，编译期检查不与App/Metadata重叠），存放X1 SOC补偿记录，格式与写入时机见 [P5计划](x1_p5_plan.md) D6/D7。B4 已实现 `app_param_store_load/save`：16 字节小端追加记录、全扇区扫描取最大有效序号、CRC/范围/保留字段校验、满后擦除验证与写后回读；Flash 失败返回 false，不确认已保存。半写记录不重用；单扇区擦除窗口掉电仍按 0 恢复。主机回归覆盖 Flash 失败与掉电恢复，运行时加载与安全保存窗口留给 B5，实板阻塞时序留给 B6。Boot升级执行代码把擦除/下载限制在App区域，主机回归断言升级擦除不越过 `APP_FLASH_END` 且拒绝下载到参数区。Flash BSP本身可操作物理Flash，参数存储调用方须自行限制在该区间。
 
 ## 阶段依赖
 
