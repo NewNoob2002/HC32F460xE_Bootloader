@@ -29,21 +29,49 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install Arm GNU Toolchain
-        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+        run: >-
+          sudo apt-get update && sudo apt-get install -y
+          gcc-arm-none-eabi libnewlib-arm-none-eabi
+          libstdc++-arm-none-eabi-newlib ninja-build
+      - name: Build Debug
+        run: cmake --preset Debug --fresh && cmake --build --preset Debug
       - name: Build Release
         run: cmake --preset Release --fresh && cmake --build --preset Release
       - name: Build Release without logging
-        run: cmake --preset ReleaseNoLog --fresh && cmake --build --preset ReleaseNoLog
+        run: >-
+          cmake --preset ReleaseNoLog --fresh &&
+          cmake --build --preset ReleaseNoLog
+      - name: Check Boot and App linker layouts
+        run: >-
+          python3 Tests/linker_layout_tests.py arm-none-eabi-gcc
+          build/Debug/hc32f460_app_x1.elf build/Release/hc32f460_app_x1.elf
+          build/ReleaseNoLog/hc32f460_app_x1.elf
       - name: Upload firmware artifacts
         uses: actions/upload-artifact@v4
         with:
           name: hc32f460-boot-firmware
           path: |
+            build/Debug/hc32f460_boot.elf
+            build/Debug/hc32f460_boot.hex
+            build/Debug/hc32f460_boot.bin
+            build/Debug/hc32f460_boot.map
+            build/Debug/hc32f460_app_x1.elf
+            build/Debug/hc32f460_app_x1.hex
+            build/Debug/hc32f460_app_x1.bin
+            build/Debug/hc32f460_app_x1.map
             build/Release/hc32f460_boot.elf
             build/Release/hc32f460_boot.hex
             build/Release/hc32f460_boot.bin
             build/Release/hc32f460_boot.map
+            build/Release/hc32f460_app_x1.elf
+            build/Release/hc32f460_app_x1.hex
+            build/Release/hc32f460_app_x1.bin
+            build/Release/hc32f460_app_x1.map
             build/ReleaseNoLog/hc32f460_boot.elf
             build/ReleaseNoLog/hc32f460_boot.hex
             build/ReleaseNoLog/hc32f460_boot.bin
             build/ReleaseNoLog/hc32f460_boot.map
+            build/ReleaseNoLog/hc32f460_app_x1.elf
+            build/ReleaseNoLog/hc32f460_app_x1.hex
+            build/ReleaseNoLog/hc32f460_app_x1.bin
+            build/ReleaseNoLog/hc32f460_app_x1.map

@@ -1,0 +1,12 @@
+selectemubysn 63728769
+device HC32F460xE
+si SWD
+speed 100
+connect
+r
+halt
+verifybin build/Debug/hc32f460_boot.bin 0x00000000
+verifybin build/Debug/hc32f460_app_x1.bin 0x00008000
+r
+g
+exit
