@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 #if defined(__GNUC__) || defined(__clang__)
-#include <cmsis_gcc.h>
+#include "cmsis_compiler.h"
 #define BSP_ATTR_UNUSED        __attribute__((unused))
 #define BSP_ATTR_ALWAYS_INLINE __attribute__((always_inline))
 #else

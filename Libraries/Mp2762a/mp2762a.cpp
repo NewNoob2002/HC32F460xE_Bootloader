@@ -1,260 +1,52 @@
 #include "mp2762a.h"
 
-TwoWire* mp2762aI2c = nullptr;
-
-bool
-mp2762aBegin(TwoWire* i2cBus) {
-    if (i2cBus == nullptr) {
+namespace {
+bool read_byte(uint8_t reg, uint8_t& value) {
+    return bsp_i2c_master_read(kMp2762aDeviceAddress, reg, &value, 1U);
+}
+bool update_bits(uint8_t reg, uint8_t mask, uint8_t bits) {
+    uint8_t value;
+    if (!read_byte(reg, value))
         return false;
-    }
-    mp2762aI2c = i2cBus;
+    // MP2762A Rev1.1 REG08：读改写不得再次触发 REG_RST/WTD_RST。
+    if (reg == 0x08U)
+        value &= 0x3EU;
+    const uint32_t inv_mask = static_cast<uint32_t>(mask) ^ 0xFFU;
+    value = static_cast<uint8_t>((static_cast<uint32_t>(value) & inv_mask) | static_cast<uint32_t>(bits));
+    uint8_t readback;
+    return bsp_i2c_master_write_byte(kMp2762aDeviceAddress, reg, value) && read_byte(reg, readback)
+           && ((readback & mask) == (value & mask));
+}
+} // namespace
+
+bsp_i2c_probe_result_t mp2762_probe() {
+    const auto result = bsp_i2c_master_probe(kMp2762aDeviceAddress);
+    if (result != BSP_I2C_PROBE_PRESENT)
+        return result;
+    uint8_t input_limit, config, status;
+    // 数据手册Rev1.1 pp32/36/42的保留位；无独立器件ID，拓扑假设需产品确认。
+    if (!read_byte(0x00U, input_limit) || !read_byte(0x08U, config) || !read_byte(0x13U, status)
+        || ((input_limit & 0x80U) != 0U) || ((config & 1U) != 0U) || ((status & 0x20U) != 0U))
+        return BSP_I2C_PROBE_IO_ERROR;
+    return BSP_I2C_PROBE_PRESENT;
+}
+
+bool mp2762_set_charging(bool enabled) {
+    return update_bits(0x08U, 0x10U, enabled ? 0x10U : 0U);
+}
+
+bool mp2762_configure() {
+    // REG07/30选择6.6V；REG03最大840mA，旧880mA请求实际也截断编码为840mA。
+    // 不执行全寄存器复位，不改变OTP电池满充电压和系统供电相关配置。
+    return mp2762_set_charging(false) && update_bits(0x07U, 0x30U, 0U) && update_bits(0x30U, 0x08U, 0x08U)
+           && update_bits(0x03U, 0xF0U, 0xF0U) && update_bits(0x02U, 0x7FU, 32U);
+}
+
+bool mp2762_read_status(Mp2762Status& status) {
+    uint8_t value;
+    if (!read_byte(0x13U, value) || ((value & 0x20U) != 0U))
+        return false;
+    status.input_present = (value & 0x02U) != 0U;
+    status.charge_state = static_cast<uint8_t>((static_cast<uint32_t>(value) >> 2U) & 3U);
     return true;
-}
-
-uint8_t
-mp2762aReadRegister8(uint8_t reg) {
-    uint8_t byte = 0;
-
-    if (mp2762aI2c->beginTransmission(MP2762A_DEVICE_ADDRESS)) {
-        mp2762aI2c->requestFrom(MP2762A_DEVICE_ADDRESS, reg, &byte, 1);
-    }
-    return byte;
-}
-
-uint16_t
-mp2762aReadRegister16(uint8_t reg) {
-    uint8_t buf[2];
-
-    if (mp2762aI2c->beginTransmission(MP2762A_DEVICE_ADDRESS)) {
-        mp2762aI2c->requestFrom(MP2762A_DEVICE_ADDRESS, reg, buf, 2);
-    }
-    uint16_t value = (buf[1] << 8) | buf[0];
-    return value;
-}
-
-uint8_t
-mp2762aWriteRegister8(uint8_t reg, uint8_t data) {
-    if (mp2762aI2c->beginTransmission(MP2762A_DEVICE_ADDRESS)) {
-        uint8_t buf[2] = {reg, data};
-        mp2762aI2c->write(buf, 2);
-        mp2762aI2c->endTransmission();
-        return 1;
-    }
-    mp2762aI2c->endTransmission();
-    return 0;
-}
-
-// Given a bit field, and a startingBitValue
-// Example: Battery voltage is bit 12.5mV per bit
-float
-convertBitsToDoubler(uint16_t bitField, float startingBitValue) {
-    float totalMv = 0;
-    for (int x = 0; x < 16; x++) {
-        if (bitField & 0x0001) {
-            totalMv += startingBitValue;
-        }
-
-        bitField >>= 1;
-
-        startingBitValue *= 2;
-    }
-    return (totalMv);
-}
-
-// Set the Precharge threshold
-// 5.8V, 6.0, 6.2, 6.4, 6.6, 6.8, 7.4, 7.2 (oddly out of order)
-void
-mp2762setFastChargeVoltageMv(uint16_t mVoltLevel) {
-    // Default to 6.8V (requires option '2')
-    uint8_t option = 1;         // This is option 2 confusingly
-    uint8_t newVbattPre = 0x01; // Default to 6.8V
-
-    if (mVoltLevel <= 5800) {
-        option = 0;
-        newVbattPre = 0x00; // 5.8V
-    } else if (mVoltLevel <= 6000) {
-        option = 0;
-        newVbattPre = 0x01; // 6.0V
-    } else if (mVoltLevel <= 6200) {
-        option = 0;
-        newVbattPre = 0x02; // 6.2V
-    } else if (mVoltLevel <= 6400) {
-        option = 0;
-        newVbattPre = 0x03; // 6.4V
-    } else if (mVoltLevel <= 6600) {
-        option = 1;
-        newVbattPre = 0x00; // 6.6V
-    } else if (mVoltLevel <= 6800) {
-        option = 1;
-        newVbattPre = 0x01; // 6.8V
-    } else if (mVoltLevel <= 7200) {
-        option = 1;
-        newVbattPre = 0x03; // 7.2V
-    } else if (mVoltLevel <= 7400) {
-        option = 1;
-        newVbattPre = 0x02; // 7.4V
-    }
-
-    // Set the Precharge bits
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_PRECHARGE_THRESHOLD);
-    status &= ~(0x03 << 4); // Clear bits 4 and 5
-    newVbattPre <<= 4;      // Shift to correct position
-    status |= newVbattPre;  // Set bits accordingly
-    mp2762aWriteRegister8(MP2762A_PRECHARGE_THRESHOLD, status);
-
-    // Set the option bit
-    status = mp2762aReadRegister8(MP2762A_PRECHARGE_THRESHOLD_OPTION);
-    status &= ~(1 << 3); // Clear bit 3
-    option <<= 3;        // Shift to correct position
-    status |= option;    // Set bit accordingly
-    mp2762aWriteRegister8(MP2762A_PRECHARGE_THRESHOLD_OPTION, status);
-}
-
-uint8_t
-mp2762setFastChargeCurrentMa(uint16_t currentLevelMa) {
-    // defualt to 1A
-    uint8_t newIFast = 0x01;
-    if (currentLevelMa <= 50) {
-        newIFast = 0x01;
-    } else {
-        uint16_t steps = currentLevelMa / 50;
-        newIFast = 0x01 * steps;
-    }
-
-    mp2762aWriteRegister8(MP2762A_SETCHARGE_CURRENT, newIFast);
-    return mp2762aReadRegister8(MP2762A_SETCHARGE_CURRENT);
-}
-
-void
-mp2762setPrechargeCurrentMa(uint16_t currentLevelMa) {
-    uint8_t newIPre = 0x03; // Default to 180mA
-
-    if (currentLevelMa <= 180) {
-        newIPre = 0x03; // 180mA
-    } else {
-        uint8_t steps = (currentLevelMa - 240) / 60; //(480 - 240)/ 60 = 4
-        newIPre = 0x05 + steps;
-    }
-
-    // Set the Precharge current bits
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_PRECHARGE_CURRENT);
-    status &= ~(0x0F << 4); // Clear bits 7, 6, 5, 4
-    newIPre <<= 4;          // Shift to correct position
-    status |= newIPre;      // Set bits accordingly
-    mp2762aWriteRegister8(MP2762A_PRECHARGE_CURRENT, status);
-}
-
-float
-mp2762getBatteryVoltageMv() {
-    uint16_t voltage = mp2762aReadRegister16(MP2762A_BATTERY_VOLTAGE);
-    float batteryVoltage =
-        convertBitsToDoubler(voltage >>= 6, 12.5); // Battery voltage is bit 15:6 so we need a 6 bit shift
-    return (batteryVoltage);
-}
-
-float
-mp2762getSystemVoltageMv() {
-    uint16_t voltage = mp2762aReadRegister16(MP2762A_SYSTEM_VOLTAGE);
-    float batteryVoltage =
-        convertBitsToDoubler(voltage >>= 6, 12.5); // Battery voltage is bit 15:6 so we need a 6 bit shift
-    return (batteryVoltage);
-}
-
-uint8_t
-mp2762getChargeStatus() {
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_STATUS);
-    status >>= 2;
-    status &= 0x03;
-    return (status);
-}
-
-float
-mp2762getChargeCurrentMa() {
-    uint8_t CurrentL = 0, CurrentH = 0;
-    CurrentL = mp2762aReadRegister8(MP2762A_CHARGE_CURRENT_L);
-    CurrentH = mp2762aReadRegister8(MP2762A_CHARGE_CURRENT_H);
-
-    uint16_t Current = (CurrentH << 8) | CurrentL;
-    Current = (Current >> 6) & 0x03FF;
-
-    float charge_current_mA = Current * 12.5;
-    return charge_current_mA;
-}
-
-float
-mp2762getInputVolatgeMv() {
-    uint8_t VoltageL = 0, VoltageH = 0;
-    VoltageL = mp2762aReadRegister8(MP2762A_INPUT_VOLTAGE_L);
-    VoltageH = mp2762aReadRegister8(MP2762A_INPUT_VOLTAGE_H);
-
-    uint16_t Voltage = (VoltageL << 8) | VoltageH;
-    Voltage = (Voltage >> 6) & 0x03FF;
-
-    float Input_voltage_mV = Voltage * 25;
-    return Input_voltage_mV;
-}
-
-float
-mp2762getInputCurrentMa() {
-    uint8_t CurrentL = 0, CurrentH = 0;
-    CurrentL = mp2762aReadRegister8(MP2762A_INPUT_CURRENT_L);
-    CurrentH = mp2762aReadRegister8(MP2762A_INPUT_CURRENT_H);
-
-    uint16_t Current = (CurrentH << 8) | CurrentL;
-    Current = (Current >> 6) & 0x03FF;
-
-    float charge_current_mA = Current * 6.25;
-    return charge_current_mA;
-}
-
-void
-mp2762resetSafetyTimer() {
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_CONFIG_0);
-
-    status &= ~(1 << 4); // Clear the CHG_EN bit
-    mp2762aWriteRegister8(MP2762A_CONFIG_0, status);
-
-    status |= (1 << 4); // Set the CHG_EN bit
-    mp2762aWriteRegister8(MP2762A_CONFIG_0, status);
-}
-
-uint8_t
-mp2762disableCharger() {
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_CONFIG_0);
-
-    status &= ~(1 << 4); // Clear the CHG_EN bit
-    mp2762aWriteRegister8(MP2762A_CONFIG_0, status);
-
-    status = mp2762aReadRegister8(MP2762A_CONFIG_0);
-    return status;
-}
-
-uint8_t
-mp2762enableCharger() {
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_CONFIG_0);
-
-    status |= (1 << 4); // Set the CHG_EN bit
-    mp2762aWriteRegister8(MP2762A_CONFIG_0, status);
-
-    status = mp2762aReadRegister8(MP2762A_CONFIG_0);
-    return status;
-}
-
-void
-mp2762updateConfig0Status(uint8_t* config) {
-    *config = mp2762aReadRegister8(MP2762A_CONFIG_0);
-}
-
-void
-mp2762registerReset() {
-    uint8_t status = 0;
-    status = mp2762aReadRegister8(MP2762A_CONFIG_0);
-    status |= 1 << 7; // Set REG_RST
-    mp2762aWriteRegister8(MP2762A_CONFIG_0, status);
 }

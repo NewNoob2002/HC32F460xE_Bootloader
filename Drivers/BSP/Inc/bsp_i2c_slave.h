@@ -5,10 +5,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BSP_I2C_RX_CAPACITY 544U
 #define BSP_I2C_TX_CAPACITY 544U
 
-typedef enum { SLAVE_RX = 0, SLAVE_RX_DONE, SLAVE_TX, SLAVE_TX_DONE } i2c_slave_state_t;
+typedef enum {
+    BSP_I2C_SLAVE_STATE_RX = 0,
+    BSP_I2C_SLAVE_STATE_RX_DONE,
+    BSP_I2C_SLAVE_STATE_TX,
+    BSP_I2C_SLAVE_STATE_TX_DONE
+} bsp_i2c_slave_state_t;
 typedef enum {
     BSP_I2C_RECOVERY_NONE = 0,
     BSP_I2C_RECOVERY_ACTIVE_STALL,
@@ -33,30 +42,35 @@ typedef struct {
     volatile uint32_t recovery_init_failures;
     volatile uint32_t last_sr;
     volatile uint32_t last_recovery_sr;
-    volatile i2c_slave_state_t last_recovery_state;
+    volatile bsp_i2c_slave_state_t last_recovery_state;
     volatile bsp_i2c_recovery_reason_t last_recovery_reason;
 } bsp_i2c_slave_counters_t;
-
-typedef struct {
-    uint8_t data[BSP_I2C_RX_CAPACITY];
-    volatile uint16_t _BufferHead;
-    volatile uint16_t _BufferTail;
-} rxtx_transaction_t;
 
 bool bsp_i2c_slave_init(void);
 void bsp_i2c_slave_deinit(void);
 bool bsp_i2c_slave_poll(uint32_t now_ms);
+size_t bsp_i2c_slave_read(uint8_t* buffer, size_t capacity);
 void bsp_i2c_slave_get_counters(bsp_i2c_slave_counters_t* counters);
-i2c_slave_state_t bsp_i2c_slave_get_state(void);
+bsp_i2c_slave_state_t bsp_i2c_slave_get_state(void);
 
-bool txBufferReserve(void);
-void txBufferCancelWrite(void);
-int txBufferAvailable(void);
-uint8_t txBufferRead(void);
-int txBufferWrite(const uint8_t* buffer, uint16_t length);
-int rxBufferAvailable(void);
-uint8_t rxBufferRead(void);
-size_t rxBufferReadBytes(uint8_t* buffer, size_t length);
-void rxBufferWrite(uint8_t ch);
+bool bsp_i2c_slave_tx_reserve(void);
+void bsp_i2c_slave_tx_cancel_write(void);
+int bsp_i2c_slave_tx_available(void);
+int bsp_i2c_slave_tx_write(const uint8_t* buffer, uint16_t length);
 
+/* Backward compatibility aliases */
+typedef bsp_i2c_slave_state_t i2c_slave_state_t;
+#define SLAVE_RX               BSP_I2C_SLAVE_STATE_RX
+#define SLAVE_RX_DONE          BSP_I2C_SLAVE_STATE_RX_DONE
+#define SLAVE_TX               BSP_I2C_SLAVE_STATE_TX
+#define SLAVE_TX_DONE          BSP_I2C_SLAVE_STATE_TX_DONE
+
+#define tx_buffer_reserve      bsp_i2c_slave_tx_reserve
+#define tx_buffer_cancel_write bsp_i2c_slave_tx_cancel_write
+#define tx_buffer_available    bsp_i2c_slave_tx_available
+#define tx_buffer_write        bsp_i2c_slave_tx_write
+
+#ifdef __cplusplus
+}
+#endif
 #endif

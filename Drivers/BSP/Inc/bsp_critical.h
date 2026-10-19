@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#if !defined(BOOT_HOST_TEST)
+#if !defined(HC32_HOST_TEST)
 #include "bsp_compiler.h"
 #endif
 
@@ -11,7 +11,7 @@ extern "C" {
 
 typedef uint32_t bsp_irq_state_t;
 
-#if defined(BOOT_HOST_TEST)
+#if defined(HC32_HOST_TEST)
 static inline bsp_irq_state_t bsp_enter_critical(void) {
     return 0U;
 }
