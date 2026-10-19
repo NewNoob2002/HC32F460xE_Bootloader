@@ -90,11 +90,18 @@ bool app_runtime_init() {
     (void)bsp_enter_critical();
     bsp_write_protection_unlock();
     const bool ready = initialize_hardware();
+    uint32_t reset_flags = 0U;
+    if (ready) {
+        // Boot 只读不清，标志会累积；残留的软件复位标志会让之后的上电被误判为热启动，故读后清除。
+        reset_flags = bsp_reset_capture();
+        bsp_reset_clear();
+    }
     bsp_write_protection_restore();
     if (ready) {
         heartbeat_ms = bsp_time_ms();
-        // 复位标志会累积；只有纯上电标志才执行冷启动按键确认，其他复位直接运行。
-        app_power_init(bsp_reset_capture() == RMU_FLAG_PWR_ON, heartbeat_ms);
+        // X1 V1.5 的电源键/USB-C 上电与外部看门狗都经 MCU_RESET 引脚复位，不产生 PORF（实板 RSTF0=0x0002）。
+        // 与旧 X1 相同：仅软件复位（0x04、Boot 升级后交接）直接运行，其余都等待电源键确认。
+        app_power_init(!bsp_reset_was_software(reset_flags), heartbeat_ms);
         // Boot 留下 PRIMASK=1；仅在 App 状态和 SysTick 就绪后显式恢复到 0。
         bsp_exit_critical(0U);
         FIRMWARE_LOG_INFO("id=%s product=%s ready clock=%lu Hz", APP_BUILD_ID, APP_PRODUCT_NAME,

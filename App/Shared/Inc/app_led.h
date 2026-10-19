@@ -10,7 +10,7 @@ enum class AppLedMode : uint8_t { Off, On, Toggle300Ms, Toggle500Ms, Toggle1000M
 /** @brief 只读输入，由调用方从电源/电池/录制快照与补偿后 SOC 映射得到。 */
 struct AppLedInput {
     AppPowerState power;
-    bool linux_seen; /* 录制闪烁门控：Linux 已出现过有效通信。 */
+    bool linux_seen; /* 本次开机 Linux 已出现过有效通信；之前功能灯常亮表示等待 Linux。 */
     bool recording;
     bool battery_valid; /* 新鲜且有效的 BQ 样本。 */
     bool charging;      /* 充电器有效且 charge_state 为 1 或 2（预充/快充）。 */

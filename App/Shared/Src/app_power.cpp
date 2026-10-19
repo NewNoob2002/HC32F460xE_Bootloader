@@ -45,6 +45,12 @@ void app_power_key_long_press(uint32_t now_ms) {
     if (power.state == AppPowerState::Starting) {
         power.state = AppPowerState::Running;
         app_recording_set_allowed(true);
+    } else if (power.state == AppPowerState::Off) {
+        // 外部供电驻留时 MCU 不会因按键复位；只有用户长按离开 Off，驻留本身仍不自动重新保持 PB3。
+        bsp_power_hold_assert();
+        power = {AppPowerState::Running, AppPowerReason::None, false};
+        low_battery_started = false;
+        app_recording_set_allowed(true);
     } else {
         request_shutdown(AppPowerReason::Key, now_ms);
     }

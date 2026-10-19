@@ -69,6 +69,9 @@ uint8_t I2C_ReadData(const CM_I2C_TypeDef* unit) {
 void NVIC_SystemReset(void) {
     ++software_reset_requests;
 }
+void RMU_ClearStatus(void) {
+    mock_rmu.RSTF0 = 0U; /* CLRF 一次清除全部标志。 */
+}
 
 static void eei(uint32_t flags) {
     mock_i2c.SR = flags;
@@ -144,6 +147,9 @@ static void test_software_reset_handover(void) {
     boot_reset_after_upgrade();
     assert(!boot_reset_take_upgrade_marker(2U));
     assert(!boot_reset_take_upgrade_marker(RMU_FLAG_SW));
+    mock_rmu.RSTF0 = RMU_FLAG_SW | 2U;
+    bsp_reset_clear();
+    assert(bsp_reset_capture() == 0U);
 }
 
 int main(void) {

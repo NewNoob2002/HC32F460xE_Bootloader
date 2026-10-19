@@ -8,6 +8,9 @@ uint32_t bsp_reset_capture(void) {
 bool bsp_reset_was_software(uint32_t flags) {
     return (flags & RMU_FLAG_SW) != 0U;
 }
+void bsp_reset_clear(void) {
+    RMU_ClearStatus();
+}
 void bsp_reset_request(void) {
     NVIC_SystemReset();
 }

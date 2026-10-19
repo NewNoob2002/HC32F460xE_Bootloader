@@ -85,11 +85,19 @@ int main() {
     in.battery_valid = false;
     check(same(app_led_select(in), M::Toggle3000Ms, M::Off, M::Off));
 
-    // 录制：500 ms 翻转；需要 Linux 已有有效通信，且仅在录制中。
+    // 录制：500 ms 翻转；Linux 出现有效通信前功能灯常亮（旧 X1 开机指示），之后不录制则熄灭。
     in = base();
     in.recording = true;
     in.linux_seen = false;
-    check(app_led_select(in).function == M::Off);
+    check(app_led_select(in).function == M::On);
+    in.recording = false;
+    check(app_led_select(in).function == M::On);
+    in.charging = true;
+    check(same(app_led_select(in), M::Off, M::Toggle1000Ms, M::On));
+    in.charging = false;
+    for (const auto state : {AppPowerState::Starting, AppPowerState::Off})
+        check(same(app_led_select({state, false, false, true, false, false, false, 50U}), M::Off, M::Off, M::Off));
+    in.recording = true;
     in.linux_seen = true;
     check(app_led_select(in).function == M::Toggle500Ms);
     in.recording = false;

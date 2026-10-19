@@ -122,4 +122,5 @@ uint8_t I2C_ReadData(const CM_I2C_TypeDef* unit);
 #define __disable_irq()           ((void)0)
 #define __DSB()                   ((void)0)
 void NVIC_SystemReset(void);
+void RMU_ClearStatus(void);
 #endif

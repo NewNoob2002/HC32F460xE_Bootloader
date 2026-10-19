@@ -18,7 +18,10 @@ uint32_t toggle_interval_ms(AppLedMode mode) {
 } // namespace
 
 AppLedPattern app_led_select(const AppLedInput& input) {
-    const AppLedMode recording = (input.linux_seen && input.recording) ? AppLedMode::Toggle500Ms : AppLedMode::Off;
+    // 旧 X1：开机后功能灯常亮，直到 Linux 出现有效通信，此后按录制状态闪烁或熄灭。
+    AppLedMode recording = AppLedMode::On;
+    if (input.linux_seen)
+        recording = input.recording ? AppLedMode::Toggle500Ms : AppLedMode::Off;
     const bool charge_row = input.charging || input.charge_done;
     AppLedMode charge = AppLedMode::Off;
     if (input.charge_done || (input.charging && input.battery_valid && (input.percent >= 100U)))

@@ -142,6 +142,9 @@ bool app_panel_response_pending() {
 
 void app_panel_poll(uint32_t time_ms) {
     now_ms = time_ms;
+    // PB3 已释放时 Linux 断电；从 Off 重新开机后须等新的一帧，功能灯才结束等待 Linux 指示。
+    if (app_power_snapshot().state == AppPowerState::Off)
+        linux_seen = false;
     bsp_i2c_slave_counters_t counters{};
     bsp_i2c_slave_get_counters(&counters);
     if (counters.tx_complete_reads != completion_count) {

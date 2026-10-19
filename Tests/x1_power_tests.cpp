@@ -12,6 +12,7 @@
 namespace {
 uint32_t now;
 unsigned releases;
+unsigned holds;
 unsigned resets;
 bool power_pressed;
 bool function_pressed;
@@ -21,7 +22,7 @@ AppBatterySnapshot battery;
 
 void initialize(bool cold = false, uint32_t time = 0U) {
     now = time;
-    releases = resets = 0U;
+    releases = holds = resets = 0U;
     power_pressed = function_pressed = false;
     battery = {AppHardware::GpioV13, {3000U, 7800U, 100U}, now, true, true, false, false, 0U, 100U};
     app_recording_init();
@@ -66,6 +67,9 @@ uint16_t GPIO_ReadInputPins(uint8_t port, uint16_t pin) {
     const bool high = pin == GPIO_PIN_00 ? power_pressed : !function_pressed;
     return high ? PIN_SET : PIN_RESET;
 }
+void bsp_power_hold_assert(void) {
+    ++holds;
+}
 void bsp_power_hold_deassert(void) {
     ++releases;
 }
@@ -89,10 +93,14 @@ int main() {
     poll(10000U);
     assert(app_power_snapshot().state == AppPowerState::Off && releases == 1U);
     assert(app_power_snapshot().reason == AppPowerReason::StartupTimeout);
+    // 外部供电驻留中 MCU 不复位，只有电源键长按离开 Off 并重新保持 PB3；驻留本身不自动重新上电。
     app_power_key_long_press(now);
+    assert(app_power_snapshot().state == AppPowerState::Running && holds == 1U);
+    assert(app_power_snapshot().reason == AppPowerReason::None && !app_power_snapshot().shutdown_requested);
+    assert(app_recording_snapshot().allowed);
     app_power_force_shutdown();
     poll(50000U);
-    assert(releases == 1U && resets == 0U && !app_power_can_reset());
+    assert(releases == 2U && holds == 1U && resets == 0U && !app_power_can_reset());
 
     // MultiButton 消抖、冷启动长按只确认一次；仍按住时不能转成关机。
     initialize(true);
@@ -218,7 +226,13 @@ int main() {
     advance(8020U, false, true);
     assert(releases == 1U && app_power_snapshot().reason == AppPowerReason::Forced);
     advance(10000U, false, true);
-    assert(releases == 1U && resets == 0U);
+    assert(releases == 1U && resets == 0U && holds == 0U);
+    // 强制断电后的驻留同样由电源键开机；同一段长按不能继续转成关机。
+    advance(40U);
+    advance(2030U, true);
+    assert(app_power_snapshot().state == AppPowerState::Running && holds == 1U);
+    advance(4000U, true);
+    assert(app_power_snapshot().state == AppPowerState::Running && releases == 1U);
     initialize(false, UINT32_MAX - 1000U);
     advance(2020U, true);
     assert(app_power_snapshot().state == AppPowerState::ShutdownWait);

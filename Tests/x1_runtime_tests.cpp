@@ -35,7 +35,7 @@ enum Stage {
     Keys
 };
 unsigned stage, fail_stage;
-bool unlocked, irq_masked;
+bool unlocked, irq_masked, flags_captured, flags_cleared;
 unsigned watchdog_polls, key_polls, power_polls, battery_polls, save_polls, led_writes;
 uint32_t reset_flags = RMU_FLAG_PWR_ON;
 uint32_t now_ms, battery_duration_ms, save_duration_ms;
@@ -59,7 +59,7 @@ bool next_stage(Stage expected) {
 void reset(unsigned failure = 0U, uint32_t now = 0U) {
     stage = 0U;
     fail_stage = failure;
-    unlocked = irq_masked = false;
+    unlocked = irq_masked = flags_captured = flags_cleared = false;
     watchdog_polls = key_polls = power_polls = battery_polls = save_polls = led_writes = 0U;
     now_ms = now;
     battery_duration_ms = save_duration_ms = 0U;
@@ -71,7 +71,7 @@ void reset(unsigned failure = 0U, uint32_t now = 0U) {
     recording = {};
 }
 void start_running() {
-    reset_flags = 2U;
+    reset_flags = RMU_FLAG_SW;
     reset();
     check(app_runtime_init());
 }
@@ -87,8 +87,17 @@ void expect_leds(bool expected_power, bool expected_charge, bool expected_functi
 extern "C" {
 uint32_t SystemCoreClock;
 uint32_t bsp_reset_capture(void) {
-    check(irq_masked && !unlocked && stage == Keys);
+    // 清除需写保护解除；只在初始化成功后读取一次。
+    check(irq_masked && unlocked && stage == Keys && !flags_captured);
+    flags_captured = true;
     return reset_flags;
+}
+bool bsp_reset_was_software(uint32_t flags) {
+    return (flags & RMU_FLAG_SW) != 0U;
+}
+void bsp_reset_clear(void) {
+    check(irq_masked && unlocked && flags_captured && !flags_cleared);
+    flags_cleared = true;
 }
 bsp_irq_state_t bsp_enter_critical(void) {
     irq_masked = true;
@@ -209,8 +218,9 @@ void app_keys_poll(uint32_t time) {
     ++key_polls;
 }
 void app_power_init(bool cold, uint32_t time) {
-    check(cold == (reset_flags == RMU_FLAG_PWR_ON));
-    check(irq_masked && !unlocked && time == now_ms);
+    // 实板上电只有 PIN 标志；仅软件复位直接运行，其余等待电源键。
+    check(cold == ((reset_flags & RMU_FLAG_SW) == 0U));
+    check(irq_masked && !unlocked && flags_cleared && time == now_ms);
     power.state = cold ? AppPowerState::Starting : AppPowerState::Running;
 }
 void app_power_poll(uint32_t time) {
@@ -232,13 +242,21 @@ int main() {
         reset(failure);
         check(!app_runtime_init());
         check(stage == failure && irq_masked && !unlocked && watchdog_polls == 0U);
+        check(!flags_captured && !flags_cleared); // 失败时保留标志供下次复位诊断。
     }
-    const uint32_t flags_list[] = {RMU_FLAG_PWR_ON, 2U, 0x100U, RMU_FLAG_PWR_ON | 2U};
-    for (uint32_t flags : flags_list) {
-        reset_flags = flags;
+    const struct {
+        uint32_t flags;
+        AppPowerState state;
+    } starts[] = {{RMU_FLAG_PWR_ON, AppPowerState::Starting},
+                  {RMU_FLAG_PIN, AppPowerState::Starting}, // 实板电源键/USB-C 上电与外部看门狗复位
+                  {RMU_FLAG_PWR_ON | RMU_FLAG_PIN, AppPowerState::Starting},
+                  {RMU_FLAG_SW, AppPowerState::Running},
+                  {RMU_FLAG_SW | RMU_FLAG_PIN, AppPowerState::Running}};
+    for (const auto& start : starts) {
+        reset_flags = start.flags;
         reset();
         check(app_runtime_init());
-        check(loaded_offset == stored_offset);
+        check(loaded_offset == stored_offset && flags_cleared && power.state == start.state);
     }
     reset(Params);
     check(app_runtime_init() && loaded_offset == 0U); // 参数读失败不能阻止开机。
@@ -293,10 +311,10 @@ int main() {
     // 实际 LED 模块：100 ms 输出节拍，模式变化立即输出，录制由 Linux 已出现门控。
     start_running();
     poll(0U);
-    expect_leds(true, false, false);
+    expect_leds(true, false, true); // Linux 出现前功能灯常亮。
     recording.active = true;
     poll(1U);
-    expect_leds(true, false, false);
+    expect_leds(true, false, true);
     check(led_writes == 3U);
     linux_seen = true;
     poll(2U);
@@ -313,6 +331,7 @@ int main() {
     expect_leds(true, false, true);
 
     start_running();
+    linux_seen = true; // 本段只验证充电灯；功能灯等待 Linux 指示已在上方覆盖。
     battery.charge_state = 2U;
     battery.percent = 98U;
     poll(0U);

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "app_battery.h"
 #include "app_panel.h"
@@ -34,6 +35,9 @@ void finish(uint32_t time = 0U) {
 extern "C" {
 void bsp_reset_request(void) {
     ++resets;
+}
+void bsp_power_hold_assert(void) {
+    abort(); // 面板请求不能从 Off 重新保持电源，只有电源键可以。
 }
 void bsp_power_hold_deassert(void) {
     ++releases;
@@ -206,6 +210,9 @@ int main() {
     assert(releases == 0U);
     app_power_poll(16104U);
     assert(releases == 1U);
+    assert(app_panel_linux_seen());
+    app_panel_poll(16104U);
+    assert(!app_panel_linux_seen()); // PB3 释放后 Linux 断电，重新开机须等新帧。
     request(4U, 2U, sync, sizeof(sync), 16105U);
     assert(output[20] == 0U);
     finish(16106U);

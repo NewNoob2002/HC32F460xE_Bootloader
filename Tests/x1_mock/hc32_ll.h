@@ -10,6 +10,8 @@ typedef enum { RESET = 0, SET = 1 } en_flag_status_t;
 #define CLK_STB_FLAG_PLL  1U
 #define CLK_STB_FLAG_XTAL 2U
 #define RMU_FLAG_PWR_ON   1U
+#define RMU_FLAG_PIN      2U
+#define RMU_FLAG_SW       0x100U
 
 /* X1 按键/指示灯 GPIO：仅模拟驱动实际消费的字段。 */
 typedef struct {
