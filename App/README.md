@@ -25,7 +25,7 @@ X1 采用与 Boot 相同的职责分离：
 | `Drivers/BSP/bsp_i2c_master.*`、`bsp_charger_gpio.*`、`bsp_keys.*` | I2C2、V1.3充电GPIO及PA0/PA15按键输入 |
 | `Libraries/Bq40z50`、`Libraries/Mp2762a` | 移除 Wire/Arduino 依赖后的有界芯片访问 |
 
-启动要求 Boot 已完成交接；App 验证继承的 200 MHz 时钟，准备 SysTick/看门狗和日志后恢复中断。初始化失败保持中断关闭、保留电源输出并停止喂狗，供外部看门狗恢复。当前`x1-p5`保留MultiButton、按键及电源业务：纯上电复位等待电源键2 s确认，10 s超时释放PB3；运行时2 s请求关机、功能键8 s强制断电。`0x05=1`是Linux关机完成确认，8 s后断电且受最初20 s兜底约束；`0x04=1`等ACK完整读出才复位，5 s未读取消。SOC≤9%有效未充电时停录制，持续180 s请求关机。PB3释放后若仍有外部供电，继续充电/喂狗/通信并驻留，不自动复位或重新保持电源。详细边界见 [X1产品契约](../docs/x1_product_contract.md)。P5 已接入三灯、SOC 补偿与参数加载/保存；读取失败按 0 继续，保存由 Running/Off、未读响应和看门狗脉冲条件门控，失败保留 pending 并最早 3 s 后重试。HostTests 18/18、三配置/布局与改动文件的 clang-format/clang-tidy 检查通过；Flash 时序、Boot 参数隔离与擦除/Linux 事务重叠已按 [P5计划](../docs/x1_p5_plan.md) B6 实板验收，B7 产物见下文，LED 电平待实板确认。双版本充电按运行时可靠响应/NACK区分并锁定，错误不作为方案切换依据。
+启动要求 Boot 已完成交接；App 验证继承的 200 MHz 时钟，准备 SysTick/看门狗和日志后恢复中断。初始化失败保持中断关闭、保留电源输出并停止喂狗，供外部看门狗恢复。当前`x1-p5`保留MultiButton、按键及电源业务：除软件复位外的上电/引脚/看门狗复位都等待电源键2 s确认，10 s超时释放PB3（外部供电驻留中电源键2 s可重新开机）；运行时2 s请求关机、功能键8 s强制断电。`0x05=1`是Linux关机完成确认，8 s后断电且受最初20 s兜底约束；`0x04=1`等ACK完整读出才复位，5 s未读取消。SOC≤9%有效未充电时停录制，持续180 s请求关机。PB3释放后若仍有外部供电，继续充电/喂狗/通信并驻留，不自动复位或重新保持电源。详细边界见 [X1产品契约](../docs/x1_product_contract.md)。P5 已接入三灯、SOC 补偿与参数加载/保存；读取失败按 0 继续，保存由 Running/Off、未读响应和看门狗脉冲条件门控，失败保留 pending 并最早 3 s 后重试。HostTests 18/18、三配置/布局与改动文件的 clang-format/clang-tidy 检查通过；Flash 时序、Boot 参数隔离与擦除/Linux 事务重叠已按 [P5计划](../docs/x1_p5_plan.md) B6 实板验收，B7 产物见下文，LED 电平待实板确认。双版本充电按运行时可靠响应/NACK区分并锁定，错误不作为方案切换依据。
 
 完整构建边界、链接地址与接入要求见 [工程结构](../docs/project_structure.md)。Boot 固定 32 KiB，App 从 `0x00008000` 开始。
 
@@ -68,6 +68,14 @@ App  ReleaseNoLog ce48c77c1103e50b80efa0d97f96cc74ddaa6c2cc2f256f82e082c5dc86c93
 Boot Debug        ba79317d7131f3e6db2008d20b600df2d4191d80add48dd45dadddc3961d76f0
 Boot Release      1226827cedbda5a783bde65212ee75068ac87bd092b0f67c51b328dbe13860f7
 Boot ReleaseNoLog e6163e52d768c4c400aa6a445da417c89283e874ee2cbaf09739733b8ed8587b
+```
+
+P3 实板修订（2026-10-18，见 [P3 HIL](../docs/x1_p3_hil.md)）：仅软件复位直接运行、其余复位等待电源键且 App 读后清除复位标志；外部供电驻留中电源键 2 s 重新开机；功能灯在本次开机首个 Linux 帧前常亮。上表 B7 App 哈希已被取代，Boot 不变。HostTests 18/18、三配置无告警、布局检查与改动文件 clang-format/clang-tidy 通过；Debug App 已在 V1.5 实板部署验证。
+
+```text
+App  Debug        15f475429c62df8541fba2ba4053006d317e7363853a136c1d1d1abc0e287bef  (27,608 B)
+App  Release      4923693f58c4fb32d75e9079f0b93fd5788f7251b39c97a1abc4e145f13b7755  (23,480 B)
+App  ReleaseNoLog 49afa32f928e6e7597386c9b31d8ec5d4914bc3bcb0674eee3efa0f7db855255  (16,576 B)
 ```
 
 以下大小、哈希和软件验证为历史 P3 基线，不能用于校验当前 P5 产物。

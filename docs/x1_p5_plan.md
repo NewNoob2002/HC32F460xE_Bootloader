@@ -85,7 +85,7 @@ D3、D6、D7 已确认，可实现；D1/D2/D4/D5/D8/D9 按推荐值实施，实�
 | 未充电，≤9（含 0%，修正旧代码排除 0%） | 300 ms 翻转 | 灭 | 按录制规则 |
 | BQ 样本无效/陈旧 | 3000 ms 翻转 | 灭 | 按录制规则 |
 
-录制规则：录制中 500 ms 翻转，否则灭；仅在 Linux 已出现过有效通信后启用（旧 `eg25_board` 门控）。
+录制规则：Linux 出现有效通信前常亮（旧 X1 开机指示，2026-10-18 实板后按旧 `Power_OnCheck`/`Led_Update_Function` 修订），之后录制中 500 ms 翻转，否则灭（旧 `eg25_board` 门控）；“Linux 已出现”在电源 Off 时清除。
 
 实现约束：LED 模块只读 `app_power_snapshot`、`app_battery_snapshot`、`app_recording_snapshot` 与补偿后 SOC；不修改录制、低电量计数或电源状态（旧代码在 LED 函数中停录制/计数关机的职责已由 P3 移入 `app_power`）。模式切换时立即写入目标电平并重置翻转时刻；约 100 ms 周期调度。
 
