@@ -25,7 +25,7 @@ X1 采用与 Boot 相同的职责分离：
 | `Drivers/BSP/bsp_i2c_master.*`、`bsp_charger_gpio.*`、`bsp_keys.*` | I2C2、V1.3充电GPIO及PA0/PA15按键输入 |
 | `Libraries/Bq40z50`、`Libraries/Mp2762a` | 移除 Wire/Arduino 依赖后的有界芯片访问 |
 
-启动要求 Boot 已完成交接；App 验证继承的 200 MHz 时钟，准备 SysTick/看门狗和日志后恢复中断。初始化失败保持中断关闭、保留电源输出并停止喂狗，供外部看门狗恢复。当前`x1-p5`保留MultiButton、按键及电源业务：纯上电复位等待电源键2 s确认，10 s超时释放PB3；运行时2 s请求关机、功能键8 s强制断电。`0x05=1`是Linux关机完成确认，8 s后断电且受最初20 s兜底约束；`0x04=1`等ACK完整读出才复位，5 s未读取消。SOC≤9%有效未充电时停录制，持续180 s请求关机。PB3释放后若仍有外部供电，继续充电/喂狗/通信并驻留，不自动复位或重新保持电源。详细边界见 [X1产品契约](../docs/x1_product_contract.md)。P5 已接入三灯、SOC 补偿与参数加载/保存；读取失败按 0 继续，保存由 Running/Off、未读响应和看门狗脉冲条件门控，失败保留 pending 并最早 3 s 后重试。HostTests 18/18、三配置/布局与改动文件的 clang-format/clang-tidy 检查通过，实板时序待 [P5计划](../docs/x1_p5_plan.md) B6，P5产物哈希待B7收尾。双版本充电按运行时可靠响应/NACK区分并锁定，错误不作为方案切换依据。
+启动要求 Boot 已完成交接；App 验证继承的 200 MHz 时钟，准备 SysTick/看门狗和日志后恢复中断。初始化失败保持中断关闭、保留电源输出并停止喂狗，供外部看门狗恢复。当前`x1-p5`保留MultiButton、按键及电源业务：纯上电复位等待电源键2 s确认，10 s超时释放PB3；运行时2 s请求关机、功能键8 s强制断电。`0x05=1`是Linux关机完成确认，8 s后断电且受最初20 s兜底约束；`0x04=1`等ACK完整读出才复位，5 s未读取消。SOC≤9%有效未充电时停录制，持续180 s请求关机。PB3释放后若仍有外部供电，继续充电/喂狗/通信并驻留，不自动复位或重新保持电源。详细边界见 [X1产品契约](../docs/x1_product_contract.md)。P5 已接入三灯、SOC 补偿与参数加载/保存；读取失败按 0 继续，保存由 Running/Off、未读响应和看门狗脉冲条件门控，失败保留 pending 并最早 3 s 后重试。HostTests 18/18、三配置/布局与改动文件的 clang-format/clang-tidy 检查通过；Flash 时序、Boot 参数隔离与擦除/Linux 事务重叠已按 [P5计划](../docs/x1_p5_plan.md) B6 实板验收，B7 产物见下文，LED 电平待实板确认。双版本充电按运行时可靠响应/NACK区分并锁定，错误不作为方案切换依据。
 
 完整构建边界、链接地址与接入要求见 [工程结构](../docs/project_structure.md)。Boot 固定 32 KiB，App 从 `0x00008000` 开始。
 
@@ -50,6 +50,25 @@ python3 Tests/linker_layout_tests.py arm-none-eabi-gcc \
 ```
 
 产物位于 `build/<preset>/hc32f460_app_x1.{elf,hex,bin,map}`，BIN 的编程基址是 `0x00008000`。旧阶段生成的 [Debug合并BIN](../build/Debug/hc32f460_x1_combined.bin) 不会自动随 App 构建更新；烧录时使用本轮独立App BIN，或用 `Tools/merge_bin.py` 重新生成到不存在的输出文件。Boot 产物路径保持不变。`APP_ENABLE_LOGGING` 独立于 `BOOT_ENABLE_LOGGING`；`ReleaseNoLog` 显式关闭两者。CI 已配置三种固件构建和 X1 产物收集，本地尚未执行远端 CI。
+
+P5（B7 收尾，2026-10-18）：源码为 `87b80f0`（509-record D6），之后提交仅改文档。在空目录干净重编译 Debug/Release/ReleaseNoLog，三配置无编译告警；HostTests **18/18**，三个实际 X1 镜像通过上述布局检查。本次工具链为 PATH 上唯一的 GNU Tools for STM32 14.3.rel1（GCC 14.3.1，STM32CubeCLT 1.22.0，目录时间 2026-10-13 02:30），P3 哈希记录的 Arm GNU Toolchain 13.3.Rel1 已不在本机。下列哈希与 B6 实板部署的 Debug App `0ff3b7a1…`、Boot `8e9fbd7e…` 不同；生产源码相同，B6 未记录其工具链版本，差异推定来自工具链，未逐项比对。当前产物未烧录、未经实板验证，实板证据只对应 B6 记录中的镜像。
+
+| 配置 | P5 App BIN字节数（含初始化数据） | SRAM静态布局含2 KiB栈预留 | Boot BIN字节数 |
+| --- | ---: | ---: | ---: |
+| Debug | 27,456 | 14,544 | 26,744 |
+| Release | 23,336 | 6,608 | 23,304 |
+| ReleaseNoLog | 16,436 | 5,048 | 14,300 |
+
+P5 BIN SHA-256（GCC 14.3.1；App 基址`0x8000`，Boot 基址`0x0`）：
+
+```text
+App  Debug        cf5f8545985d34094064328219cdee75ab375b2009e73ae035536e26415c7c45
+App  Release      88ed41e6f051ccbaebc9039dd277c064848f52d055d2d4c80af27481d1e9b057
+App  ReleaseNoLog ce48c77c1103e50b80efa0d97f96cc74ddaa6c2cc2f256f82e082c5dc86c9307
+Boot Debug        ba79317d7131f3e6db2008d20b600df2d4191d80add48dd45dadddc3961d76f0
+Boot Release      1226827cedbda5a783bde65212ee75068ac87bd092b0f67c51b328dbe13860f7
+Boot ReleaseNoLog e6163e52d768c4c400aa6a445da417c89283e874ee2cbaf09739733b8ed8587b
+```
 
 以下大小、哈希和软件验证为历史 P3 基线，不能用于校验当前 P5 产物。
 

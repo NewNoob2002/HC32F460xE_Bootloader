@@ -137,6 +137,7 @@ D3、D6、D7 已确认，可实现；D1/D2/D4/D5/D8/D9 按推荐值实施，实�
 ### B7 收尾
 
 - Debug/Release/ReleaseNoLog 的 Boot+App 构建、布局检查、HostTests；更新 `x1_app_implementation_plan.md` 进度表、`App/README.md` 哈希、`current_status.md`。
+- **进度（2026-10-18，完成）**：空目录干净重编译三配置 Boot+App，无编译告警；HostTests 18/18；三个实际 X1 镜像布局检查通过。本机工具链现为 GNU Tools for STM32 14.3.rel1，哈希与 B6 部署镜像不同（源码相同，差异推定来自工具链），大小与哈希见 [App/README.md](../App/README.md)；新产物未烧录。
 
 ## 7. 完成判定
 
